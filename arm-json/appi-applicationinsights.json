@@ -8,8 +8,12 @@
     "type": {
       "type": "string"
     },
-    "regionId": {
-      "type": "string"
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Specifies the Azure location where the app configuration store should be created."
+      }
     },
     "tagsArray": {
       "type": "object"
@@ -25,7 +29,7 @@
     {
       "name": "[parameters('name')]",
       "type": "microsoft.insights/components",
-      "location": "[parameters('regionId')]",
+      "location": "[parameters('location')]",
       "tags": "[parameters('tagsArray')]",
       "apiVersion": "2020-02-02-preview",
       "dependsOn": [],

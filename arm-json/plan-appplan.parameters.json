@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "hostingPlanName": {
-      "value": "plan-events-dev-001"
+      "value": "plan-arm-dev-001"
     },
     "skuName": {
       "value": "F1"

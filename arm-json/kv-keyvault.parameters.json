@@ -6,10 +6,7 @@
       "value": true
     },
     "DomainName": {
-      "value": "widgettest"
-    },
-    "workloadName": {
-      "value": "Development"
+      "value": "myproduct"
     },
     "resourceVersion": {
       "value": "001"

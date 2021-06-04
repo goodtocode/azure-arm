@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "subdomainName": {
-      "value": "goodtocode"
+      "value": "myproduct"
     },
     "appInsightsName": {
-      "value": "goodtocode"
+      "value": "appi-arm-dev-001"
     },
     "hostingPlanName": {
-      "value": "AppServicePlan-F1"
+      "value": "plan-arm-dev-001"
     },
     "skuName": {
       "value": "F1"

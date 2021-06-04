@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "hostingPlanName": {
-      "value": "plan-events-dev-001"
+      "value": "plan-arm-dev-001"
     },
     "apiSubdomain": {
-      "value": "api-events-dev-001"
+      "value": "api-arm-dev-001"
     }
   }
 }
