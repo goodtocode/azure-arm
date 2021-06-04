@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "deploy": {
+      "value": false
+    },
+    "orgName": {
+      "value": "aacn"
+    },
+    "domainName": {
+      "value": "widgettest"
+    },
+    "billingScope": {
+      "value": "/providers/Microsoft.Billing/billingAccounts/e1ca82d6-1e9a-50b1-2dd0-fcc1622e641b:882bcd4d-1012-499f-8219-0ca484168d33_2019-05-31/billingProfiles/ODU5-KHUO-BG7-PGB/invoiceSections/45OE-WUJV-PJA-PGB"
+    },
+    "targetManagementGroup": {
+      "value": "Prototypes"
+    },
+    "managementGroupShortName": {
+      "value": "proto"
+    },
+    "workloadName": {
+      "value": "Development"
+    },
+    "resourceVersion": {
+      "value": "001"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "planName": {
+      "value": "plan-certtestcenter-dev-001"
+    },
+    "functionsSubdomain": {
+      "value": "func-certtestcenter-dev-001"
+    },
+    "storageSubdomain": {
+      "value": "stcerttestcenterdev001"
+    },
+    "location": {
+      "value": "West US 2"
+    },
+    "alwaysOn": {
+      "value": false
+    },
+    "sku": {
+      "value": "Dynamic"
+    },
+    "skuCode": {
+      "value": "Y1"
+    },
+    "workerSize": {
+      "value": "0"
+    },
+    "workerSizeId": {
+      "value": "0"
+    },
+    "numberOfWorkers": {
+      "value": "1"
+    },
+    "use32BitWorkerProcess": {
+      "value": true
+    }
+  }
+}

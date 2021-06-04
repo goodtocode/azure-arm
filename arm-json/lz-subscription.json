@@ -1,0 +1,82 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/managementGroupDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Deploy": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "orgName": {
+      "type": "string",
+      "defaultValue": "aacn",
+      "metadata": {
+        "description": "Provide a domain name to be used to group resources."
+      }
+    },
+    "managementGroupShortName": {
+      "type": "string",
+      "metadata": {
+        "description": "Official abbreviation for the management group, to be used in all subscription. I.e. proto, identity, hub."
+      }
+    },
+    "domainName": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide a domain name to be used to group resources."
+      }
+    },
+    "billingScope": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide the full resource ID of billing scope to use for subscription creation."
+      }
+    },
+    "targetManagementGroup": {
+      "type": "string",
+      "allowedValues": [
+        "Internal",
+        "External",
+        "Sandbox",
+        "Shared"
+      ],
+      "metadata": {
+        "description": "Provide the ID of the target management group to place the subscription."
+      }
+    },
+    "workloadName": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide the value (typically the environment) for the workload tag metadata."
+      },
+      "resourceVersion": {
+        "type": "string",
+        "metadata": {
+          "description": "Suffix for the resource. i.e. -001, -v1"
+        }
+      }
+    },
+  "variables": {
+    "subscriptionAliasName": "[concat(parameters('orgName'), '-', parameters('managementGroupShortName')'-', parameters('domainName'), '-001')]"
+  },
+  "resources": [
+    {
+      "condition": "[parameters('Deploy')]",
+      "scope": "/",
+      "name": "[parameters('subscriptionAliasName')]",
+      "type": "Microsoft.Subscription/aliases",
+      "apiVersion": "2020-09-01",
+      "properties": {
+        "workLoad": "[parameters('workloadName')]",
+        "displayName": "[parameters('subscriptionAliasName')]",
+        "billingScope": "[parameters('billingScope')]",
+        "managementGroupId": "[tenantResourceId('Microsoft.Management/managementGroups/', parameters('targetManagementGroup'))]"
+      }
+    }
+  ],
+  "outputs": {
+    "targetMG": {
+      "type": "string",
+      "value": "[parameters('targetManagementGroup')]"
+    }
+  }
+}

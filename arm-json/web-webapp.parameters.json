@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "subdomainName": {
+      "value": "goodtocode"
+    },
+    "appInsightsName": {
+      "value": "goodtocode"
+    },
+    "hostingPlanName": {
+      "value": "AppServicePlan-F1"
+    },
+    "skuName": {
+      "value": "F1"
+    },
+    "skuCapacity": {
+      "value": 1
+    }
+  }
+}

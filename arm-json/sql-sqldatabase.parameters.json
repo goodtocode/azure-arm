@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "subdomainName": {
+      "value": "mysundialdev"
+    },
+    "administratorLogin": {
+      "value": "LocalAdmin"
+    },
+    "databaseName": {
+      "value": "Reflections"
+    },
+    "administratorLoginPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/7ff496d5-8747-4a50-b5a9-ed99706a855c/resourceGroups/MySundial.com/providers/Microsoft.KeyVault/vaults/mysundial"
+        },
+        "secretName": "MySundial-LocalAdminPW"
+      }
+    }
+  }
+}

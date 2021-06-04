@@ -1,0 +1,66 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "apiConnectionName": {
+      "type": "string"
+    },
+    "dataGatewayConnectorName": {
+      "type": "string"
+    },
+    "dataGatewayResourceGroupName": {
+      "type": "string"
+    },
+    "sqlAuthType": {
+      "type": "string",
+      "allowedValues": [ "basic", "windows" ],
+      "defaultValue": "windows"
+    },
+    "sqlServerName": {
+      "type": "string"
+    },
+    "sqlDatabaseName": {
+      "type": "string"
+    },
+    "sqlUserName": {
+      "type": "string"
+    },
+    "sqlUserPassword": {
+      "type": "string"
+    },
+    "locationName": {
+      "type": "string",
+      "allowedValues": [ "West US 2", "West US 3" ],
+      "defaultValue": "West US 2"
+    }
+  },
+  "variables": {
+    "locationShortName": "[toLower(replace(parameters('locationName'), ' ', ''))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2018-07-01-preview",
+      "name": "[parameters('apiConnectionName')]",
+      "location": "[variables('locationShortName')]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[parameters('apiConnectionName')]",
+        "customParameterValues": {},
+        "api": {
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/sql')]"
+        },
+        "parameterValues": {
+          "server": "[parameters('sqlServerName')]",
+          "database": "[parameters('sqlDatabaseName')]",
+          "username": "[parameters('sqlUserName')]",
+          "password": "[parameters('sqlUserPassword')]",
+          "authType": "[parameters('sqlAuthType')]",
+          "gateway": {
+            "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('dataGatewayResourceGroupName'), '/providers/Microsoft.Web/connectionGateways/', parameters('dataGatewayConnectorName'))]"
+          }
+        }
+      }
+    }
+  ]
+}

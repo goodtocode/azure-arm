@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "configStoreName": {
+      "value": null
+    },
+    "location": {
+      "value": "[resourceGroup().location]"
+    },
+    "keyValueNames": {
+      "value": [
+        "myKey",
+        "myKey$myLabel"
+      ]
+    },
+    "keyValueValues": {
+      "value": [
+        "Key-value without label",
+        "Key-value with label"
+      ]
+    },
+    "contentType": {
+      "value": "the-content-type"
+    },
+    "tags": {
+      "value": {
+        "tag1": "tag-value-1",
+        "tag2": "tag-value-2"
+      }
+    }
+  }
+}

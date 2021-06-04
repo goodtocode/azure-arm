@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Deploy": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "DomainName": {
+      "type": "string",
+      "metadata": {
+        "description": "Domain name. I.e. ntievents, certtestcenter, mediauploader, "
+      }
+    },
+    "resourceVersion": {
+      "type": "string",
+      "metadata": {
+        "description": "Suffix for the resource. i.e. -001, -v1"
+      }
+    }
+  },
+  "variables": {
+    "key-vault-name": "[concat('kv-', parameters('DomainName'), '-001')]"
+  },
+
+  "resources": [
+    {
+      "condition": "[parameters('Deploy')]",
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[variables('key-vault-name')]",
+      "apiVersion": "2016-10-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "KeyVault"
+      },
+      "properties": {
+        "createMode": "default",
+        "enabledForDeployment": true,
+        "enabledForDiskEncryption": true,
+        "enabledForTemplateDeployment": true,
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "name": "premium",
+          "family": "A"
+        },
+        "networkAcls": {
+          "defaultAction": "Allow",
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": []
+        },
+        "accessPolicies": []
+      }
+    }
+  ],
+  "outputs": {}
+}

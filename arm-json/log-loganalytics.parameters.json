@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Deploy": {
+      "value": false
+    },
+    "domainname": {
+      "value": "widgettest"
+    },
+    "service-tier": {
+      "value": "PerGB2018"
+    },
+    "data-retention": {
+      "value": 365
+    },
+    "location": {
+      "value": "West US 2"
+    },
+    "workloadName": {
+      "value": "Development"
+    },
+    "resourceVersion": {
+      "value": "001"
+    }
+  }
+}
