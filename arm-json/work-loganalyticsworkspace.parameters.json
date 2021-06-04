@@ -5,9 +5,6 @@
     "name": {
       "value": "work-www-arm-001"
     },
-    "location": {
-      "value": "westus2"
-    },
     "sku": {
       "value": "pergb2018"
     },
