@@ -8,7 +8,7 @@
     },
     "orgName": {
       "type": "string",
-      "defaultValue": "aacn",
+      "defaultValue": "myorg",
       "metadata": {
         "description": "Provide a domain name to be used to group resources."
       }

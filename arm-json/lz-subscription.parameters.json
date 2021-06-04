@@ -6,13 +6,13 @@
       "value": false
     },
     "orgName": {
-      "value": "aacn"
+      "value": "myorg"
     },
     "domainName": {
-      "value": "widgettest"
+      "value": "myproduct"
     },
     "billingScope": {
-      "value": "/providers/Microsoft.Billing/billingAccounts/e1ca82d6-1e9a-50b1-2dd0-fcc1622e641b:882bcd4d-1012-499f-8219-0ca484168d33_2019-05-31/billingProfiles/ODU5-KHUO-BG7-PGB/invoiceSections/45OE-WUJV-PJA-PGB"
+      "value": "/providers/Microsoft.Billing/billingAccounts/00000000-0000-0000-0000-000000000000:00000000-0000-0000-0000-000000000000_2019-05-31/billingProfiles/0000-0000-000-000/invoiceSections/0000-0000-000-000"
     },
     "targetManagementGroup": {
       "value": "Prototypes"
