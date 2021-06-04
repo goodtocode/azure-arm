@@ -14,9 +14,6 @@
     "data-retention": {
       "value": 365
     },
-    "location": {
-      "value": "West US 2"
-    },
     "workloadName": {
       "value": "Development"
     },
