@@ -5,7 +5,7 @@
     "hostingPlanName": {
       "value": "plan-arm-dev-001"
     },
-    "apiSubdomain": {
+    "name": {
       "value": "api-arm-dev-001"
     }
   }

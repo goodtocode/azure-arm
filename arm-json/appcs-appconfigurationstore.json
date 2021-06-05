@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "configStoreName": {
+    "name": {
       "type": "string",
       "metadata": {
         "description": "Specifies the name of the App Configuration store."
@@ -51,7 +51,7 @@
     {
       "type": "Microsoft.AppConfiguration/configurationStores",
       "apiVersion": "2020-07-01-preview",
-      "name": "[parameters('configStoreName')]",
+      "name": "[parameters('name')]",
       "location": "[parameters('location')]",
       "sku": {
         "name": "standard"
@@ -60,13 +60,13 @@
     {
       "type": "Microsoft.AppConfiguration/configurationStores/keyValues",
       "apiVersion": "2020-07-01-preview",
-      "name": "[concat(parameters('configStoreName'), '/', parameters('keyValueNames')[copyIndex()])]",
+      "name": "[concat(parameters('name'), '/', parameters('keyValueNames')[copyIndex()])]",
       "copy": {
         "name": "keyValueCopy",
         "count": "[length(parameters('keyValueNames'))]"
       },
       "dependsOn": [
-        "[parameters('configStoreName')]"
+        "[parameters('name')]"
       ],
       "properties": {
         "value": "[parameters('keyValueValues')[copyIndex()]]",
@@ -77,11 +77,11 @@
   ],
   "outputs": {
     "reference-key-value-value": {
-      "value": "[reference(resourceId('Microsoft.AppConfiguration/configurationStores/keyValues', parameters('configStoreName'), parameters('keyValueNames')[0]), '2020-07-01-preview').value]",
+      "value": "[reference(resourceId('Microsoft.AppConfiguration/configurationStores/keyValues', parameters('name'), parameters('keyValueNames')[0]), '2020-07-01-preview').value]",
       "type": "string"
     },
     "reference-key-value-object": {
-      "value": "[reference(resourceId('Microsoft.AppConfiguration/configurationStores/keyValues', parameters('configStoreName'), parameters('keyValueNames')[1]), '2020-07-01-preview')]",
+      "value": "[reference(resourceId('Microsoft.AppConfiguration/configurationStores/keyValues', parameters('name'), parameters('keyValueNames')[1]), '2020-07-01-preview')]",
       "type": "object"
     }
   }

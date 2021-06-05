@@ -6,18 +6,17 @@
       "type": "string",
       "minLength": 1
     },
-    "apiSubdomain": {
+    "name": {
       "type": "string",
       "minLength": 1
     }
   },
   "variables": {
-    "webSiteName": "[parameters('apiSubdomain')]"
   },
   "resources": [
     {
       "apiVersion": "2015-08-01",
-      "name": "[variables('webSiteName')]",
+      "name": "[parameters('name')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -25,7 +24,7 @@
         "displayName": "Website"
       },
       "properties": {
-        "name": "[variables('webSiteName')]",
+        "name": "[parameters('name')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
       }
     }
