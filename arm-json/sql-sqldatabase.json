@@ -1,8 +1,8 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "subdomainName": {
+    "name": {
       "type": "string",
       "minLength": 1,
       "maxLength": 60
@@ -57,7 +57,7 @@
     }
   },
   "variables": {
-    "sqlserverName": "[toLower(parameters('subdomainName'))]"
+    "sqlserverName": "[toLower(parameters('name'))]"
   },
   "resources": [
     {

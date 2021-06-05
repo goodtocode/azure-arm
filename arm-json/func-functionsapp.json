@@ -5,7 +5,7 @@
     "planName": {
       "type": "string"
     },
-    "functionsSubdomain": {
+    "name": {
       "type": "string"
     },
     "location": {
@@ -50,7 +50,7 @@
   "resources": [
     {
       "apiVersion": "2018-11-01",
-      "name": "[parameters('functionsSubdomain')]",
+      "name": "[parameters('name')]",
       "type": "Microsoft.Web/sites",
       "kind": "functionapp",
       "location": "[parameters('location')]",
@@ -59,7 +59,7 @@
         "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
       ],
       "properties": {
-        "name": "[parameters('functionsSubdomain')]",
+        "name": "[parameters('name')]",
         "siteConfig": {
           "appSettings": [
             {
@@ -88,7 +88,7 @@
             },
             {
               "name": "WEBSITE_CONTENTSHARE",
-              "value": "[concat(toLower(parameters('functionsSubdomain')), '9711')]"
+              "value": "[concat(toLower(parameters('name')), '9711')]"
             }
           ],
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"

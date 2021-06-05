@@ -2,11 +2,11 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "Deploy": {
+    "deploy": {
       "type": "bool",
       "defaultValue": false
     },
-    "Name": {
+    "name": {
       "type": "string",
       "metadata": {
         "description": "Domain name. I.e. myproduct, auth, etc. "
@@ -17,7 +17,7 @@
   },
   "resources": [
     {
-      "condition": "[parameters('Deploy')]",
+      "condition": "[parameters('deploy')]",
       "type": "Microsoft.KeyVault/vaults",
       "name": "[parameters('name')]",
       "apiVersion": "2016-10-01",

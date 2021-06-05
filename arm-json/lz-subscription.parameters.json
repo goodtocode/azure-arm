@@ -5,6 +5,9 @@
     "deploy": {
       "value": false
     },
+    "name": {
+      "value": "org-"
+    },
     "orgName": {
       "value": "myorg"
     },
@@ -22,9 +25,6 @@
     },
     "workloadName": {
       "value": "Development"
-    },
-    "resourceVersion": {
-      "value": "001"
     }
   }
 }

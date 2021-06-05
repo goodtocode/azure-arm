@@ -5,7 +5,7 @@
     "planName": {
       "value": "plan-certtestcenter-dev-001"
     },
-    "functionsSubdomain": {
+    "name": {
       "value": "func-certtestcenter-dev-001"
     },
     "storageSubdomain": {
