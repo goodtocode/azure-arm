@@ -6,28 +6,20 @@
       "type": "bool",
       "defaultValue": false
     },
-    "DomainName": {
+    "Name": {
       "type": "string",
       "metadata": {
         "description": "Domain name. I.e. myproduct, auth, etc. "
       }
-    },
-    "resourceVersion": {
-      "type": "string",
-      "metadata": {
-        "description": "Suffix for the resource. i.e. -001, -v1"
-      }
     }
   },
   "variables": {
-    "key-vault-name": "[concat('kv-', parameters('DomainName'), '-001')]"
   },
-
   "resources": [
     {
       "condition": "[parameters('Deploy')]",
       "type": "Microsoft.KeyVault/vaults",
-      "name": "[variables('key-vault-name')]",
+      "name": "[parameters('name')]",
       "apiVersion": "2016-10-01",
       "location": "[resourceGroup().location]",
       "tags": {

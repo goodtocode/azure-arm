@@ -5,11 +5,8 @@
     "Deploy": {
       "value": true
     },
-    "DomainName": {
-      "value": "myproduct"
-    },
-    "resourceVersion": {
-      "value": "001"
+    "Name": {
+      "value": "kv-myproduct-dev-001"
     }
   }
 }
