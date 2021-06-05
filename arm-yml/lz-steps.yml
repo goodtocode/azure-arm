@@ -1,0 +1,115 @@
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: "Validate $(storageName)"
+            inputs:
+                deploymentScope: 'Resource Group'
+                azureResourceManagerConnection: '$(subscriptionName)'
+                subscriptionId: '$(subscriptionId)'
+                action: 'Create Or Update Resource Group'
+                resourceGroupName: '$(rgName)'
+                location: '$(locationName)'
+                templateLocation: 'Linked artifact'
+                csmFile: 'st-storageaccount.json'
+                csmParametersFile: 'st-storageaccount.parameters.json'
+                deploymentMode: 'Validation'
+
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: "Deploy $(storageName)"
+            inputs:
+                deploymentScope: 'Resource Group'
+                azureResourceManagerConnection: '$(subscriptionName)'
+                subscriptionId: '$(subscriptionId)'
+                action: 'Create Or Update Resource Group'
+                resourceGroupName: '$(rgName)'
+                location: '$(locationName)'
+                templateLocation: 'Linked artifact'
+                csmFile: 'st-storageaccount.json'
+                csmParametersFile: 'st-storageaccount.parameters.json'
+                deploymentMode: 'Incremental'
+                overrideParameters: -Name "$(storageName)"
+
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: "Validate $(workspaceName)"
+            inputs:
+                deploymentScope: 'Resource Group'
+                azureResourceManagerConnection: '$(subscriptionName)'
+                subscriptionId: '$(subscriptionId)'
+                action: 'Create Or Update Resource Group'
+                resourceGroupName: '$(rgName)'
+                location: '$(locationName)'
+                templateLocation: 'Linked artifact'
+                csmFile: 'work-loganalyticsworkspace.json'
+                csmParametersFile: 'work-loganalyticsworkspace.parameters.json'
+                deploymentMode: 'Validation'
+
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: "Deploy $(workspaceName)"
+            inputs:
+                deploymentScope: 'Resource Group'
+                azureResourceManagerConnection: '$(subscriptionName)'
+                subscriptionId: '$(subscriptionId)'
+                action: 'Create Or Update Resource Group'
+                resourceGroupName: '$(rgName)'
+                location: '$(locationName)'
+                templateLocation: 'Linked artifact'
+                csmFile: 'work-loganalyticsworkspace.json'
+                csmParametersFile: 'work-loganalyticsworkspace.parameters.json'
+                deploymentMode: 'Incremental'
+                overrideParameters: -Name "$(workspaceName)"
+
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: "Validate $(appInsightsName)"
+            inputs:
+                deploymentScope: 'Resource Group'
+                azureResourceManagerConnection: '$(subscriptionName)'
+                subscriptionId: '$(subscriptionId)'
+                action: 'Create Or Update Resource Group'
+                resourceGroupName: '$(rgName)'
+                location: '$(locationName)'
+                templateLocation: 'Linked artifact'
+                csmFile: 'appi-applicationinsights.json'
+                csmParametersFile: 'appi-applicationinsights.parameters.json'
+                deploymentMode: 'Validation'
+
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: "Deploy $(appInsightsName)"
+            inputs:
+                deploymentScope: 'Resource Group'
+                azureResourceManagerConnection: '$(subscriptionName)'
+                subscriptionId: '$(subscriptionId)'
+                action: 'Create Or Update Resource Group'
+                resourceGroupName: '$(rgName)'
+                location: '$(locationName)'
+                templateLocation: 'Linked artifact'
+                csmFile: 'appi-applicationinsights.json'
+                csmParametersFile: 'appi-applicationinsights.parameters.json'
+                deploymentMode: 'Incremental'
+                overrideParameters: -Name "$(appInsightsName)" -SubscriptionId "$(subscriptionId)" -ResourceGroupName "$(rgName)" -WorkspaceName "$(workspaceName)"
+
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: "Validate $(kvName)"
+            inputs:
+                deploymentScope: 'Resource Group'
+                azureResourceManagerConnection: '$(subscriptionName)'
+                subscriptionId: '$(subscriptionId)'
+                action: 'Create Or Update Resource Group'
+                resourceGroupName: '$(rgName)'
+                location: '$(locationName)'
+                templateLocation: 'Linked artifact'
+                csmFile: 'kv-keyvault.parameters.json'
+                csmParametersFile: 'kv-keyvault.parameters.parameters.json'
+                deploymentMode: 'Validation'
+
+          - task: AzureResourceManagerTemplateDeployment@3
+            displayName: "Deploy $(kvName)"
+            inputs:
+                deploymentScope: 'Resource Group'
+                azureResourceManagerConnection: '$(subscriptionName)'
+                subscriptionId: '$(subscriptionId)'
+                action: 'Create Or Update Resource Group'
+                resourceGroupName: '$(rgName)'
+                location: '$(locationName)'
+                templateLocation: 'Linked artifact'
+                csmFile: 'kv-keyvault.parameters.json'
+                csmParametersFile: 'kv-keyvault.parameters.parameters.json'
+                deploymentMode: 'Incremental'
+                overrideParameters: -Name "$(kvName)"
