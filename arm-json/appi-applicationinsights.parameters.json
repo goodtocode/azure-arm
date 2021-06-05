@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "appi-www-dev-001"
+      "value": "appi-PRODUCT-ENVIRONMENT-001"
     },
     "type": {
       "value": "web"
@@ -18,10 +18,10 @@
       "value": "00000000-0000-0000-0000-000000000000"
     },
     "resourceGroupName": {
-      "value": "rg-www-dev-001"
+      "value": "org-rg-PRODUCT-ENVIRONMENT-001"
     },
     "workspaceName": {
-      "value": "work-www-dev-001"
+      "value": "work-PRODUCT-ENVIRONMENT-001"
     }
   }
 }

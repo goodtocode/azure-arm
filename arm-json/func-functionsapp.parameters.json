@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "planName": {
-      "value": "plan-certtestcenter-dev-001"
+      "value": "plan-PRODUCT-ENVIRONMENT-001"
     },
     "name": {
-      "value": "func-certtestcenter-dev-001"
+      "value": "func-PRODUCT-ENVIRONMENT-001"
     },
     "storageSubdomain": {
-      "value": "stcerttestcenterdev001"
+      "value": "stPRODUCTENVIRONMENT001"
     },
     "location": {
       "value": "West US 2"
