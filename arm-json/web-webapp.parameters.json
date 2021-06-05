@@ -2,14 +2,14 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "subdomainName": {
+    "Name": {
       "value": "myproduct"
     },
     "appInsightsName": {
-      "value": "appi-arm-dev-001"
+      "value": "appi-PRODUCT-ENVIRONMENT-001"
     },
     "hostingPlanName": {
-      "value": "plan-arm-dev-001"
+      "value": "plan-PRODUCT-ENVIRONMENT-001"
     },
     "skuName": {
       "value": "F1"

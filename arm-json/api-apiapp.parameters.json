@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "hostingPlanName": {
-      "value": "plan-arm-dev-001"
+      "value": "plan-PRODUCT-ENVIRONMENT-001"
     },
     "name": {
-      "value": "api-arm-dev-001"
+      "value": "api-PRODUCT-ENVIRONMENT-001"
     }
   }
 }

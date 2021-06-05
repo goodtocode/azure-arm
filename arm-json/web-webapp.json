@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "subdomainName": {
+    "Name": {
       "type": "string",
       "minLength": 1,
       "maxLength": 60
@@ -47,8 +47,7 @@
       }
     }
   },
-  "variables": {
-    "webSiteName": "[toLower(parameters('subdomainName'))]"
+  "variables": {    
   },
   "resources": [
     {
@@ -69,7 +68,7 @@
     },
     {
       "apiVersion": "2015-08-01",
-      "name": "[variables('webSiteName')]",
+      "name": "[parameters('Name')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -80,7 +79,7 @@
         "[resourceId('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
       ],
       "properties": {
-        "name": "[variables('webSiteName')]",
+        "name": "[parameters('Name')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
       }
     },
@@ -90,14 +89,14 @@
       "type": "Microsoft.Insights/components",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/', variables('webSiteName'))]"
+        "[resourceId('Microsoft.Web/sites/', parameters('Name'))]"
       ],
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('webSiteName'))]": "Resource",
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('Name'))]": "Resource",
         "displayName": "AppInsightsComponent"
       },
       "properties": {
-        "applicationId": "[variables('webSiteName')]"
+        "applicationId": "[parameters('Name')]"
       }
     }
   ]

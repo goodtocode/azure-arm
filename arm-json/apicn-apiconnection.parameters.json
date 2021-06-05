@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "apicn-cc-dgw-arm-dev-001"
+      "value": "apicn-cc-dgw-PRODUCT-ENVIRONMENT-001"
     },
     "sqlServerName": {
       "value": "myserver.mydomain.com"

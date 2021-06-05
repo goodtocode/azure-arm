@@ -15,22 +15,31 @@
         "description": "Specifies the Azure location where the app configuration store should be created."
       }
     },
-    "tagsArray": {
+    "tags": {
       "type": "object"
     },
     "requestSource": {
       "type": "string"
     },
-    "workspaceResourceId": {
+    "subscriptionId": {
+      "type": "string"
+    },
+    "resourceGroupName": {
+      "type": "string"
+    },
+    "workspaceName": {
       "type": "string"
     }
+  },
+  "variables": {
+    "workspaceResourceId": "[concat('/subscriptions/', parameters('subscriptionId'), '/resourcegroups/', parameters('resourceGroupName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]"
   },
   "resources": [
     {
       "name": "[parameters('name')]",
       "type": "microsoft.insights/components",
       "location": "[parameters('location')]",
-      "tags": "[parameters('tagsArray')]",
+      "tags": "[parameters('tags')]",
       "apiVersion": "2020-02-02-preview",
       "dependsOn": [],
       "properties": {
@@ -38,7 +47,7 @@
         "Application_Type": "[parameters('type')]",
         "Flow_Type": "Redfield",
         "Request_Source": "[parameters('requestSource')]",
-        "WorkspaceResourceId": "[parameters('workspaceResourceId')]"
+        "WorkspaceResourceId": "[variables('workspaceResourceId')]"
       }
     }
   ]

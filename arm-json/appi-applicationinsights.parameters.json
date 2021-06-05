@@ -2,20 +2,26 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "name": {
+      "value": "appi-PRODUCT-ENVIRONMENT-001"
+    },
     "type": {
       "value": "web"
     },
-    "name": {
-      "value": "appi-www-arm-001"
-    },
-    "tagsArray": {
+    "tags": {
       "value": {}
     },
     "requestSource": {
       "value": "IbizaAIExtension"
     },
-    "workspaceResourceId": {
-      "value": "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/rg-arm-dev-001/providers/microsoft.operationalinsights/workspaces/work-arm-dev-001"
+    "subscriptionId": {
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    "resourceGroupName": {
+      "value": "rg-PRODUCT-ENVIRONMENT-001"
+    },
+    "workspaceName": {
+      "value": "work-PRODUCT-ENVIRONMENT-001"
     }
   }
 }
