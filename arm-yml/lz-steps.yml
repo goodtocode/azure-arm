@@ -31,7 +31,7 @@ steps:
         csmFile: "${{ parameters.armPath }}/st-storageaccount.json"
         csmParametersFile: "${{ parameters.armPath }}/st-storageaccount.parameters.json"
         deploymentMode: "Incremental"
-        overrideParameters: -Name "$(storageName)"
+        overrideParameters: -name "$(storageName)"
 
   - task: AzureResourceManagerTemplateDeployment@3
     displayName: "Validate $(workspaceName)"
@@ -60,7 +60,7 @@ steps:
         csmFile: "${{ parameters.armPath }}/work-loganalyticsworkspace.json"
         csmParametersFile: "${{ parameters.armPath }}/work-loganalyticsworkspace.parameters.json"
         deploymentMode: "Incremental"
-        overrideParameters: -Name "$(workspaceName)"
+        overrideParameters: -name "$(workspaceName)"
 
   - task: AzureResourceManagerTemplateDeployment@3
     displayName: "Validate $(appInsightsName)"
@@ -89,7 +89,7 @@ steps:
         csmFile: "${{ parameters.armPath }}/appi-applicationinsights.json"
         csmParametersFile: "${{ parameters.armPath }}/appi-applicationinsights.parameters.json"
         deploymentMode: "Incremental"
-        overrideParameters: -Name "$(appInsightsName)" -SubscriptionId "$(subscriptionId)" -ResourceGroupName "$(rgName)" -WorkspaceName "$(workspaceName)"
+        overrideParameters: -name "$(appInsightsName)" -subscriptionId "$(subscriptionId)" -resourceGroupName "$(rgName)" -workspaceName "$(workspaceName)"
 
   - task: AzureResourceManagerTemplateDeployment@3
     displayName: "Validate $(kvName)"
@@ -118,4 +118,4 @@ steps:
         csmFile: "${{ parameters.armPath }}/kv-keyvault.parameters.json"
         csmParametersFile: "${{ parameters.armPath }}/kv-keyvault.parameters.parameters.json"
         deploymentMode: "Incremental"
-        overrideParameters: -Name "$(kvName)"
+        overrideParameters: -name "$(kvName)"
