@@ -1,21 +1,19 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "subdomainName": {
+    "name": {
       "type": "string",
       "minLength": 1,
       "maxLength": 60
     },
     "appInsightsName": {
       "type": "string",
-      "defaultValue": "goodtocode",
       "minLength": 1,
       "maxLength": 60
     },
     "hostingPlanName": {
       "type": "string",
-      "defaultValue": "AppServicePlan-F1",
       "minLength": 1,
       "maxLength": 60
     },
@@ -49,8 +47,7 @@
       }
     }
   },
-  "variables": {
-    "webSiteName": "[toLower(parameters('subdomainName'))]"
+  "variables": {    
   },
   "resources": [
     {
@@ -71,7 +68,7 @@
     },
     {
       "apiVersion": "2015-08-01",
-      "name": "[variables('webSiteName')]",
+      "name": "[parameters('name')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -82,7 +79,7 @@
         "[resourceId('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
       ],
       "properties": {
-        "name": "[variables('webSiteName')]",
+        "name": "[parameters('Name')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
       }
     },
@@ -92,14 +89,27 @@
       "type": "Microsoft.Insights/components",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/', variables('webSiteName'))]"
+        "[resourceId('Microsoft.Web/sites/', parameters('name'))]"
       ],
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('webSiteName'))]": "Resource",
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('name'))]": "Resource",
         "displayName": "AppInsightsComponent"
       },
       "properties": {
-        "applicationId": "[variables('webSiteName')]"
+        "applicationId": "[parameters('name')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2018-11-01",
+      "name": "[concat(parameters('name'), '/', parameters('name'), '.azurewebsites.net')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+          "[resourceId('Microsoft.Web/sites', parameters('name'))]"
+      ],
+      "properties": {
+          "siteName": "parameters('name')",
+          "hostNameType": "Verified"
       }
     }
   ]

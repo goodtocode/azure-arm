@@ -2,23 +2,26 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "name": {
+      "value": "appi-PRODUCT-ENVIRONMENT-001"
+    },
     "type": {
       "value": "web"
     },
-    "name": {
-      "value": "appi-www-arm-001"
-    },
-    "regionId": {
-      "value": "westus2"
-    },
-    "tagsArray": {
+    "tags": {
       "value": {}
     },
     "requestSource": {
       "value": "IbizaAIExtension"
     },
-    "workspaceResourceId": {
-      "value": "/subscriptions/7ff496d5-8747-4a50-b5a9-ed99706a855c/resourcegroups/goodtocode.com/providers/microsoft.operationalinsights/workspaces/goodtocode"
+    "subscriptionId": {
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    "resourceGroupName": {
+      "value": "org-rg-PRODUCT-ENVIRONMENT-001"
+    },
+    "workspaceName": {
+      "value": "work-PRODUCT-ENVIRONMENT-001"
     }
   }
 }

@@ -2,26 +2,26 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "apiConnectionName": {
-      "value": "apicn-cc-dgw-events-dev-001"
+    "name": {
+      "value": "apicn-cc-dgw-PRODUCT-ENVIRONMENT-001"
     },
     "sqlServerName": {
-      "value": "nfdevdb01.aacn.org\\netforumdev"
+      "value": "myserver.mydomain.com"
     },
     "sqlDatabaseName": {
-      "value": "nfAACN2014Dev"
+      "value": "MyDb"
     },
     "sqlUserName": {
-      "value": "AACNHQ\\dbdevsvc"
+      "value": "Domain\\MyUser"
     },
     "sqlUserPassword": {
-      "value": "DB5erv231"
+      "value": "MyUserPass"
     },
     "dataGatewayResourceGroupName": {
-      "value": "rg-ilandgateways-dev-001"
+      "value": "rg-onpremgateways-dev-001"
     },
     "dataGatewayConnectorName": {
-      "value": "cc-dgw-iland-dev-001"
+      "value": "cc-dgw-onprem-dev-001"
     }
   }
 }

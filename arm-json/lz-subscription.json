@@ -2,13 +2,20 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-08-01/managementGroupDeploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "Deploy": {
+    "deploy": {
       "type": "bool",
       "defaultValue": false
+    },   
+    "name": {
+      "type": "string",
+      "defaultValue": "[concat(parameters('orgName'), '-', parameters('managementGroupShortName'),'-', parameters('domainName'), '-001')]",
+      "metadata": {
+        "description": "Provide a domain name to be used to group resources."
+      }
     },
     "orgName": {
       "type": "string",
-      "defaultValue": "aacn",
+      "defaultValue": "myorg",
       "metadata": {
         "description": "Provide a domain name to be used to group resources."
       }
@@ -47,27 +54,21 @@
       "type": "string",
       "metadata": {
         "description": "Provide the value (typically the environment) for the workload tag metadata."
-      },
-      "resourceVersion": {
-        "type": "string",
-        "metadata": {
-          "description": "Suffix for the resource. i.e. -001, -v1"
-        }
       }
-    },
+    }
+  },
   "variables": {
-    "subscriptionAliasName": "[concat(parameters('orgName'), '-', parameters('managementGroupShortName')'-', parameters('domainName'), '-001')]"
   },
   "resources": [
     {
-      "condition": "[parameters('Deploy')]",
+      "condition": "[parameters('deploy')]",
       "scope": "/",
-      "name": "[parameters('subscriptionAliasName')]",
+      "name": "[parameters('name')]",
       "type": "Microsoft.Subscription/aliases",
       "apiVersion": "2020-09-01",
       "properties": {
         "workLoad": "[parameters('workloadName')]",
-        "displayName": "[parameters('subscriptionAliasName')]",
+        "displayName": "[parameters('name')]",
         "billingScope": "[parameters('billingScope')]",
         "managementGroupId": "[tenantResourceId('Microsoft.Management/managementGroups/', parameters('targetManagementGroup'))]"
       }

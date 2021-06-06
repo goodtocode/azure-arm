@@ -2,32 +2,24 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "Deploy": {
+    "deploy": {
       "type": "bool",
       "defaultValue": false
     },
-    "DomainName": {
+    "name": {
       "type": "string",
       "metadata": {
-        "description": "Domain name. I.e. ntievents, certtestcenter, mediauploader, "
-      }
-    },
-    "resourceVersion": {
-      "type": "string",
-      "metadata": {
-        "description": "Suffix for the resource. i.e. -001, -v1"
+        "description": "Domain name. I.e. myproduct, auth, etc. "
       }
     }
   },
   "variables": {
-    "key-vault-name": "[concat('kv-', parameters('DomainName'), '-001')]"
   },
-
   "resources": [
     {
-      "condition": "[parameters('Deploy')]",
+      "condition": "[parameters('deploy')]",
       "type": "Microsoft.KeyVault/vaults",
-      "name": "[variables('key-vault-name')]",
+      "name": "[parameters('name')]",
       "apiVersion": "2016-10-01",
       "location": "[resourceGroup().location]",
       "tags": {

@@ -2,58 +2,58 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "DeployVNet": {
+        "deployVNet": {
             "value": false
         },
-        "SpokeVNetName": {
+        "spokeVNetName": {
             "value": "vnet-westus2-lz-mediauploader-prod"
         },
-        "SpokeVNetPrefix": {
+        "spokeVNetPrefix": {
             "value": "10.1.8.0/21"
         },
-        "AgSubnetName": {
+        "agSubnetName": {
             "value": "snet-westus2-prod-appgw-001"
         },
-        "AgSubnetPrefix": {
+        "agSubnetPrefix": {
             "value": "10.1.8.0/24"
         },
-        "WebSubnetName": {
+        "webSubnetName": {
             "value": "snet-westus2-prod-web-001"
         },
-        "WebSubnetPrefix": {
+        "webSubnetPrefix": {
             "value": "10.1.11.0/24"
         },
-        "AppSubnetName": {
+        "appSubnetName": {
             "value": "snet-westus2-prod-middle-001"
         },
-        "AppSubnetPrefix": {
+        "appSubnetPrefix": {
             "value": "10.1.10.0/24"
         },
-        "DataSubnetName": {
+        "dataSubnetName": {
             "value": "snet-westus2-prod-data-001"
         },
-        "DataSubnetPrefix": {
+        "dataSubnetPrefix": {
             "value": "10.1.9.0/24"
         },
-        "AgNsgName": {
+        "agNsgName": {
             "value": "nsg-snet-westus2-prod-appgw-001"
         },
-        "WebNsgName": {
+        "webNsgName": {
             "value": "nsg-snet-westus2-prod-web-001"
         },
-        "AppNsgName": {
+        "appNsgName": {
             "value": "nsg-snet-westus2-prod-middle-001"
         },
-        "DataNsgName": {
+        "dataNsgName": {
             "value": "nsg-snet-westus2-prod-data-001"
         },
-        "HubSubscriptionId": {
+        "hubSubscriptionId": {
             "value": "7daa1d35-dc46-4683-9c8c-b175bf57817a"
         },
-        "HubVnetName": {
+        "hubVnetName": {
             "value": "vnet-westus2-platform-hub-prod"
         },
-        "HubVNetResourceGroup": {
+        "hubVNetResourceGroup": {
             "value": "rg-westus2-network-prod-001"
         }
     }

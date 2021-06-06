@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "wcert-myproduct-dev-001"
+      "value": "wcert-PRODUCT-ENVIRONMENT-001"
     },
     "tags": {
       "value": {}
