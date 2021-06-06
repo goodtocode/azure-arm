@@ -68,7 +68,7 @@
     },
     {
       "apiVersion": "2015-08-01",
-      "name": "[parameters('Name')]",
+      "name": "[parameters('name')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -89,14 +89,27 @@
       "type": "Microsoft.Insights/components",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/', parameters('Name'))]"
+        "[resourceId('Microsoft.Web/sites/', parameters('name'))]"
       ],
       "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('Name'))]": "Resource",
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('name'))]": "Resource",
         "displayName": "AppInsightsComponent"
       },
       "properties": {
-        "applicationId": "[parameters('Name')]"
+        "applicationId": "[parameters('name')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2018-11-01",
+      "name": "[concat(parameters('name'), '/', parameters('name'), '.azurewebsites.net')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+          "[resourceId('Microsoft.Web/sites', parameters('name'))]"
+      ],
+      "properties": {
+          "siteName": "parameters('name')",
+          "hostNameType": "Verified"
       }
     }
   ]

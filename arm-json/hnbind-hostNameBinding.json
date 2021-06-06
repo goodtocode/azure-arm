@@ -1,0 +1,56 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "fqdn": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "headlessDn": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "siteName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "thumbprint": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    }
+  },
+  "variables": {
+    "deployFqdn": "[if(empty(parameters('fqdn')), bool('false'), bool('true'))]",
+    "deployHeadlessDn": "[if(empty(parameters('headlessDn')), bool('false'), bool('true'))]"
+  },
+  "resources": [   
+      {
+          "condition": "[variables('deployFqdn')]",
+          "type": "Microsoft.Web/sites/hostNameBindings",
+          "apiVersion": "2018-11-01",
+          "name": "[concat(parameters('siteName'), '/', parameters('fqdn'))]",
+          "location": "[resourceGroup().location]",
+          "properties": {
+              "siteName": "[parameters('siteName')]",
+              "sslState": "SniEnabled",
+              "thumbprint": "[parameters('thumbprint')]"
+          }
+      },
+            {
+          "condition": "[variables('deployHeadlessDn')]",
+          "type": "Microsoft.Web/sites/hostNameBindings",
+          "apiVersion": "2018-11-01",
+          "name": "[concat(parameters('siteName'), '/', parameters('headlessDn'))]",
+          "location": "[resourceGroup().location]",
+          "properties": {
+              "siteName": "[parameters('siteName')]",
+              "sslState": "SniEnabled",
+              "thumbprint": "[parameters('thumbprint')]"
+          }
+      }
+  ]
+}
