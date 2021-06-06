@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "mysundialdev"
+      "value": "sql-PRODUCT-ENVIRONMENT-001"
     },
     "administratorLogin": {
       "value": "LocalAdmin"
@@ -14,9 +14,9 @@
     "administratorLoginPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MySundial.com/providers/Microsoft.KeyVault/vaults/mysundial"
+          "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RESOURCEGROUPNAME/providers/Microsoft.KeyVault/vaults/KEYVAULTNAME"
         },
-        "secretName": "MySundial-LocalAdminPW"
+        "secretName": "PRODUCT-LocalAdminPW"
       }
     }
   }

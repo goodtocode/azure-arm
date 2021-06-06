@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "cdn-arm-prod-001"
+      "value": "cdn-PRODUCT-ENVIRONMENT-001"
     }
   }
 }

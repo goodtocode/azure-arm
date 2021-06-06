@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "myproduct"
+      "value": "web-PRODUCT-ENVIRONMENT-001"
     },
     "appInsightsName": {
       "value": "appi-PRODUCT-ENVIRONMENT-001"
