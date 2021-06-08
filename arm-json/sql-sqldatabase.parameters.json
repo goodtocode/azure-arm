@@ -3,20 +3,20 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "subdomainName": {
-      "value": "mysundialdev"
+      "value": "PRODUCTNAME"
     },
     "administratorLogin": {
       "value": "LocalAdmin"
     },
     "databaseName": {
-      "value": "Reflections"
+      "value": "PRODUCTNAME"
     },
     "administratorLoginPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/7ff496d5-8747-4a50-b5a9-ed99706a855c/resourceGroups/MySundial.com/providers/Microsoft.KeyVault/vaults/mysundial"
+          "id": "/subscriptions/0000-0000-0000-000000000000/resourceGroups/TENANTNAME/providers/Microsoft.KeyVault/vaults/VAULTNAME"
         },
-        "secretName": "MySundial-LocalAdminPW"
+        "secretName": "LocalAdminPassword"
       }
     }
   }
