@@ -2,24 +2,22 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "name": {
+      "type": "string"
+    },
     "planName": {
       "type": "string"
     },
-    "functionsSubdomain": {
+    "storageName": {
       "type": "string"
     },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Specifies the Azure location where the app configuration store should be created."
-      }
+    "workspaceName": {
+      "type": "string"
     },
-    "alwaysOn": {
-      "type": "bool",
-      "defaultValue": false
+    "appInsightsKey": {
+      "type": "string"
     },
-    "storageSubdomain": {
+    "appInsightsConnection": {
       "type": "string"
     },
     "use32BitWorkerProcess": {
@@ -48,22 +46,20 @@
     }
   },
   "variables": {
-    "hostingPlanName": "[parameters('planName')]",
-    "storageAccountName": "[parameters('storageSubdomain')]"
   },
   "resources": [
     {
       "apiVersion": "2018-11-01",
-      "name": "[parameters('functionsSubdomain')]",
+      "name": "[parameters('name')]",
       "type": "Microsoft.Web/sites",
       "kind": "functionapp",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "tags": {},
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
+        "[concat('Microsoft.Web/serverfarms/', parameters('planName'))]"
       ],
       "properties": {
-        "name": "[parameters('functionsSubdomain')]",
+        "name": "[parameters('name')]",
         "siteConfig": {
           "appSettings": [
             {
@@ -76,41 +72,41 @@
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "b1b3c648-c4bc-4220-8a3d-7c96d41faf84"
+              "value": "[parameters('appInsightsKey')]"
             },
             {
-              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-              "value": "InstrumentationKey=b1b3c648-c4bc-4220-8a3d-7c96d41faf84;IngestionEndpoint=https://westus-0.in.applicationinsights.azure.com/"
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",              
+              "value": "[parameters('appInsightsConnection')]"
             },
             {
               "name": "AzureWebJobsStorage",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('storageName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
             },
             {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('storageName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
             },
             {
               "name": "WEBSITE_CONTENTSHARE",
-              "value": "[concat(toLower(parameters('functionsSubdomain')), '9711')]"
+              "value": "[concat(toLower(parameters('name')), '9711')]"
             }
           ],
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"
         },
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('hostingPlanName'))]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]",
         "clientAffinityEnabled": true
       }
     },
     {
       "apiVersion": "2018-11-01",
-      "name": "[variables('hostingPlanName')]",
+      "name": "[parameters('planName')]",
       "type": "Microsoft.Web/serverfarms",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "kind": "",
       "tags": {},
       "dependsOn": [],
       "properties": {
-        "name": "[variables('hostingPlanName')]",
+        "name": "[parameters('planName')]",
         "workerSize": "[parameters('workerSize')]",
         "workerSizeId": "[parameters('workerSizeId')]",
         "numberOfWorkers": "[parameters('numberOfWorkers')]"
@@ -124,7 +120,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "newWorkspaceTemplate",
-      "resourceGroup": "DefaultResourceGroup-WUS",
+      "resourceGroup": "[resourceGroup().name]",
       "subscriptionId": "[subscription().subscriptionId]",
       "properties": {
         "mode": "Incremental",
@@ -136,9 +132,9 @@
           "resources": [
             {
               "apiVersion": "2020-08-01",
-              "name": "DefaultWorkspace-a1461566-907e-4de0-8b50-d7400f47e72d-WUS",
+              "name": "[parameters('workspaceName')]",
               "type": "Microsoft.OperationalInsights/workspaces",
-              "location": "westus",
+              "location": "[resourceGroup().location]",
               "properties": {}
             }
           ]

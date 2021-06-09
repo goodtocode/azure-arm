@@ -6,10 +6,7 @@
       "value": "web"
     },
     "name": {
-      "value": "appi-www-arm-001"
-    },
-    "regionId": {
-      "value": "westus2"
+      "value": "appi-PRODUCT-ENVIRONMENT-001"
     },
     "tagsArray": {
       "value": {}

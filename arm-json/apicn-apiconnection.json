@@ -27,25 +27,20 @@
     },
     "sqlUserPassword": {
       "type": "string"
-    },
-    "locationName": {
-      "type": "string",
-      "allowedValues": [ "West US 2", "West US 3" ],
-      "defaultValue": "West US 2"
     }
   },
   "variables": {
-    "locationShortName": "[toLower(replace(parameters('locationName'), ' ', ''))]"
+    "locationShortName": "[toLower(replace(resourceGroup().location, ' ', ''))]"
   },
   "resources": [
     {
       "type": "Microsoft.Web/connections",
       "apiVersion": "2018-07-01-preview",
-      "name": "[parameters('apiConnectionName')]",
+      "name": "[parameters('name')]",
       "location": "[variables('locationShortName')]",
       "kind": "V1",
       "properties": {
-        "displayName": "[parameters('apiConnectionName')]",
+        "displayName": "[parameters('name')]",
         "customParameterValues": {},
         "api": {
           "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/sql')]"

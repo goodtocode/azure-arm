@@ -3,16 +3,22 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "planName": {
-      "value": "plan-certtestcenter-dev-001"
+      "value": "plan-PRODUCT-ENVIRONMENT-001"
     },
-    "functionsSubdomain": {
-      "value": "func-certtestcenter-dev-001"
+    "name": {
+      "value": "func-PRODUCT-ENVIRONMENT-001"
     },
-    "storageSubdomain": {
-      "value": "stcerttestcenterdev001"
+    "workspaceName": {
+      "value": "work-PRODUCT-ENVIRONMENT-001"
     },
-    "alwaysOn": {
-      "value": false
+    "storageName": {
+      "value": "stPRODUCTENVIRONMENT001"
+    },
+    "appInsightsKey": {
+      "value": "APPI-KEY"
+    },
+    "appInsightsConnection": {
+      "value": "APPI-CONNECTION-STRING"
     },
     "sku": {
       "value": "Dynamic"

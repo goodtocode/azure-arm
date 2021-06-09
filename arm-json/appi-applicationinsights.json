@@ -1,5 +1,5 @@
 {
-  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
@@ -8,10 +8,7 @@
     "type": {
       "type": "string"
     },
-    "regionId": {
-      "type": "string"
-    },
-    "tagsArray": {
+     "tagsArray": {
       "type": "object"
     },
     "requestSource": {
@@ -21,11 +18,13 @@
       "type": "string"
     }
   },
+  "variables": {
+  },
   "resources": [
     {
       "name": "[parameters('name')]",
       "type": "microsoft.insights/components",
-      "location": "[parameters('regionId')]",
+      "location": "[resourceGroup().location]",
       "tags": "[parameters('tagsArray')]",
       "apiVersion": "2020-02-02-preview",
       "dependsOn": [],
