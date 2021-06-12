@@ -75,7 +75,7 @@
               "value": "[parameters('appInsightsKey')]"
             },
             {
-              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",              
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
               "value": "[parameters('appInsightsConnection')]"
             },
             {

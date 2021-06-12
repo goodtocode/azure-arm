@@ -9,7 +9,7 @@
     "name": {
       "type": "string",
       "metadata": {
-        "description": "Domain name. I.e. ntievents, certtestcenter, mediauploader, "
+        "description": "Domain name. I.e. ntievents, certtestcenter, PRODUCT, "
       }
     }
   },

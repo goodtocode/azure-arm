@@ -2,11 +2,11 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "Deploy": {
+    "deploy": {
       "type": "bool",
       "defaultValue": false
     },
-    "domainname": {
+    "name": {
       "type": "string",
       "metadata": {
         "description": "Short domain name used for the name of all resources"
@@ -34,12 +34,6 @@
       "metadata": {
         "displayName": "Log retention in days",
         "description": "Number of days data will be retained for"
-      },
-      "resourceVersion": {
-        "type": "string",
-        "metadata": {
-          "description": "Suffix for the resource. i.e. -001, -v1"
-        }
       }
     }
   },
@@ -47,7 +41,7 @@
     "uniqueString": "[uniqueString(subscription().id)]",
     "diagnostic-suffix": "[concat('-', substring(variables('uniqueString'), 0, 5))]",
     "diagnostic-storageAccount-name": "[toLower(replace(concat('st', variables('diagnostic-suffix')), '-', ''))]",
-    "oms-workspace-name": "[concat('log-', parameters('domainname'), '-', variables('diagnostic-suffix'))]"
+    "oms-workspace-name": "[concat('log-', parameters('name'), '-', variables('diagnostic-suffix'))]"
   },
   "resources": [
     {

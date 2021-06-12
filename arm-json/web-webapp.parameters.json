@@ -8,7 +8,7 @@
     "appInsightsName": {
       "value": "ap[i-PRODUCT-ENVIRONMENT-001"
     },
-    "hostingPlanName": {
+    "planName": {
       "value": "plan-PRODUCT-ENVIRONMENT-001-F1"
     },
     "skuName": {

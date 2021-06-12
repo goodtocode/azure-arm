@@ -13,7 +13,7 @@
       "minLength": 1,
       "maxLength": 60
     },
-    "hostingPlanName": {
+    "planName": {
       "type": "string",
       "defaultValue": "plan-PRODUCT-ENVIRONMENT-001",
       "minLength": 1,
@@ -55,7 +55,7 @@
   "resources": [
     {
       "apiVersion": "2015-08-01",
-      "name": "[parameters('hostingPlanName')]",
+      "name": "[parameters('planName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -66,7 +66,7 @@
         "capacity": "[parameters('skuCapacity')]"
       },
       "properties": {
-        "name": "[parameters('hostingPlanName')]"
+        "name": "[parameters('planName')]"
       }
     },
     {
@@ -75,15 +75,15 @@
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "tags": {
-        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "Resource",
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]": "Resource",
         "displayName": "Website"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+        "[resourceId('Microsoft.Web/serverfarms/', parameters('planName'))]"
       ],
       "properties": {
         "name": "[variables('webSiteName')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]"
       }
     },
     {

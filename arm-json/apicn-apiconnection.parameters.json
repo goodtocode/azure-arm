@@ -6,10 +6,10 @@
       "value": "apicn-cc-dgw-PRODUCT-ENVIRONMENT-001"
     },
     "sqlServerName": {
-      "value": "nfdevdb01.aacn.org\\netforumdev"
+      "value": "SQLSERVER"
     },
     "sqlDatabaseName": {
-      "value": "nfAACN2014Dev"
+      "value": "SQLDATABASE"
     },
     "sqlUserName": {
       "value": "SQLUSER"
