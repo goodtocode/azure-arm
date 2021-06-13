@@ -12,19 +12,19 @@
       "value": "PASSWORD"
     },
     "keyVaultId": {
-      "value": "PASSWORD"
+      "value": "VAULTID"
     },
     "keyVaultSecretName": {
-      "value": "PASSWORD"
+      "value": "VAULTSECRET"
     },
     "serverFarmId": {
-      "value": "PASSWORD"
+      "value": "SERVERFARMID"
     },
     "canonicalName": {
-      "value": "PASSWORD"
+      "value": "CANONICALNAME"
     },
     "domainValidationMethod": {
-      "value": "PASSWORD"
+      "value": "VALIDATIONMETHOD"
     },
     "hostnames": {
       "value": []
