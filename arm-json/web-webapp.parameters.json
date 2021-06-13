@@ -11,7 +11,7 @@
     "planName": {
       "value": "plan-PRODUCT-ENVIRONMENT-001-F1"
     },
-    "skuName": {
+    "skuCode": {
       "value": "F1"
     },
     "skuCapacity": {

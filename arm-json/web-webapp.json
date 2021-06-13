@@ -19,7 +19,7 @@
       "minLength": 1,
       "maxLength": 60
     },
-    "skuName": {
+    "skuCode": {
       "type": "string",
       "defaultValue": "F1",
       "allowedValues": [
@@ -62,7 +62,7 @@
         "displayName": "HostingPlan"
       },
       "sku": {
-        "name": "[parameters('skuName')]",
+        "name": "[parameters('skuCode')]",
         "capacity": "[parameters('skuCapacity')]"
       },
       "properties": {
