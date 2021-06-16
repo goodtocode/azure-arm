@@ -5,7 +5,7 @@
     "planName": {
       "value": "plan-PRODUCT-ENVIRONMENT-001"
     },
-    "skuName": {
+    "skuCode": {
       "value": "F1"
     }
   }
