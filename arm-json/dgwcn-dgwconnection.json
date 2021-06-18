@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string"
+    },
+    "dataGatewayConnectorName": {
+      "type": "string"
+    },
+    "dataGatewayResourceGroupName": {
+      "type": "string"
+    },
+    "sqlAuthType": {
+      "type": "string",
+      "allowedValues": [ "basic", "windows" ],
+      "defaultValue": "windows"
+    },
+    "sqlServerName": {
+      "type": "string"
+    },
+    "sqlDatabaseName": {
+      "type": "string"
+    },
+    "sqlUserName": {
+      "type": "string"
+    },
+    "sqlUserPassword": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "locationShortName": "[toLower(replace(resourceGroup().location, ' ', ''))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2018-07-01-preview",
+      "name": "[parameters('name')]",
+      "location": "[variables('locationShortName')]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[parameters('name')]",
+        "customParameterValues": {},
+        "api": {
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/sql')]"
+        },
+        "parameterValues": {
+          "server": "[parameters('sqlServerName')]",
+          "database": "[parameters('sqlDatabaseName')]",
+          "username": "[parameters('sqlUserName')]",
+          "password": "[parameters('sqlUserPassword')]",
+          "authType": "[parameters('sqlAuthType')]",
+          "gateway": {
+            "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('dataGatewayResourceGroupName'), '/providers/Microsoft.Web/connectionGateways/', parameters('dataGatewayConnectorName'))]"
+          }
+        }
+      }
+    }
+  ]
+}

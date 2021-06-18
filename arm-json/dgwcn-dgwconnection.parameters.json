@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "dgwcn-PRODUCT-ENVIRONMENT-001"
+    },
+    "sqlServerName": {
+      "value": "SQLSERVER"
+    },
+    "sqlDatabaseName": {
+      "value": "SQLDATABASE"
+    },
+    "sqlUserName": {
+      "value": "SQLUSER"
+    },
+    "sqlUserPassword": {
+      "value": "SQLPASSWORD"
+    },
+    "dataGatewayResourceGroupName": {
+      "value": "rg-PRODUCT-ENVIRONMENT-001"
+    },
+    "dataGatewayConnectorName": {
+      "value": "cc-dgw-PRODUCT-ENVIRONMENT-001"
+    }
+  }
+}
