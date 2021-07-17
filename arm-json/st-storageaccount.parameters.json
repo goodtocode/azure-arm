@@ -4,6 +4,9 @@
   "parameters": {
     "name": {
       "value": "stPRODUCTENVIRONMENT001"
+    },
+    "skuCode": {
+      "value": "Standard_LRS"
     }
   }
 }

@@ -4,6 +4,9 @@
   "parameters": {
     "name": {
       "value": "log-PRODUCT-ENVIRONMENT-001"
+    },    
+    "skuCode": {
+      "value": "Standard_LRS"
     },
     "service-tier": {
       "value": "PerGB2018"

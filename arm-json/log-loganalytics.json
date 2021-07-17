@@ -12,6 +12,13 @@
         "description": "Short domain name used for the name of all resources"
       }
     },
+    "skuCode": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "metadata": {
+        "description": "Sku of the Storage Account. (st)"
+      }
+    },
     "service-tier": {
       "type": "string",
       "defaultValue": "PerGB2018",
