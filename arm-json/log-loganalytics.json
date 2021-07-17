@@ -60,7 +60,7 @@
       "location": "[resourceGroup().location]",
       "kind": "StorageV2",
       "sku": {
-        "name": "Standard_LRS"
+        "name": "[parameters('skuCode')]"
       },
       "tags": {
         "layer": "management"

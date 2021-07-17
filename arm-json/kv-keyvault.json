@@ -11,6 +11,13 @@
       "metadata": {
         "description": "Domain name. I.e. ntievents, certtestcenter, PRODUCT, "
       }
+    },
+    "skuCode": {
+      "type": "string",
+      "defaultValue": "premium",
+      "metadata": {
+        "description": "Sku of the key vault."
+      }
     }
   },
   "variables": {
@@ -33,7 +40,7 @@
         "enabledForTemplateDeployment": true,
         "tenantId": "[subscription().tenantId]",
         "sku": {
-          "name": "premium",
+          "name": "[parameters('skuCode')]",
           "family": "A"
         },
         "networkAcls": {
