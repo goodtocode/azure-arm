@@ -12,7 +12,7 @@
         "description": "Domain name. I.e. ntievents, certtestcenter, PRODUCT, "
       }
     },
-    "skuCode": {
+    "sku": {
       "type": "string",
       "defaultValue": "premium",
       "metadata": {
@@ -40,7 +40,7 @@
         "enabledForTemplateDeployment": true,
         "tenantId": "[subscription().tenantId]",
         "sku": {
-          "name": "[parameters('skuCode')]",
+          "name": "[parameters('sku')]",
           "family": "A"
         },
         "networkAcls": {

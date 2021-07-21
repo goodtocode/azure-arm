@@ -8,11 +8,11 @@
         "description": "Specifies the name of the App Configuration store."
       }
     },
-    "skuCode": {
+    "sku": {
       "type": "string",
       "defaultValue": "standard",
       "metadata": {
-        "description": "Specifies the skuCode of the App Configuration store."
+        "description": "Specifies the sku of the App Configuration store."
       }
     },
     "location": {
@@ -61,7 +61,7 @@
       "name": "[parameters('name')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "[parameters('skuCode')]"
+        "name": "[parameters('sku')]"
       }
     },
     {

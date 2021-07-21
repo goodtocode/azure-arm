@@ -28,7 +28,7 @@
       "type": "string",
       "defaultValue": "Dynamic"
     },
-    "skuCode": {
+    "sku": {
       "type": "string",
       "defaultValue": "Y1"
     },
@@ -113,7 +113,7 @@
       },
       "sku": {
         "Tier": "[parameters('sku')]",
-        "Name": "[parameters('skuCode')]"
+        "Name": "[parameters('sku')]"
       }
     },
     {

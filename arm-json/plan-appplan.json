@@ -6,7 +6,7 @@
       "type": "string",
       "minLength": 1
     },
-    "skuCode": {
+    "sku": {
       "type": "string",
       "defaultValue": "F1",
       "allowedValues": [
@@ -48,7 +48,7 @@
         "displayName": "HostingPlan"
       },
       "sku": {
-        "name": "[parameters('skuCode')]",
+        "name": "[parameters('sku')]",
         "capacity": "[parameters('skuCapacity')]"
       },
       "properties": {

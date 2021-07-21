@@ -12,7 +12,7 @@
         "description": "Specifies the Azure location where the app configuration store should be created."
       }
     },
-    "skuCode": {
+    "sku": {
       "type": "string"
     },
     "tags": {
@@ -30,7 +30,7 @@
       "type": "Microsoft.OperationalInsights/workspaces",
       "properties": {
         "sku": {
-          "name": "[parameters('skuCode')]"
+          "name": "[parameters('sku')]"
         }
       }
     }

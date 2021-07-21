@@ -9,7 +9,7 @@
         "description": "That name is the name of our application. It has to be unique.Type a name followed by your resource group name. (<name>-<resourceGroupName>)"
       }
     },
-    "skuCode": {
+    "sku": {
       "type": "string",
       "defaultValue": "S0",
       "allowedValues": [
@@ -24,7 +24,7 @@
       "name": "[parameters('name')]",
       "location": "[resourceGroup().location]",
       "sku": {
-        "name": "[parameters('skuCode')]"
+        "name": "[parameters('sku')]"
       },
       "kind": "CognitiveServices",
       "properties": {

@@ -12,7 +12,7 @@
         "description": "Short domain name used for the name of all resources"
       }
     },
-    "skuCode": {
+    "sku": {
       "type": "string",
       "defaultValue": "Standard_LRS",
       "metadata": {
@@ -60,7 +60,7 @@
       "location": "[resourceGroup().location]",
       "kind": "StorageV2",
       "sku": {
-        "name": "[parameters('skuCode')]"
+        "name": "[parameters('sku')]"
       },
       "tags": {
         "layer": "management"

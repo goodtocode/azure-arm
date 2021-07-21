@@ -6,19 +6,23 @@
       "type": "string"
     },
     "type": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "web"
     },
      "tagsArray": {
-      "type": "object"
+      "type": "object",
+      "defaultValue": {}
     },
     "requestSource": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "IbizaAIExtension"
     },
-    "workspaceResourceId": {
+    "workspaceName": {
       "type": "string"
     }
   },
   "variables": {
+    "workspaceResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]"
   },
   "resources": [
     {
@@ -33,7 +37,7 @@
         "Application_Type": "[parameters('type')]",
         "Flow_Type": "Redfield",
         "Request_Source": "[parameters('requestSource')]",
-        "WorkspaceResourceId": "[parameters('workspaceResourceId')]"
+        "WorkspaceResourceId": "[variables('workspaceResourceId')]"
       }
     }
   ]

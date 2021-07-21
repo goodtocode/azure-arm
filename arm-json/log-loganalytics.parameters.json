@@ -5,7 +5,7 @@
     "name": {
       "value": "log-PRODUCT-ENVIRONMENT-001"
     },    
-    "skuCode": {
+    "sku": {
       "value": "Standard_LRS"
     },
     "service-tier": {

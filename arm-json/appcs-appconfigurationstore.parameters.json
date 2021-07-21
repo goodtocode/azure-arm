@@ -5,7 +5,7 @@
     "name": {
       "value": "appcs-PRODUCT-ENVIRONMENT-001"
     },
-    "skuCode": {
+    "sku": {
       "value": "standard"
     },
     "keyValueNames": {

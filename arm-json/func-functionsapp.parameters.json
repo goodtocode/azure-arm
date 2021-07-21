@@ -23,7 +23,7 @@
     "sku": {
       "value": "Dynamic"
     },
-    "skuCode": {
+    "sku": {
       "value": "Y1"
     },
     "workerSize": {
