@@ -24,7 +24,7 @@
       "type": "bool",
       "defaultValue": true
     },
-    "sku": {
+    "skuTier": {
       "type": "string",
       "defaultValue": "Dynamic"
     },
@@ -112,7 +112,7 @@
         "numberOfWorkers": "[parameters('numberOfWorkers')]"
       },
       "sku": {
-        "Tier": "[parameters('sku')]",
+        "Tier": "[parameters('skuTier')]",
         "Name": "[parameters('sku')]"
       }
     },

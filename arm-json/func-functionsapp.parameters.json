@@ -20,7 +20,7 @@
     "appInsightsConnection": {
       "value": "APPI-CONNECTION-STRING"
     },
-    "sku": {
+    "skuTier": {
       "value": "Dynamic"
     },
     "sku": {
