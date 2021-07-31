@@ -5,9 +5,6 @@
     "name": {
       "type": "string"
     },
-    "planName": {
-      "type": "string"
-    },
     "storageName": {
       "type": "string"
     },
@@ -46,6 +43,7 @@
     }
   },
   "variables": {
+    "planName": "[concat('plan-', parameters('name'))]"
   },
   "resources": [
     {
@@ -56,7 +54,7 @@
       "location": "[resourceGroup().location]",
       "tags": {},
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', parameters('planName'))]"
+        "[concat('Microsoft.Web/serverfarms/', variables('planName'))]"
       ],
       "properties": {
         "name": "[parameters('name')]",
@@ -93,20 +91,20 @@
           ],
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"
         },
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('planName'))]",
         "clientAffinityEnabled": true
       }
     },
     {
       "apiVersion": "2018-11-01",
-      "name": "[parameters('planName')]",
+      "name": "[variables('planName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[resourceGroup().location]",
       "kind": "",
       "tags": {},
       "dependsOn": [],
       "properties": {
-        "name": "[parameters('planName')]",
+        "name": "[variables('planName')]",
         "workerSize": "[parameters('workerSize')]",
         "workerSizeId": "[parameters('workerSizeId')]",
         "numberOfWorkers": "[parameters('numberOfWorkers')]"

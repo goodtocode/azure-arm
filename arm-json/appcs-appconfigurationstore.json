@@ -24,16 +24,16 @@
     },
     "keyValueNames": {
       "type": "array",
-      "defaultValue": [ "myKey", "myKey$myLabel" ],
+      "defaultValue": [ "Shared:Sentinel", "Shared:Sentinel$Development" ],
       "metadata": {
-        "description": "Specifies the names of the key-value resources. The name is a combination of key and label with $ as delimiter. The label is optional."
+        "description": "Sentinel key to refresh configs for no label and Development label."
       }
     },
     "keyValueValues": {
       "type": "array",
-      "defaultValue": [ "Key-value without label", "Key-value with label" ],
+      "defaultValue": [ "1", "1" ],
       "metadata": {
-        "description": "Specifies the values of the key-value resources. It's optional"
+        "description": "Sentinel value is 1. When changed to 0, will trigger config refreshes."
       }
     },
     "contentType": {
