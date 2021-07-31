@@ -1,0 +1,62 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "String"
+        },
+        "sku": {
+            "type": "String",
+            "defaultValue": "Basic",
+            "allowedVAlues": ["Basic", "Standard"]
+        }
+    },
+    "variables": {
+        "nameAlphaNumeric": "[replace(replace(parameters('name'), '-', ''), '.', '')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ServiceBus/namespaces",
+            "apiVersion": "2021-01-01-preview",
+            "name": "[variables('nameAlphaNumeric')]",
+            "location": "West US 2",
+            "sku": {
+                "name": "[parameters('sku')]",
+                "tier": "[parameters('sku')]"
+            },
+            "properties": {
+                "zoneRedundant": false
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
+            "apiVersion": "2021-01-01-preview",
+            "name": "[concat(variables('nameAlphaNumeric'), '/RootManageSharedAccessKey')]",
+            "location": "West US 2",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', variables('nameAlphaNumeric'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/networkRuleSets",
+            "apiVersion": "2021-01-01-preview",
+            "name": "[concat(variables('nameAlphaNumeric'), '/default')]",
+            "location": "West US 2",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', variables('nameAlphaNumeric'))]"
+            ],
+            "properties": {
+                "defaultAction": "Deny",
+                "virtualNetworkRules": [],
+                "ipRules": []
+            }
+        }
+    ]
+}
