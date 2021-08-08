@@ -9,15 +9,15 @@
       "value": "standard"
     },
     "keyValueNames": {
-      "value": [
-        "myKey",
-        "myKey$myLabel"
+      "value": [ 
+        "Shared:Sentinel", 
+        "Shared:Sentinel$Development" 
       ]
     },
     "keyValueValues": {
       "value": [
-        "Key-value without label",
-        "Key-value with label"
+        "1",
+        "1"
       ]
     },
     "contentType": {
