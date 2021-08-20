@@ -23,6 +23,9 @@
     "sku": {
       "value": "Y1"
     },
+    "environment": {
+      "value": "Development"
+    },
     "workerRuntime": {
       "value": "dotnet"
     },
