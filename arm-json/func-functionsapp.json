@@ -29,6 +29,11 @@
       "type": "string",
       "defaultValue": "Y1"
     },
+    "workerRuntime": {
+      "type": "string",
+      "defaultValue": "dotnet",
+      "allowedValues": ["dotnet", "python", "dotnet-isolated"]
+    },
     "workerSize": {
       "type": "string",
       "defaultValue": "0"
