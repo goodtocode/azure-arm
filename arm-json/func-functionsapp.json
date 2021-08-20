@@ -29,6 +29,11 @@
       "type": "string",
       "defaultValue": "Y1"
     },
+    "environment": {
+      "type": "string",
+      "defaultValue": "Development",
+      "allowedValues": ["Development", "QA", "Staging", "Production"]
+    },
     "workerRuntime": {
       "type": "string",
       "defaultValue": "dotnet",
@@ -71,7 +76,7 @@
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
-              "value": "dotnet"
+              "value": "[parameters('workerRuntime')]"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -92,6 +97,14 @@
             {
               "name": "WEBSITE_CONTENTSHARE",
               "value": "[concat(toLower(parameters('name')), '9711')]"
+            },
+            {
+              "name": "ASPNETCORE_ENVIRONMENT",
+              "value": "[parameters('environment')]"
+            },
+            {
+              "name": "AZURE_FUNCTIONS_ENVIRONMENT",
+              "value": "[parameters('environment')]"
             }
           ],
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"
