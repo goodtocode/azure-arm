@@ -16,7 +16,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2021-05-01",
       "name": "[variables('webSiteName')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
