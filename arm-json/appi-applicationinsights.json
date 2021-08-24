@@ -30,7 +30,7 @@
       "type": "microsoft.insights/components",
       "location": "[resourceGroup().location]",
       "tags": "[parameters('tagsArray')]",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2020-02-02",
       "dependsOn": [],
       "properties": {
         "ApplicationId": "[parameters('name')]",

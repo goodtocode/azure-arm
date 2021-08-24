@@ -28,7 +28,7 @@
       "condition": "[parameters('deploy')]",
       "type": "Microsoft.KeyVault/vaults",
       "name": "[parameters('name')]",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2021-06-01-preview",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "KeyVault"
@@ -38,6 +38,7 @@
         "enabledForDeployment": true,
         "enabledForDiskEncryption": true,
         "enabledForTemplateDeployment": true,
+        "publicNetworkAccess": "Disabled",
         "tenantId": "[subscription().tenantId]",
         "sku": {
           "name": "[parameters('sku')]",

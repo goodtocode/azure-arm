@@ -19,7 +19,7 @@
   "resources": [
     {
       "type": "Microsoft.Web/connections",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2021-06-01",
       "name": "[parameters('name')]",
       "location": "[variables('locationShortName')]",
       "kind": "V1",
