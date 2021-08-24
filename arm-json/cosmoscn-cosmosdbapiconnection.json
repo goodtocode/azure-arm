@@ -30,11 +30,10 @@
         },
         "parameterValues": {
           "databaseAccount": "[parameters('cosmosName')]",
-          "accessKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosName')), '2015-04-08').primaryMasterKey]"
+          "accessKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosName')), '2018-07-01-preview').primaryMasterKey]"
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosName'))]"
       ]
     }
   ]

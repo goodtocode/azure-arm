@@ -8,6 +8,12 @@
     },
      "displayName": {
       "type": "string"
+    },
+     "storageName": {
+      "type": "string"
+    },
+     "storageKey": {
+      "type": "string"
     }
   },
   "variables": {
@@ -20,13 +26,9 @@
       "name": "[parameters('name')]",
       "location": "[variables('locationShortName')]",
       "kind": "V1",
+      "scale": null,
       "properties": {
         "displayName": "[parameters('displayName')]",
-        "statuses": [
-            {
-                "status": "Connected"
-            }
-        ],
         "customParameterValues": {},
         "api": {
             "name": "azureblob",
@@ -38,18 +40,12 @@
             "type": "Microsoft.Web/locations/managedApis"
         },
         "parameterValues": {
-          "databaseAccount": "[parameters('cosmosName')]",
-          "accessKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosName')), '2015-04-08').primaryMasterKey]"
-        },
-        "testLinks": [
-            {
-                "requestUri": "[concat('https://management.azure.com:443/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/connections/', parameters('connections_azureblob_5_name'), '/extensions/proxy/testconnection?api-version=2018-07-01-preview')]",
-                "method": "get"
-            }
-        ]
+            "accountName": "[parameters('storageName')]",
+            //"accessKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosName')), '2018-07-01-preview').primaryMasterKey]"
+            "accessKey": "[parameters('storageKey')]"
+        }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosName'))]"
       ]
     }
   ]

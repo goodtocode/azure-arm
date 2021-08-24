@@ -7,6 +7,12 @@
     },    
     "displayName": {
       "value": "stcn-PRODUCT-ENVIRONMENT-001"
+    },
+    "storageName": {
+      "value": "stproductenvironment001"
+    },
+    "storageKey": {
+      "value": ""
     }
   }
 }
