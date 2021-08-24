@@ -22,19 +22,14 @@
       "kind": "V1",
       "properties": {
         "displayName": "[parameters('displayName')]",
-        "statuses": [
-            {
-                "status": "Connected"
-            }
-        ],
         "customParameterValues": {},
         "api": {
             "name": "[parameters('name')]",
-            "displayName": "Microsoft Teams",
+            "displayName": "Office 365",
             "description": "Microsoft Teams enables you to get all your content, tools and conversations in the Team workspace with Office 365.",
             "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1505/1.0.1505.2520/', parameters('name'), '/icon.png')]",
             "brandColor": "#4B53BC",
-            "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/teams')]",
+            "id": "[concat(subscription().id,'/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/office365')]",
             "type": "Microsoft.Web/locations/managedApis"
         },
         "parameterValues": {

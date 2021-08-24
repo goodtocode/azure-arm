@@ -11,9 +11,6 @@
     },
      "storageName": {
       "type": "string"
-    },
-     "storageKey": {
-      "type": "string"
     }
   },
   "variables": {
@@ -41,8 +38,7 @@
         },
         "parameterValues": {
             "accountName": "[parameters('storageName')]",
-            //"accessKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosName')), '2018-07-01-preview').primaryMasterKey]"
-            "accessKey": "[parameters('storageKey')]"
+            "accessKey": "[listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('storageName')), '2021-05-01').keys[0].value]"
         }
       },
       "dependsOn": [
