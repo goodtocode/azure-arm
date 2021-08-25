@@ -3,10 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "stcnproductenvironment001"
-    },    
-    "displayName": {
-      "value": "stcn-PRODUCT-ENVIRONMENT-001"
+      "value": "sttablecn-PRODUCT-ENVIRONMENT-001"
     },
     "storageName": {
       "value": "stproductenvironment001"

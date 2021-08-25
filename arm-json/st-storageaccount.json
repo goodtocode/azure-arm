@@ -19,15 +19,16 @@
     }   
   },
   "variables": {
+    "nameLower": "[toLower(replace(replace(parameters('name'), '-', ''), ' ', ''))]"
   },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[parameters('name')]",
+      "name": "[variables('nameLower')]",
       "apiVersion": "2021-06-01",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "[parameters('name')]"
+        "displayName": "[variables('nameLower')]"
       },
       "sku": {
         "name": "[parameters('sku')]"
