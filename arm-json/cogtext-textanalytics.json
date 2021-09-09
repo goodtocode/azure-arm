@@ -14,7 +14,7 @@
       "defaultValue": "F0",
       "allowedValues": [
         "F0",
-        "S0"
+        "S"
       ],
       "metadata": {
         "description": "Sku (pricing tier) of this resource"

@@ -28,7 +28,7 @@
       "condition": "[parameters('deploy')]",
       "type": "Microsoft.KeyVault/vaults",
       "name": "[parameters('name')]",
-      "apiVersion": "2021-06-01-preview",
+      "apiVersion": "2016-10-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "KeyVault"
