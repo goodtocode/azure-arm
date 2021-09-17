@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "name": {
+          "value": "dgw-iland-dev-001"
+      },
+      "location": {
+          "value": "westus2"
+      },
+      "subscriptionId": {
+        "value": "f777258d-fdd8-4efd-81be-8c383ae0b600"
+      },      
+      "dgwInstallationId": {
+        "value": "baab7ade-7562-4875-b136-f3f19631d470"
+      },     
+      "tagsByResource": {
+          "value": {}
+      }
+  }
+}
