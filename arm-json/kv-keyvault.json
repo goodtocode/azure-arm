@@ -38,7 +38,7 @@
         "enabledForDeployment": true,
         "enabledForDiskEncryption": true,
         "enabledForTemplateDeployment": true,
-        "publicNetworkAccess": "Disabled",
+        "publicNetworkAccess": "Enabled",
         "tenantId": "[subscription().tenantId]",
         "sku": {
           "name": "[parameters('sku')]",
