@@ -13,10 +13,10 @@
       "type": "string",
       "defaultValue": "[subscription().subscriptionId]"
     },
-    "dataGatewayConnectorName": {
+    "dgwName": {
       "type": "string"
     },
-    "dataGatewayResourceGroupName": {
+    "dgwResourceGroupName": {
       "type": "string"
     },
     "sqlAuthType": {
@@ -60,7 +60,7 @@
           "password": "[parameters('sqlUserPassword')]",
           "authType": "[parameters('sqlAuthType')]",
           "gateway": {
-            "id": "[concat('/subscriptions/',  parameters('subscriptionId'), '/resourceGroups/', parameters('dataGatewayResourceGroupName'), '/providers/Microsoft.Web/connectionGateways/', parameters('dataGatewayConnectorName'))]"
+            "id": "[concat('/subscriptions/',  parameters('subscriptionId'), '/resourceGroups/', parameters('dgwResourceGroupName'), '/providers/Microsoft.Web/connectionGateways/', parameters('dgwName'))]"
           }
         }
       }

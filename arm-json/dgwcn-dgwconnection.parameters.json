@@ -20,10 +20,10 @@
     "sqlUserPassword": {
       "value": "SQLPASSWORD"
     },
-    "dataGatewayResourceGroupName": {
+    "dgwResourceGroupName": {
       "value": "rg-PRODUCT-ENVIRONMENT-001"
     },
-    "dataGatewayConnectorName": {
+    "dgwName": {
       "value": "cc-dgw-PRODUCT-ENVIRONMENT-001"
     }
   }
