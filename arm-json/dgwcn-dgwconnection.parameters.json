@@ -3,7 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "apicn-cc-dgw-PRODUCT-ENVIRONMENT-001"
+      "value": "dgwcn-PRODUCT-ENVIRONMENT-001"
+    },
+    "location": {
+      "value": ""
+    },
+    "subscriptionId": {
+      "value": "00000000-0000-0000-0000-000000000000"
     },
     "sqlServerName": {
       "value": "SQLSERVER"
