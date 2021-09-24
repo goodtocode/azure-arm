@@ -22,7 +22,7 @@
     },
   "variables": {
     "locationShortName": "[toLower(replace(parameters('location'), ' ', ''))]",
-    "gatewayInstallationId": "[concat('/subscriptions/', parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/connectionGatewayInstallations/', parameters('dgwInstallationId'))]"
+    "gatewayInstallationId": "[concat(parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/connectionGatewayInstallations/', parameters('dgwInstallationId'))]"
   },
     "resources": [
         {
