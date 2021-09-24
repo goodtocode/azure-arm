@@ -60,7 +60,7 @@
           "password": "[parameters('sqlUserPassword')]",
           "authType": "[parameters('sqlAuthType')]",
           "gateway": {
-            "id": "[concat('/subscriptions/',  parameters('subscriptionId'), '/resourceGroups/', parameters('dgwResourceGroupName'), '/providers/Microsoft.Web/connectionGateways/', parameters('dgwName'))]"
+            "id": "[concat(parameters('subscriptionId'), '/resourceGroups/', parameters('dgwResourceGroupName'), '/providers/Microsoft.Web/connectionGateways/', parameters('dgwName'))]"
           }
         }
       }
