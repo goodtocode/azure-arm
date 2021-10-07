@@ -1,4 +1,4 @@
-# GoodToCode Azure ARM Template library
+# azure-arm Azure ARM Template library
 <sup>ARM Templates in .json and upcoming .bicep files.</sup> <br>
 
 This is a atomic-level repository of Azure ARM templates. All files install only a single resource. You can include the resources you need in an Azure DevOps or GitHub Actions pipeline to deploy directly to Azure.
