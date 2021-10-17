@@ -7,7 +7,7 @@
       "minLength": 1,
       "maxLength": 60
     },
-    "appInsightsName": {
+    "appiName": {
       "type": "string",
       "defaultValue": "appi-PRODUCT-ENVIRONMENT-001",
       "minLength": 1,
@@ -88,7 +88,7 @@
     },
     {
       "apiVersion": "2014-04-01",
-      "name": "[parameters('appInsightsName')]",
+      "name": "[parameters('appiName')]",
       "type": "Microsoft.Insights/components",
       "location": "[resourceGroup().location]",
       "dependsOn": [

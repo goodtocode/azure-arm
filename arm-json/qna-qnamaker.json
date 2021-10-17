@@ -47,7 +47,7 @@
         "puredAzureSearchName": "[replace(parameters('name'), '-', '')]",
         "normalizedAzureSearchName": "[if(greater(length(variables('puredAzureSearchName')), 40), substring(variables('puredAzureSearchName'), sub(length(variables('puredAzureSearchName')), 40), 40) , variables('puredAzureSearchName'))]",
         "azureSearchName": "[toLower(concat('srch-', variables('normalizedAzureSearchName')))]",
-        "appInsightsName": "[concat('appi-', parameters('name'))]"
+        "appiName": "[concat('appi-', parameters('name'))]"
     },
     "resources": [
         {
@@ -68,7 +68,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Web/Sites', parameters('name'))]",
                 "[resourceId('Microsoft.Search/searchServices/', variables('azureSearchName'))]",
-                "[resourceId('microsoft.insights/components/', variables('appInsightsName'))]"
+                "[resourceId('microsoft.insights/components/', variables('appiName'))]"
             ]
         },
         {
@@ -112,7 +112,7 @@
             ],
             "resources": [
                 {
-                    "name": "[variables('appInsightsName')]",
+                    "name": "[variables('appiName')]",
                     "type": "microsoft.insights/components",
                     "kind": "web",
                     "apiVersion": "2015-05-01",
@@ -138,9 +138,9 @@
                     "properties": {
                         "AzureSearchName": "[variables('azureSearchName')]",
                         "AzureSearchAdminKey": "[listAdminKeys(resourceId('Microsoft.Search/searchServices/', variables('azureSearchName')), '2015-08-19').primaryKey]",
-                        "UserAppInsightsKey": "[reference(resourceId('microsoft.insights/components/', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
-                        "UserAppInsightsName": "[variables('appInsightsName')]",
-                        "UserAppInsightsAppId": "[reference(resourceId('microsoft.insights/components/', variables('appInsightsName')), '2015-05-01').AppId]",
+                        "UserAppInsightsKey": "[reference(resourceId('microsoft.insights/components/', variables('appiName')), '2015-05-01').InstrumentationKey]",
+                        "UserappiName": "[variables('appiName')]",
+                        "UserAppInsightsAppId": "[reference(resourceId('microsoft.insights/components/', variables('appiName')), '2015-05-01').AppId]",
                         "PrimaryEndpointKey": "[concat(parameters('name'), '-PrimaryEndpointKey')]",
                         "SecondaryEndpointKey": "[concat(parameters('name'), '-SecondaryEndpointKey')]",
                         "DefaultAnswer": "No good match found in KB.",
