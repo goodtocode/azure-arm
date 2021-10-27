@@ -17,55 +17,73 @@
     },
     "ftpPassword": {
       "type": "string"
+    },
+    "ftpRootFolder": {
+      "type": "string",
+      "defaultValue": "/"
+    },
+    "ftpPrivateKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH private key (the content of the file should be provided entirely as is, in the multiline format)"
+      }      
+    },
+    "ftpPassphrase": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH private key passphrase (if the private key is protected by a passphrase)"
+      }      
+    },
+    "ftpAcceptAnySshKey": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Disable SSH host key validation? (True/False)"
+      }
+    },
+    "ftpHostKeyFingerprint": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH host key finger-print"
+      }
     }
   },
   "variables": {
     "locationShortName": "[toLower(replace(resourceGroup().location, ' ', ''))]",
-    "nameLower": "[toLower(replace(replace(parameters('name'), '-', ''), ' ', ''))]",
-    "ftpIsSsl": "true",
-    "ftpIsBinaryTransport": "true",
-    "acceptAnySshHostKey": "true"
+    "nameLower": "[toLower(replace(replace(parameters('name'), '-', ''), ' ', ''))]"
   },
   "resources": [
     {
-      "type": "Microsoft.Web/connections",
-      "apiVersion": "2016-06-01",
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2018-07-01-preview",
       "name": "[variables('nameLower')]",
       "location": "[variables('locationShortName')]",
-      "kind": "V1",
-      "scale": null,
       "properties": {
-        "displayName": "[parameters('name')]",
-        "customParameterValues": {},
         "api": {
-            "name": "[concat(variables('nameLower'), 'sftpwithssh')]",
-            "displayName": "SFTP - SSH",
-            "description": "SFTP (SSH File Transfer Protocol) is a network protocol that provides file access, file transfer, and file management over any reliable data stream. It was designed by the Internet Engineering Task Force (IETF) as an extension of the Secure Shell protocol (SSH) version 2.0 to provide secure file transfer capabilities.",
-            "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1518/1.0.1518.2564/sftpwithssh/icon.png')]",
-            "brandColor": "#e8bb00",
-            "id": "[subscriptionResourceId('Microsoft.Web/locations/managedApis', variables('locationShortName'), 'ftp')]",
-            //"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/ftp')]",
-            "type": "Microsoft.Web/locations/managedApis"
-            },
-        "parameterValues": {          
-          "serverAddress": "[parameters('ftpServerAddress')]",
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/', 'sftpwithssh')]",
+          "type": "Microsoft.Web/locations/managedApis",
+          "name": "[concat(variables('nameLower'), 'sftpwithssh')]",
+          "displayName": "SFTP - SSH",
+          "description": "SFTP (SSH File Transfer Protocol) is a network protocol that provides file access, file transfer, and file management over any reliable data stream. It was designed by the Internet Engineering Task Force (IETF) as an extension of the Secure Shell protocol (SSH) version 2.0 to provide secure file transfer capabilities.",
+          "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1518/1.0.1518.2564/sftpwithssh/icon.png')]",
+          "brandColor": "#e8bb00"
+        },
+        "displayName": "[parameters('name')]",
+        "parameterValues": {
+          "hostName": "[parameters('ftpServerAddress')]",
           "userName": "[parameters('ftpUsername')]",
-          "password": "[parameters('ftpPassword')]",          
-          "serverPort": "[parameters('ftpServerPort')]",          
-          "isssl": false,
-          "disableCertificateValidation": true
-          //"rootFolder": "/"
-          //"hostName": "[parameters('ftpServerAddress')]",
-          //"portNumber": "[parameters('ftpServerPort')]",
-          //"acceptAnySshHostKey": "[variables('acceptAnySshHostKey')]",
-          //"sshHostKeyFingerprint": "testdata",
-          //"isssl": "[variables('ftpIsSsl')]",
-          //"isBinaryTransport": "[variables('ftpIsBinaryTransport')]",
-          //"disableCertificateValidation": "[variables('ftpDisableCertificateValidation')]"
+          "password": "[parameters('ftpPassword')]",
+          "sshPrivateKey": "[parameters('ftpPrivateKey')]",
+          "sshPrivateKeyPassphrase": "[parameters('ftpPassphrase')]",
+          "portNumber": "[parameters('ftpServerPort')]",
+          "acceptAnySshHostKey": "[parameters('ftpAcceptAnySshKey')]",
+          "sshHostKeyFingerprint": "[parameters('ftpHostKeyFingerprint')]",
+          "rootFolder": "[parameters('ftpRootFolder')]"
         }
-      },
-      "dependsOn": [
-      ]
-    }
+      }
+    }    
   ]
 }

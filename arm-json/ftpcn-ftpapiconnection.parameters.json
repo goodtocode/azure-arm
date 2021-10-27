@@ -16,9 +16,6 @@
     },
     "ftpPassword": {
       "value": ""
-    },
-    "ftpRootFolder": {
-      "value": "/"
     }
   }
 }
