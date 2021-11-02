@@ -10,8 +10,7 @@
       "type": "string"
     },
     "storageKey": {
-      "type": "securestring",
-      "defaultValue": ""
+      "type": "securestring"
     }
   },
   "variables": {
