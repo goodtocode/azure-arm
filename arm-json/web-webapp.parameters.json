@@ -5,17 +5,8 @@
     "name": {
       "value": "web-PRODUCT-ENVIRONMENT-001"
     },
-    "appInsightsName": {
-      "value": "appi-PRODUCT-ENVIRONMENT-001"
-    },
-    "hostingPlanName": {
+    "planName": {
       "value": "plan-PRODUCT-ENVIRONMENT-001"
-    },
-    "sku": {
-      "value": "F1"
-    },
-    "skuCapacity": {
-      "value": 1
     }
   }
 }

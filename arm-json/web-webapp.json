@@ -7,71 +7,18 @@
       "minLength": 1,
       "maxLength": 60
     },
-    "appiName": {
-      "type": "string",
-      "defaultValue": "appi-PRODUCT-ENVIRONMENT-001",
-      "minLength": 1,
-      "maxLength": 60
-    },
     "planName": {
       "type": "string",
-      "defaultValue": "plan-PRODUCT-ENVIRONMENT-001",
       "minLength": 1,
       "maxLength": 60
-    },
-    "sku": {
-      "type": "string",
-      "defaultValue": "F1",
-      "allowedValues": [
-        "F1",
-        "D1",
-        "B1",
-        "B2",
-        "B3",
-        "S1",
-        "S2",
-        "S3",
-        "P1",
-        "P2",
-        "P3",
-        "P4"
-      ],
-      "metadata": {
-        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
-      }
-    },
-    "skuCapacity": {
-      "type": "int",
-      "defaultValue": 1,
-      "minValue": 1,
-      "metadata": {
-        "description": "Describes plan's instance count"
-      }
     }
   },
   "variables": {
-    "webSiteName": "[toLower(parameters('name'))]"
   },
-  "resources": [
+  "resources": [    
     {
       "apiVersion": "2021-06-01",
-      "name": "[parameters('planName')]",
-      "type": "Microsoft.Web/serverfarms",
-      "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "HostingPlan"
-      },
-      "sku": {
-        "name": "[parameters('sku')]",
-        "capacity": "[parameters('skuCapacity')]"
-      },
-      "properties": {
-        "name": "[parameters('planName')]"
-      }
-    },
-    {
-      "apiVersion": "2021-06-01",
-      "name": "[variables('webSiteName')]",
+      "name": "[parameters('name')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -82,24 +29,8 @@
         "[resourceId('Microsoft.Web/serverfarms/', parameters('planName'))]"
       ],
       "properties": {
-        "name": "[variables('webSiteName')]",
+        "name": "[parameters('name')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]"
-      }
-    },
-    {
-      "apiVersion": "2014-04-01",
-      "name": "[parameters('appiName')]",
-      "type": "Microsoft.Insights/components",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/', variables('webSiteName'))]"
-      ],
-      "tags": {
-        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('webSiteName'))]": "Resource",
-        "displayName": "AppInsightsComponent"
-      },
-      "properties": {
-        "applicationId": "[variables('webSiteName')]"
       }
     }
   ]
