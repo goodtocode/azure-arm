@@ -11,7 +11,7 @@
     "hostingPlanName": {
       "value": "plan-PRODUCT-ENVIRONMENT-001"
     },
-    "skuName": {
+    "sku": {
       "value": "F1"
     },
     "skuCapacity": {
