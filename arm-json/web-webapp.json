@@ -26,7 +26,6 @@
         "displayName": "Website"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms/', parameters('planName'))]"
       ],
       "properties": {
         "name": "[parameters('name')]",
