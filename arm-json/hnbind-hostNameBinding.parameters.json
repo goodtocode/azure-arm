@@ -3,16 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "siteName": {
-      "value": "web-PRODUCT-ENVIRONMENT-001"
+      "value": "web-www-dev-001"
     },
     "fqdn": {
-      "value": "ENVIRONMENT.COMPANY.com"
+      "value": "www.GoodToCode.com"
     },
     "headlessDn": {
-      "value": "COMPANY.com"
+      "value": "GoodToCode.com"
     },
     "thumbprint": {
-      "value": "00000000000000000000000000000000000000000000000"
+      "value": "8FD908D0AC6D34D499816BB670D64626D123E6D8"
     }
   }
 }
