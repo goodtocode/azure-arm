@@ -8,7 +8,7 @@
         "sku": {
             "type": "String",
             "defaultValue": "Basic",
-            "allowedVAlues": ["Basic", "Standard"]
+            "allowedVAlues": ["Basic", "Standard", "Premium"]
         }
     },
     "variables": {
@@ -45,6 +45,7 @@
             }
         },
         {
+            "condition": "[equals(parameters('sku'),'Premium')]",
             "type": "Microsoft.ServiceBus/namespaces/networkRuleSets",
             "apiVersion": "2021-01-01-preview",
             "name": "[concat(variables('nameAlphaNumeric'), '/default')]",
