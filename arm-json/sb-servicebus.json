@@ -8,7 +8,7 @@
         "sku": {
             "type": "String",
             "defaultValue": "Basic",
-            "allowedVAlues": ["Basic", "Standard"]
+            "allowedVAlues": ["Basic", "Standard", "Premium"]
         }
     },
     "variables": {

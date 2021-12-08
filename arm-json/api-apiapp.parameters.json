@@ -7,6 +7,12 @@
     },
     "name": {
       "value": "api-PRODUCT-ENVIRONMENT-001"
+    },
+    "appInsightsKey": {
+      "value": "[APPI_KEY]"
+    },
+    "appInsightsConnection": {
+      "value": "[APPI_CONNECTION_STRING]"
     }
   }
 }
