@@ -8,6 +8,16 @@
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]"
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard"
+            ],
+            "metadata": {
+                "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+            }
         }
     },
     "variables": {
@@ -17,10 +27,10 @@
             "type": "Microsoft.Relay/namespaces",
             "apiVersion": "2018-01-01-preview",
             "name": "[parameters('name')]",
-            "location": "West US 2",
+            "location": "[parameters('location')]",
             "sku": {
-                "name": "Standard",
-                "tier": "Standard"
+                "name": "[parameters('sku')]",
+                "tier": "[parameters('sku')]"
             },
             "properties": {}
         },
