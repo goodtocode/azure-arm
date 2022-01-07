@@ -9,6 +9,18 @@
     "name": {
       "type": "string",
       "minLength": 1
+    },
+    "appInsightsKey": {
+      "type": "string"
+    },
+    "appInsightsConnection": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "Development",
+      "allowedValues": ["Development", "QA", "Staging", "Production"]
     }
   },
   "variables": {
@@ -16,17 +28,34 @@
   },
   "resources": [
     {
-      "apiVersion": "2021-06-01",
+      "apiVersion": "2015-08-01",
       "name": "[variables('webSiteName')]",
       "type": "Microsoft.Web/sites",
-      "location": "[resourceGroup().location]",
+      "kind": "app",
+      "location": "[resourceGroup().location]",      
       "tags": {
         "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]": "Resource",
         "displayName": "Website"
       },
       "properties": {
         "name": "[variables('webSiteName')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[parameters('appInsightsKey')]"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[parameters('appInsightsConnection')]"
+            },
+            {
+              "name": "ASPNETCORE_ENVIRONMENT",
+              "value": "[parameters('environment')]"
+            }
+          ]
+        }
       }
     }
   ]

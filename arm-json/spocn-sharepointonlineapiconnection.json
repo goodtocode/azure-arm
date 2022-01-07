@@ -4,6 +4,10 @@
   "parameters": {
     "name": {
       "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "defaultValue": "[subscription().tenantId]"
     }
   },
   "variables": {
@@ -22,12 +26,15 @@
         "customParameterValues": {},
         "api": {
             "name": "[variables('nameLower')]",
-            "displayName": "Microsoft Teams",
-            "description": "Microsoft Teams enables you to get all your content, tools and conversations in the Team workspace with Office 365.",
-            "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1505/1.0.1505.2520/', variables('nameLower'), '/icon.png')]",
-            "brandColor": "#4B53BC",
-            "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/teams')]",
+            "displayName": "SharePoint",
+            "description": "SharePoint helps organizations share and collaborate with colleagues, partners, and customers. You can connect to SharePoint Online or to an on-premises SharePoint 2013 or 2016 farm using the On-Premises Data Gateway to manage documents and list items.",
+            "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1533/1.0.1533.2600/', variables('nameLower'), '/icon.png')]",
+            "brandColor": "#036C70",
+            "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/', 'sharepointonline')]",
             "type": "Microsoft.Web/locations/managedApis"
+        },
+        "nonSecretParameterValues": {
+          "token:TenantId": "[parameters('tenantId')]"
         },
         "parameterValues": {
         }

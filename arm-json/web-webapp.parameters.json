@@ -3,7 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "teamscn-PRODUCT-ENVIRONMENT-001"
+      "value": "web-PRODUCT-ENVIRONMENT-001"
+    },
+    "planName": {
+      "value": "plan-PRODUCT-ENVIRONMENT-001"
     }
   }
 }

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "siteName": {
+      "value": "web-www-dev-001"
+    },
+    "fqdn": {
+      "value": "www.GoodToCode.com"
+    },
+    "headlessDn": {
+      "value": "GoodToCode.com"
+    },
+    "thumbprint": {
+      "value": "8FD908D0AC6D34D499816BB670D64626D123E6D8"
+    }
+  }
+}

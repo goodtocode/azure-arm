@@ -8,7 +8,14 @@
         "sku": {
             "type": "String",
             "defaultValue": "Basic",
-            "allowedVAlues": ["Basic", "Standard"]
+            "allowedVAlues": ["Basic", "Standard", "Premium"]
+        },
+            "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Specifies the Azure location where the resource should be created."
+            }
         }
     },
     "variables": {
@@ -19,7 +26,7 @@
             "type": "Microsoft.ServiceBus/namespaces",
             "apiVersion": "2021-01-01-preview",
             "name": "[variables('nameAlphaNumeric')]",
-            "location": "West US 2",
+            "location": "[parameters('location')]",
             "sku": {
                 "name": "[parameters('sku')]",
                 "tier": "[parameters('sku')]"
@@ -32,7 +39,7 @@
             "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
             "apiVersion": "2021-01-01-preview",
             "name": "[concat(variables('nameAlphaNumeric'), '/RootManageSharedAccessKey')]",
-            "location": "West US 2",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.ServiceBus/namespaces', variables('nameAlphaNumeric'))]"
             ],
@@ -45,10 +52,11 @@
             }
         },
         {
+            "condition": "[equals(parameters('sku'),'Premium')]",
             "type": "Microsoft.ServiceBus/namespaces/networkRuleSets",
             "apiVersion": "2021-01-01-preview",
             "name": "[concat(variables('nameAlphaNumeric'), '/default')]",
-            "location": "West US 2",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.ServiceBus/namespaces', variables('nameAlphaNumeric'))]"
             ],

@@ -3,7 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "teamscn-PRODUCT-ENVIRONMENT-001"
+      "value": "sql-PRODUCT-ENVIRONMENT-001"
+    },
+    "adminLogin": {
+      "value": "LocalAdmin"
+    },
+    "adminPassword": {
+      "value": ""
     }
   }
 }

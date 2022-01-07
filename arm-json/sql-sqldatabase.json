@@ -2,17 +2,17 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "subdomainName": {
+    "name": {
       "type": "string",
       "minLength": 1,
       "maxLength": 60
     },
-    "administratorLogin": {
+    "adminLogin": {
       "type": "string",
       "minLength": 1,
       "maxLength": 60
     },
-    "administratorLoginPassword": {
+    "adminPassword": {
       "type": "securestring",
       "minLength": 1,
       "maxLength": 128
@@ -57,11 +57,11 @@
     }
   },
   "variables": {
-    "sqlserverName": "[toLower(parameters('subdomainName'))]"
+    "serverNameLower": "[toLower(parameters('name'))]"
   },
   "resources": [
     {
-      "name": "[variables('sqlserverName')]",
+      "name": "[variables('serverNameLower')]",
       "type": "Microsoft.Sql/servers",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -69,8 +69,8 @@
       },
       "apiVersion": "2014-04-01-preview",
       "properties": {
-        "administratorLogin": "[parameters('administratorLogin')]",
-        "administratorLoginPassword": "[parameters('administratorLoginPassword')]"
+        "administratorLogin": "[parameters('adminLogin')]",
+        "administratorLoginPassword": "[parameters('adminPassword')]"
       },
       "resources": [
         {
@@ -82,7 +82,7 @@
           },
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers/', variables('sqlserverName'))]"
+            "[resourceId('Microsoft.Sql/servers/', variables('serverNameLower'))]"
           ],
           "properties": {
             "edition": "[parameters('edition')]",
@@ -95,7 +95,7 @@
           "type": "firewallrules",
           "apiVersion": "2014-04-01-preview",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers/', variables('sqlserverName'))]"
+            "[resourceId('Microsoft.Sql/servers/', variables('serverNameLower'))]"
           ],
           "location": "[resourceGroup().location]",
           "name": "AllowAllWindowsAzureIps",

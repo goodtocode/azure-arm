@@ -1,0 +1,89 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "defaultValue": "azureblob"
+    },
+     "ftpServerAddress": {
+      "type": "string"
+    },
+    "ftpServerPort": {
+      "type": "string"
+    },
+    "ftpUsername": {
+      "type": "string"
+    },
+    "ftpPassword": {
+      "type": "string"
+    },
+    "ftpRootFolder": {
+      "type": "string",
+      "defaultValue": "/"
+    },
+    "ftpPrivateKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH private key (the content of the file should be provided entirely as is, in the multiline format)"
+      }      
+    },
+    "ftpPassphrase": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH private key passphrase (if the private key is protected by a passphrase)"
+      }      
+    },
+    "ftpAcceptAnySshKey": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Disable SSH host key validation? (True/False)"
+      }
+    },
+    "ftpHostKeyFingerprint": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH host key finger-print"
+      }
+    }
+  },
+  "variables": {
+    "locationShortName": "[toLower(replace(resourceGroup().location, ' ', ''))]",
+    "nameLower": "[toLower(replace(replace(parameters('name'), '-', ''), ' ', ''))]"
+  },
+  "resources": [
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2018-07-01-preview",
+      "name": "[variables('nameLower')]",
+      "location": "[variables('locationShortName')]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/', 'sftpwithssh')]",
+          "type": "Microsoft.Web/locations/managedApis",
+          "name": "[concat(variables('nameLower'), 'sftpwithssh')]",
+          "displayName": "SFTP - SSH",
+          "description": "SFTP (SSH File Transfer Protocol) is a network protocol that provides file access, file transfer, and file management over any reliable data stream. It was designed by the Internet Engineering Task Force (IETF) as an extension of the Secure Shell protocol (SSH) version 2.0 to provide secure file transfer capabilities.",
+          "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1518/1.0.1518.2564/sftpwithssh/icon.png')]",
+          "brandColor": "#e8bb00"
+        },
+        "displayName": "[parameters('name')]",
+        "parameterValues": {
+          "hostName": "[parameters('ftpServerAddress')]",
+          "userName": "[parameters('ftpUsername')]",
+          "password": "[parameters('ftpPassword')]",
+          "sshPrivateKey": "[parameters('ftpPrivateKey')]",
+          "sshPrivateKeyPassphrase": "[parameters('ftpPassphrase')]",
+          "portNumber": "[parameters('ftpServerPort')]",
+          "acceptAnySshHostKey": "[parameters('ftpAcceptAnySshKey')]",
+          "sshHostKeyFingerprint": "[parameters('ftpHostKeyFingerprint')]",
+          "rootFolder": "[parameters('ftpRootFolder')]"
+        }
+      }
+    }    
+  ]
+}
