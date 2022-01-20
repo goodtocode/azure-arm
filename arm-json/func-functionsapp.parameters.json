@@ -12,10 +12,10 @@
       "value": "stPRODUCTENVIRONMENT001"
     },
     "appInsightsKey": {
-      "value": "[APPI_KEY]"
+      "value": "APPI-KEY"
     },
     "appInsightsConnection": {
-      "value": "[APPI_CONNECTION_STRING]"
+      "value": "APPI-CONNECTION-STRING"
     },
     "skuTier": {
       "value": "Dynamic"
