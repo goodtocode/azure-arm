@@ -3,20 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "type": "string",
-      "defaultValue": "azureblob"
+      "type": "string"
     },
      "storageName": {
       "type": "string"
-    },
-    "storageKey": {
-      "type": "securestring",
-      "defaultValue": ""
     }
   },
   "variables": {
     "locationShortName": "[toLower(replace(resourceGroup().location, ' ', ''))]",
-    "nameLower": "[toLower(replace(replace(parameters('name'), '-', ''), ' ', ''))]"
+    "nameLower": "[toLower(replace(replace(parameters('name'), '-', ''), ' ', ''))]",
+    "storageId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
   },
   "resources": [
     {
@@ -40,7 +36,7 @@
         },
         "parameterValues": {
             "accountName": "[parameters('storageName')]",
-            "accessKey": "[if(empty(parameters('storageKey')), listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('storageName')), '2016-06-01').keys[0].value, parameters('storageKey'))]"
+            "accessKey": "[listKeys(variables('storageId'), '2019-04-01').keys[0].value]"            
         }
       },
       "dependsOn": [
