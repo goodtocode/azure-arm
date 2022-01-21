@@ -35,6 +35,9 @@
     "workerSizeId": {
       "value": "0"
     },
+    "workerVersion": {
+      "value": 3
+    },
     "numberOfWorkers": {
       "value": "1"
     },
