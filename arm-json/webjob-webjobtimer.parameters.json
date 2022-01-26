@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "web-PRODUCT-ENVIRONMENT-001"
+      "value": "webjob-PRODUCT-ENVIRONMENT-001"
     },
-    "planName": {
-      "value": "plan-PRODUCT-ENVIRONMENT-001"
+    "webName": {
+      "value": "web-PRODUCT-ENVIRONMENT-001"
     }
   }
 }
