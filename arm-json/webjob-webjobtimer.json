@@ -54,7 +54,6 @@
       "name":"[parameters('name')]",
       "type":"Microsoft.Scheduler/jobCollections",
       "dependsOn":[
-        "[resourceId('Microsoft.Web/Sites', parameters('webName'))]"
       ],
       "location":"[parameters('location')]",
       "properties":{
