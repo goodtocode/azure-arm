@@ -2,14 +2,11 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "redisCacheName": {
-      "value": "GEN-UNIQUE"
+    "name": {
+      "value": "redis-PRODUCT-ENVIRONMENT-001"
     },
-    "existingDiagnosticsStorageAccountName": {
-      "value": "GET-PREREQ-existingDiagnosticsStorageAccountName"
-    },
-    "existingDiagnosticsStorageAccountResourceGroup": {
-      "value": "GET-PREREQ-existingDiagnosticsStorageAccountResourceGroup"
+    "storageName": {
+      "value": "stproductenvironment001"
     }
   }
 }

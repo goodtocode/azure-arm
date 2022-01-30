@@ -9,9 +9,9 @@
     }
   },
   "parameters": {
-    "redisCacheName": {
+    "name": {
       "type": "string",
-      "defaultValue": "[format('redisCache-{0}', uniqueString(resourceGroup().id))]",
+      "defaultValue": "[format('redis-{0}', uniqueString(resourceGroup().id))]",
       "metadata": {
         "description": "Specify the name of the Azure Redis Cache to create."
       }
@@ -23,9 +23,9 @@
         "description": "Location of all resources"
       }
     },
-    "redisCacheSKU": {
+    "sku": {
       "type": "string",
-      "defaultValue": "Standard",
+      "defaultValue": "Basic",
       "allowedValues": [
         "Basic",
         "Standard",
@@ -35,7 +35,7 @@
         "description": "Specify the pricing tier of the new Azure Redis Cache."
       }
     },
-    "redisCacheFamily": {
+    "family": {
       "type": "string",
       "defaultValue": "C",
       "allowedValues": [
@@ -46,7 +46,7 @@
         "description": "Specify the family for the sku. C = Basic/Standard, P = Premium."
       }
     },
-    "redisCacheCapacity": {
+    "capacity": {
       "type": "int",
       "defaultValue": 1,
       "allowedValues": [
@@ -69,21 +69,22 @@
         "description": "Specify a boolean value that indicates whether to allow access via non-SSL ports."
       }
     },
-    "diagnosticsEnabled": {
+    "enableDiagnostics": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
         "description": "Specify a boolean value that indicates whether diagnostics should be saved to the specified storage account."
       }
     },
-    "existingDiagnosticsStorageAccountName": {
+    "storageName": {
       "type": "string",
       "metadata": {
         "description": "Specify the name of an existing storage account for diagnostics."
       }
     },
-    "existingDiagnosticsStorageAccountResourceGroup": {
+    "storageResourceGroup": {
       "type": "string",
+      "defaultValue": "[resourceGroup().name]",
       "metadata": {
         "description": "Specify the resource group name of an existing storage account for diagnostics."
       }
@@ -94,38 +95,38 @@
     {
       "type": "Microsoft.Cache/redis",
       "apiVersion": "2020-06-01",
-      "name": "[parameters('redisCacheName')]",
+      "name": "[parameters('name')]",
       "location": "[parameters('location')]",
       "properties": {
         "enableNonSslPort": "[parameters('enableNonSslPort')]",
         "minimumTlsVersion": "1.2",
         "sku": {
-          "capacity": "[parameters('redisCacheCapacity')]",
-          "family": "[parameters('redisCacheFamily')]",
-          "name": "[parameters('redisCacheSKU')]"
+          "capacity": "[parameters('capacity')]",
+          "family": "[parameters('family')]",
+          "name": "[parameters('sku')]"
         }
       }
     },
     {
       "type": "microsoft.insights/diagnosticSettings",
       "apiVersion": "2017-05-01-preview",
-      "scope": "[format('Microsoft.Cache/redis/{0}', parameters('redisCacheName'))]",
-      "name": "[parameters('redisCacheName')]",
+      "scope": "[format('Microsoft.Cache/redis/{0}', parameters('name'))]",
+      "name": "[parameters('name')]",
       "properties": {
-        "storageAccountId": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('existingDiagnosticsStorageAccountResourceGroup')), 'Microsoft.Storage/storageAccounts', parameters('existingDiagnosticsStorageAccountName'))]",
+        "storageAccountId": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('storageResourceGroup')), 'Microsoft.Storage/storageAccounts', parameters('storageName'))]",
         "metrics": [
           {
             "timeGrain": "AllMetrics",
-            "enabled": "[parameters('diagnosticsEnabled')]",
+            "enabled": "[parameters('enableDiagnostics')]",
             "retentionPolicy": {
               "days": 90,
-              "enabled": "[parameters('diagnosticsEnabled')]"
+              "enabled": "[parameters('enableDiagnostics')]"
             }
           }
         ]
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Cache/redis', parameters('redisCacheName'))]"
+        "[resourceId('Microsoft.Cache/redis', parameters('name'))]"
       ]
     }
   ]

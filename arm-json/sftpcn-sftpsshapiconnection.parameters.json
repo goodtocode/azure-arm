@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "stcn-PRODUCT-ENVIRONMENT-001"
+      "value": "sftpcn-PRODUCT-ENVIRONMENT-001"
     },
     "ftpServerAddress": {
       "value": ""
