@@ -47,6 +47,11 @@
       "type": "string",
       "defaultValue": "0"
     },
+    "workerVersion": {
+      "type": "int",
+      "defaultValue": 4,
+      "allowedValues": [1, 2, 3, 4]
+    },
     "numberOfWorkers": {
       "type": "string",
       "defaultValue": "1"
@@ -72,7 +77,7 @@
           "appSettings": [
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "~3"
+              "value": "[concat('~', parameters('workerVersion'))]"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
