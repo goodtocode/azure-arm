@@ -47,6 +47,20 @@
       "metadata": {
         "description": "Allow public access"
       }
+    },
+    "containerResources": {
+      "type": "object",
+      "defaultValue": {
+        "resources": [
+            {
+              "name": "mycontainer",
+              "publicAccess": "None"
+            }
+          ]
+        },
+      "metadata": {
+        "description": "Array of container JSON objects. value: {containers:[name:, publicAccess:Container|None]}"
+      }
     }
   },
   "variables": {
@@ -83,7 +97,21 @@
         "cors": {
           "corsRules": []
         }
-      }
+      },
+      "copy": [
+        {
+          "name": "resources",
+          "count": "[length(parameters('containerResources').resources)]",
+          "input": {
+            "name": "[concat('default/', parameters('containerResources').resources[copyIndex()].name)]",                
+            "type": "blobServices/containers",
+            "apiVersion": "2021-06-01",
+            "properties": {
+                "publicAccess": "[parameters('containerResources').resources[copyIndex()].publicAccess]"
+            }
+          }
+        }
+      ]
     },
     {
       "type": "Microsoft.Storage/storageAccounts/fileServices",
