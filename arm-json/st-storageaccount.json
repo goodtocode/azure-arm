@@ -43,7 +43,7 @@
     },
     "allowBlobPublicAccess": {
       "type": "bool",
-      "defaultValue": "false",
+      "defaultValue": false,
       "metadata": {
         "description": "Allow public access"
       }

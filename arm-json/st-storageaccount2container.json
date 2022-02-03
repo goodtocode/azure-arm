@@ -13,11 +13,42 @@
     "sku": {
       "type": "string",
       "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Premium_LRS",
+        "Premium_ZRS",
+        "Standard_GRS",
+        "Standard_GZRS",
+        "Standard_LRS",
+        "Standard_RAGRS",
+        "Standard_RAGZRS",
+        "Standard_ZRS"
+        ],
       "metadata": {
         "description": "Sku of the Storage Account."
       }
     },
-    "container1Name": {
+    "kind": {
+      "type": "string",
+      "defaultValue": "StorageV2",
+      "allowedValues": [
+        "BlobStorage",
+        "BlockBlobStorage",
+        "FileStorage",
+        "Storage",
+        "StorageV2"
+        ],
+      "metadata": {
+        "description": "Kind of the Storage Account."
+      }
+    },
+    "allowBlobPublicAccess": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Allow public access"
+      }
+    },
+        "container1Name": {
       "type": "string",
       "minLength": 3,
       "maxLength": 24,
@@ -52,29 +83,15 @@
       "metadata": {
         "description": "Name of the Storage Account container 1"
       }
-    },
-    "kind": {
-      "type": "string",
-      "defaultValue": "StorageV2",
-      "allowedValues": [
-        "BlobStorage",
-        "BlockBlobStorage",
-        "FileStorage",
-        "Storage",
-        "StorageV2"
-        ],
-      "metadata": {
-        "description": "Kind of the Storage Account."
-      }
     }
   },
   "variables": {
   },
-    "resources": [
+  "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('name')]",
-      "apiVersion": "2018-02-01",
+      "apiVersion": "2021-06-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "[parameters('name')]"
@@ -83,7 +100,10 @@
         "name": "[parameters('sku')]"
       },
       "kind": "[parameters('kind')]",
-      "properties": {},
+      "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]"        
+      },
       "resources": [
           {
               "type": "blobServices/containers",
@@ -108,6 +128,64 @@
               }
           }
       ]
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2021-06-01",
+      "name": "[concat(parameters('name'), '/default')]",
+      "dependsOn": [
+          "[resourceId('Microsoft.Storage/storageAccounts', parameters('name'))]"
+      ],
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices",
+      "apiVersion": "2021-06-01",
+      "name": "[concat(parameters('name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('name'))]"
+      ],
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/queueServices",
+      "apiVersion": "2021-06-01",
+      "name": "[concat(parameters('name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/tableServices",
+      "apiVersion": "2021-06-01",
+      "name": "[concat(parameters('name'), '/default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('name'))]"
+      ],
+      "properties": {
+        "cors": {
+          "corsRules": []
+        }
+      }
     }
   ],
   "outputs": {
