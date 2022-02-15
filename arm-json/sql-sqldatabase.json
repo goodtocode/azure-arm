@@ -35,6 +35,15 @@
         "Premium"
       ]
     },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "allowedValues": [
+        "West US",
+        "West US 2",
+        "West US 3"
+      ]
+    },
     "maxSizeBytes": {
       "type": "string",
       "defaultValue": "1073741824"
@@ -63,7 +72,7 @@
     {
       "name": "[variables('serverNameLower')]",
       "type": "Microsoft.Sql/servers",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "displayName": "SqlServer"
       },
@@ -76,7 +85,7 @@
         {
           "name": "[parameters('databaseName')]",
           "type": "databases",
-          "location": "[resourceGroup().location]",
+          "location": "[parameters('location')]",
           "tags": {
             "displayName": "Database"
           },
