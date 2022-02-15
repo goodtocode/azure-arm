@@ -26,7 +26,7 @@
       "type": "string",
       "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
     },
-    "edition": {
+    "sku": {
       "type": "string",
       "defaultValue": "Basic",
       "allowedValues": [
@@ -52,7 +52,7 @@
         "P3"
       ],
       "metadata": {
-        "description": "Describes the performance level for Edition"
+        "description": "Describes the performance level for Sku"
       }
     }
   },
@@ -85,7 +85,7 @@
             "[resourceId('Microsoft.Sql/servers/', variables('serverNameLower'))]"
           ],
           "properties": {
-            "edition": "[parameters('edition')]",
+            "edition": "[parameters('sku')]",
             "collation": "[parameters('collation')]",
             "maxSizeBytes": "[parameters('maxSizeBytes')]",
             "requestedServiceObjectiveName": "[parameters('requestedServiceObjectiveName')]"

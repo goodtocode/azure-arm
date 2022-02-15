@@ -5,6 +5,9 @@
     "name": {
       "value": "sql-PRODUCT-ENVIRONMENT-001"
     },
+    "sku": {
+      "value": "Basic"
+    },
     "databaseName": {
       "value": "ProductName"
     },
