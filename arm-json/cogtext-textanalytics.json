@@ -22,7 +22,7 @@
     },
     "location": {
         "type": "string",
-        "defaultValue": "[resourceGroup().location]",
+        "defaultValue": "[toLower(replace(resourceGroup().location, ' ', ''))]",
         "metadata": {
           "description": "Location (region) of this resource"
         }

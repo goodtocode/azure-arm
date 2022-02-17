@@ -37,7 +37,7 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "[resourceGroup().location]",
+      "defaultValue": "[toLower(replace(resourceGroup().location, ' ', ''))]",
       "allowedValues": [
         "West US",
         "West US 2",
