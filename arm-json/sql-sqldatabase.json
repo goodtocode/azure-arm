@@ -37,12 +37,7 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "[toLower(replace(resourceGroup().location, ' ', ''))]",
-      "allowedValues": [
-        "West US",
-        "West US 2",
-        "West US 3"
-      ]
+      "defaultValue": "[toLower(replace(resourceGroup().location, ' ', ''))]"
     },
     "maxSizeBytes": {
       "type": "string",
