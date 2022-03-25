@@ -3,7 +3,9 @@
 
 This is a atomic-level repository of Azure ARM templates. All files install only a single resource. You can include the resources you need in an Azure DevOps or GitHub Actions pipeline to deploy directly to Azure.
 
-[What are Azure ARM Templates](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview)
+[Overview: What are Azure ARM Templates - docs.microsoft.com](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview)
+
+[Tutorial: Deploy and Manage Azure Resources - azuredevopslabs.com](https://azuredevopslabs.com/labs/vsts/azureresource/)
 
 #### Contents
 Path | Item | Contents
