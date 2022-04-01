@@ -10,7 +10,8 @@
     },
     "sku": {
       "type": "string",
-      "defaultValue": "standard",
+      "defaultValue": "free",
+      "allowedValues": ["free", "standard"],
       "metadata": {
         "description": "Specifies the sku of the App Configuration store."
       }
