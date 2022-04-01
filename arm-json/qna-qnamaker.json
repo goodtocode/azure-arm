@@ -138,7 +138,7 @@
                     "properties": {
                         "AzureSearchName": "[variables('azureSearchName')]",
                         "AzureSearchAdminKey": "[listAdminKeys(resourceId('Microsoft.Search/searchServices/', variables('azureSearchName')), '2015-08-19').primaryKey]",
-                        "UserAppInsightsKey": "[reference(resourceId('microsoft.insights/components/', variables('appiName')), '2015-05-01').InstrumentationKey]",
+                        "UserappiKey": "[reference(resourceId('microsoft.insights/components/', variables('appiName')), '2015-05-01').InstrumentationKey]",
                         "UserappiName": "[variables('appiName')]",
                         "UserAppInsightsAppId": "[reference(resourceId('microsoft.insights/components/', variables('appiName')), '2015-05-01').AppId]",
                         "PrimaryEndpointKey": "[concat(parameters('name'), '-PrimaryEndpointKey')]",

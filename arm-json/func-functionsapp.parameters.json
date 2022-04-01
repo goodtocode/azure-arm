@@ -8,13 +8,13 @@
     "workspaceName": {
       "value": "work-PRODUCT-ENVIRONMENT-001"
     },
-    "storageName": {
+    "stName": {
       "value": "stPRODUCTENVIRONMENT001"
     },
-    "appInsightsKey": {
+    "appiKey": {
       "value": "APPI-KEY"
     },
-    "appInsightsConnection": {
+    "appiConnection": {
       "value": "APPI-CONNECTION-STRING"
     },
     "skuTier": {
@@ -23,7 +23,7 @@
     "sku": {
       "value": "Y1"
     },
-    "environment": {
+    "rgEnvironment": {
       "value": "Development"
     },
     "workerRuntime": {

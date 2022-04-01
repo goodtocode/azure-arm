@@ -5,16 +5,16 @@
     "name": {
       "type": "string"
     },
-    "storageName": {
+    "stName": {
       "type": "string"
     },
     "workspaceName": {
       "type": "string"
     },
-    "appInsightsKey": {
+    "appiKey": {
       "type": "string"
     },
-    "appInsightsConnection": {
+    "appiConnection": {
       "type": "string"
     },
     "use32BitWorkerProcess": {
@@ -29,7 +29,7 @@
       "type": "string",
       "defaultValue": "Y1"
     },
-    "environment": {
+    "rgEnvironment": {
       "type": "string",
       "defaultValue": "Development",
       "allowedValues": ["Development", "QA", "Staging", "Production"]
@@ -85,19 +85,19 @@
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[parameters('appInsightsKey')]"
+              "value": "[parameters('appiKey')]"
             },
             {
               "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-              "value": "[parameters('appInsightsConnection')]"
+              "value": "[parameters('appiConnection')]"
             },
             {
               "name": "AzureWebJobsStorage",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('storageName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('stName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('stName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
             },
             {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('storageName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('stName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('stName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
             },
             {
               "name": "WEBSITE_CONTENTSHARE",

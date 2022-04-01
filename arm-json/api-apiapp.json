@@ -10,13 +10,13 @@
       "type": "string",
       "minLength": 1
     },
-    "appInsightsKey": {
+    "appiKey": {
       "type": "string"
     },
-    "appInsightsConnection": {
+    "appiConnection": {
       "type": "string"
     },
-    "environment": {
+    "rgEnvironment": {
       "type": "string",
       "minLength": 1,
       "defaultValue": "Development",
@@ -44,11 +44,11 @@
           "appSettings": [
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[parameters('appInsightsKey')]"
+              "value": "[parameters('appiKey')]"
             },
             {
               "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-              "value": "[parameters('appInsightsConnection')]"
+              "value": "[parameters('appiConnection')]"
             },
             {
               "name": "ASPNETCORE_ENVIRONMENT",

@@ -5,14 +5,14 @@
     "name": {
       "type": "string"
     },
-     "storageName": {
+     "stName": {
       "type": "string"
     }
   },
   "variables": {
     "locationShortName": "[toLower(replace(resourceGroup().location, ' ', ''))]",
     "nameLower": "[toLower(replace(replace(parameters('name'), '-', ''), ' ', ''))]",
-    "storageId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+    "storageId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('stName'))]"
   },
   "resources": [
     {
@@ -35,7 +35,7 @@
             "type": "Microsoft.Web/locations/managedApis"
         },
         "parameterValues": {
-            "accountName": "[parameters('storageName')]",
+            "accountName": "[parameters('stName')]",
             "accessKey": "[listKeys(variables('storageId'), '2019-04-01').keys[0].value]"            
         }
       },

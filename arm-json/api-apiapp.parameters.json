@@ -8,10 +8,10 @@
     "name": {
       "value": "api-PRODUCT-ENVIRONMENT-001"
     },
-    "appInsightsKey": {
+    "appiKey": {
       "value": "[APPI_KEY]"
     },
-    "appInsightsConnection": {
+    "appiConnection": {
       "value": "[APPI_CONNECTION_STRING]"
     }
   }

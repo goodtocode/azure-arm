@@ -6,7 +6,7 @@
       "type": "string",
       "defaultValue": "azureblob"
     },
-     "storageName": {
+     "stName": {
       "type": "string"
     }
   },
@@ -35,8 +35,8 @@
             "type": "Microsoft.Web/locations/managedApis"
         },
         "parameterValues": {
-          "accountName": "[parameters('storageName')]",
-          "accessKey": "[listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('storageName')), '2021-06-01').keys[0].value]"
+          "accountName": "[parameters('stName')]",
+          "accessKey": "[listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('stName')), '2021-06-01').keys[0].value]"
         }
       },
       "dependsOn": [
