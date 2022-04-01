@@ -52,7 +52,7 @@
             },
             {
               "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "[parameters('environment')]"
+              "value": "[parameters('rgEnvironment')]"
             }
           ]
         }
