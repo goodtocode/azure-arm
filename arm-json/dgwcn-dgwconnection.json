@@ -35,6 +35,14 @@
     },
     "sqlUserPassword": {
       "type": "string"
+    },
+    "encryptConnection": {
+      "type": "bool",
+      "defaultValue": "false"
+    },
+    "privacySetting": {
+      "type": "string",
+      "defaultValue": "None"
     }
   },
   "variables": {
@@ -59,6 +67,8 @@
           "username": "[parameters('sqlUserName')]",
           "password": "[parameters('sqlUserPassword')]",
           "authType": "[parameters('sqlAuthType')]",
+          "encryptConnection": "[parameters('encryptConnection')]",
+          "privacySetting": "[parameters('privacySetting')]",
           "gateway": {
             "id": "[concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('dgwResourceGroupName'), '/providers/Microsoft.Web/connectionGateways/', parameters('dgwName'))]"
           }
