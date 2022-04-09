@@ -5,7 +5,7 @@
     "name": {
       "value": "func-PRODUCT-ENVIRONMENT-001"
     },
-    "workspaceName": {
+    "workName": {
       "value": "work-PRODUCT-ENVIRONMENT-001"
     },
     "stName": {
@@ -35,7 +35,7 @@
     "workerSizeId": {
       "value": "0"
     },
-    "workerVersion": {
+    "funcVersion": {
       "value": 3
     },
     "numberOfWorkers": {

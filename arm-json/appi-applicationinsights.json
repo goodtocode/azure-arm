@@ -17,12 +17,12 @@
       "type": "string",
       "defaultValue": "IbizaAIExtension"
     },
-    "workspaceName": {
+    "workName": {
       "type": "string"
     }
   },
   "variables": {
-    "workspaceResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', parameters('workspaceName'))]"
+    "workspaceResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', parameters('workName'))]"
   },
   "resources": [
     {
