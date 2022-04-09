@@ -34,7 +34,7 @@
       "defaultValue": "Development",
       "allowedValues": ["Development", "QA", "Staging", "Production"]
     },
-    "workerRuntime": {
+    "funcRuntime": {
       "type": "string",
       "defaultValue": "dotnet",
       "allowedValues": ["dotnet", "python", "dotnet-isolated"]
@@ -81,7 +81,7 @@
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
-              "value": "[parameters('workerRuntime')]"
+              "value": "[parameters('funcRuntime')]"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
