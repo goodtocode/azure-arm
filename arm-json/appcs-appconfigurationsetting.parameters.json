@@ -5,9 +5,6 @@
     "name": {
       "value": "appcs-PRODUCT-ENVIRONMENT-001"
     },
-    "sku": {
-      "value": "standard"
-    },
     "appcsKeys": {
       "value": [ 
         "Shared:Sentinel", 

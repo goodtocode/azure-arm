@@ -8,21 +8,6 @@
         "description": "Specifies the name of the App Configuration store."
       }
     },
-    "sku": {
-      "type": "string",
-      "defaultValue": "free",
-      "allowedValues": ["free", "standard"],
-      "metadata": {
-        "description": "Specifies the sku of the App Configuration store."
-      }
-    },
-    "location": {
-      "type": "string",
-      "defaultValue": "[toLower(replace(resourceGroup().location, ' ', ''))]",
-      "metadata": {
-        "description": "Specifies the Azure location where the app configuration store should be created."
-      }
-    },
     "appcsKeys": {
       "type": "array",
       "defaultValue": [ "Shared:Sentinel", "Shared:Sentinel$Development" ],
@@ -57,15 +42,6 @@
   },
   "resources": [
     {
-      "type": "Microsoft.AppConfiguration/configurationStores",
-      "apiVersion": "2020-07-01-preview",
-      "name": "[parameters('name')]",
-      "location": "[parameters('location')]",
-      "sku": {
-        "name": "[parameters('sku')]"
-      }
-    },
-    {
       "type": "Microsoft.AppConfiguration/configurationStores/keyValues",
       "apiVersion": "2020-07-01-preview",
       "name": "[concat(parameters('name'), '/', parameters('appcsKeys')[copyIndex()])]",
@@ -73,9 +49,6 @@
         "name": "keyValueCopy",
         "count": "[length(parameters('appcsKeys'))]"
       },
-      "dependsOn": [
-        "[parameters('name')]"
-      ],
       "properties": {
         "value": "[parameters('appcsValues')[copyIndex()]]",
         "contentType": "[parameters('contentType')]",
