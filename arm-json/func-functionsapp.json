@@ -105,11 +105,11 @@
             },
             {
               "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "[parameters('environment')]"
+              "value": "[parameters('rgEnvironment')]"
             },
             {
               "name": "AZURE_FUNCTIONS_ENVIRONMENT",
-              "value": "[parameters('environment')]"
+              "value": "[parameters('rgEnvironment')]"
             }
           ],
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"
