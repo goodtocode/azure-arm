@@ -8,7 +8,7 @@
     "stName": {
       "type": "string"
     },
-    "workspaceName": {
+    "workName": {
       "type": "string"
     },
     "appiKey": {
@@ -34,7 +34,7 @@
       "defaultValue": "Development",
       "allowedValues": ["Development", "QA", "Staging", "Production"]
     },
-    "workerRuntime": {
+    "funcRuntime": {
       "type": "string",
       "defaultValue": "dotnet",
       "allowedValues": ["dotnet", "python", "dotnet-isolated"]
@@ -47,7 +47,7 @@
       "type": "string",
       "defaultValue": "0"
     },
-    "workerVersion": {
+    "funcVersion": {
       "type": "int",
       "defaultValue": 4,
       "allowedValues": [1, 2, 3, 4]
@@ -77,11 +77,11 @@
           "appSettings": [
             {
               "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "[concat('~', parameters('workerVersion'))]"
+              "value": "[concat('~', parameters('funcVersion'))]"
             },
             {
               "name": "FUNCTIONS_WORKER_RUNTIME",
-              "value": "[parameters('workerRuntime')]"
+              "value": "[parameters('funcRuntime')]"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -105,11 +105,11 @@
             },
             {
               "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "[parameters('environment')]"
+              "value": "[parameters('rgEnvironment')]"
             },
             {
               "name": "AZURE_FUNCTIONS_ENVIRONMENT",
-              "value": "[parameters('environment')]"
+              "value": "[parameters('rgEnvironment')]"
             }
           ],
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"
@@ -153,7 +153,7 @@
           "resources": [
             {
               "apiVersion": "2020-08-01",
-              "name": "[parameters('workspaceName')]",
+              "name": "[parameters('workName')]",
               "type": "Microsoft.OperationalInsights/workspaces",
               "location": "[resourceGroup().location]",
               "properties": {}
