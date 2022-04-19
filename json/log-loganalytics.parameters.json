@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "log-PRODUCT-ENVIRONMENT-001"
+    },    
+    "sku": {
+      "value": "Standard_LRS"
+    },
+    "service-tier": {
+      "value": "PerGB2018"
+    },
+    "data-retention": {
+      "value": 365
+    }
+  }
+}

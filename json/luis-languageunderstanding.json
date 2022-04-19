@@ -1,0 +1,62 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "F0",
+            "allowedValues": ["F0", "S0"]
+        },
+        "authoringName": {
+            "type": "string"
+        },
+        "authoringLocation": {
+            "type": "string",
+            "defaultValue": "westus",
+            "allowedValues": ["westus", "eastus"]
+        },
+        "authoringSku": {
+            "type": "string",
+            "defaultValue": "F0",
+            "allowedValues": ["F0"]
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-04-18",
+            "name": "[parameters('name')]",
+            "location": "[parameters('location')]",
+            "type": "Microsoft.CognitiveServices/accounts",
+            "kind": "LUIS",
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "properties": {
+                "customSubDomainName": "[parameters('name')]"
+            }
+        },
+        {
+            "apiVersion": "2017-04-18",
+            "name": "[parameters('authoringName')]",
+            "location": "[parameters('authoringLocation')]",
+            "type": "Microsoft.CognitiveServices/accounts",
+            "kind": "LUIS.Authoring",
+            "sku": {
+                "name": "[parameters('authoringSku')]"
+            },
+            "properties": {
+                "customSubDomainName": "[parameters('authoringName')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('name'))]"
+            ]
+        }
+    ]
+}

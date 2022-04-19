@@ -1,0 +1,103 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "deploy": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Short domain name used for the name of all resources"
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "metadata": {
+        "description": "Sku of the Storage Account. (st)"
+      }
+    },
+    "service-tier": {
+      "type": "string",
+      "defaultValue": "PerGB2018",
+      "allowedValues": [
+        "Free",
+        "Standalone",
+        "PerNode",
+        "PerGB2018"
+      ],
+      "metadata": {
+        "displayName": "Service tier",
+        "description": "Service tier: Free, Standalone, PerNode or PerGB2018"
+      }
+    },
+    "data-retention": {
+      "type": "int",
+      "defaultValue": 365,
+      "minValue": 0,
+      "maxValue": 365,
+      "metadata": {
+        "displayName": "Log retention in days",
+        "description": "Number of days data will be retained for"
+      }
+    }
+  },
+  "variables": {
+    "uniqueString": "[uniqueString(subscription().id)]",
+    "diagnostic-suffix": "[concat('-', substring(variables('uniqueString'), 0, 5))]",
+    "diagnostic-storageAccount-name": "[toLower(replace(concat('st', variables('diagnostic-suffix')), '-', ''))]",
+    "oms-workspace-name": "[concat('log-', parameters('name'), '-', variables('diagnostic-suffix'))]"
+  },
+  "resources": [
+    {
+      "condition": "[parameters('Deploy')]",
+      "comments": "----DIAGNOSTICS STORAGE ACCOUNT-----",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('diagnostic-storageAccount-name')]",
+      "apiVersion": "2018-07-01",
+      "location": "[resourceGroup().location]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "tags": {
+        "layer": "management"
+      },
+      "properties": {
+        "encryption": {
+          "keySource": "Microsoft.Storage",
+          "services": {
+            "blob": {
+              "enabled": true
+            },
+            "file": {
+              "enabled": true
+            }
+          }
+        },
+        "supportsHttpsTrafficOnly": true,
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "defaultAction": "Deny"
+        }
+      }
+    },
+    {
+      "condition": "[parameters('Deploy')]",
+      "name": "[variables('oms-workspace-name')]",
+      "location": "[resourceGroup().location]",
+      "tags": {},
+      "apiVersion": "2015-11-01-preview",
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "properties": {
+        "sku": {
+          "name": "[parameters('service-tier')]"
+        },
+        "retention": "[parameters('data-retention')]"
+      }
+    }
+  ],
+  "outputs": {}
+}

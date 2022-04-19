@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "defaultValue": "teams"
+    }
+  },
+  "variables": {
+    "locationLower": "[toLower(replace(resourceGroup().location, ' ', ''))]",
+    "nameLower": "[toLower(replace(replace(parameters('name'), '-', ''), ' ', ''))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2021-06-01",
+      "name": "[variables('nameLower')]",
+      "location": "[variables('locationLower')]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[parameters('name')]",
+        "customParameterValues": {},
+        "api": {
+            "name": "[variables('nameLower')]",
+            "displayName": "Office 365",
+            "description": "Microsoft Teams enables you to get all your content, tools and conversations in the Team workspace with Office 365.",
+            "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1505/1.0.1505.2520/', variables('nameLower'), '/icon.png')]",
+            "brandColor": "#4B53BC",
+            "id": "[concat(subscription().id,'/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/office365')]",
+            "type": "Microsoft.Web/locations/managedApis"
+        },
+        "parameterValues": {
+        }
+      },
+      "dependsOn": [        
+      ]
+    }
+  ]
+}

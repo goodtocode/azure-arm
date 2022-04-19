@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "value": "qna-PRODUCT-ENVIRONMENT-001"
+        },
+        "location": {
+            "value": "westus"
+        },
+        "location3": {
+            "value": "westus2"
+        },
+        "azureSearchLocation": {
+            "value": "westus2"
+        },
+        "sku": {
+            "value": "F0"
+        },
+        "azureSearchSku": {
+            "value": "free"
+        },
+        "searchHostingMode": {
+            "value": "Default"
+        },
+        "location2": {
+            "value": "westus2"
+        }
+    }
+}
