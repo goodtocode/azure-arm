@@ -7,7 +7,7 @@
             "defaultValue": false
         },
         "SpokeVNetName": {
-            "defaultValue": "vnet-westus2-lz-PRODUCT-ENVIRONMENT",
+            "defaultValue": "vnet-REGION-lz-ENVIRONMENTUCT-ENVIRONMENT",
             "type": "string",
             "metadata": {
                 "description": "Name of the Spoke Virtual Network"
@@ -21,7 +21,7 @@
             }
         },
         "AgSubnetName": {
-            "defaultValue": "snet-westus2-ENVIRONMENT-appgw-001",
+            "defaultValue": "snet-REGION-ENVIRONMENT-appgw-001",
             "type": "string",
             "metadata": {
                 "description": "Name for the Spoke Subscription Application Gateway Subnet"
@@ -35,7 +35,7 @@
             }
         },
         "WebSubnetName": {
-            "defaultValue": "snet-westus2-ENVIRONMENT-web-001",
+            "defaultValue": "snet-REGION-ENVIRONMENT-web-001",
             "type": "string",
             "metadata": {
                 "description": "Name for the Spoke Subscription Web Subnet"
@@ -49,7 +49,7 @@
             }
         },
         "AppSubnetName": {
-            "defaultValue": "snet-westus2-ENVIRONMENT-middle-001",
+            "defaultValue": "snet-REGION-ENVIRONMENT-middle-001",
             "type": "string",
             "metadata": {
                 "description": "Name for the Spoke Subscription Middle Tier App Subnet"
@@ -63,7 +63,7 @@
             }
         },
         "DataSubnetName": {
-            "defaultValue": "snet-westus2-ENVIRONMENT-data-001",
+            "defaultValue": "snet-REGION-ENVIRONMENT-data-001",
             "type": "string",
             "metadata": {
                 "description": "Name for the Spoke Subscription Data Tier Subnet"
@@ -77,28 +77,28 @@
             }
         },
         "AgNsgName": {
-            "defaultValue": "nsg-snet-westus2-ENVIRONMENT-appgw-001",
+            "defaultValue": "nsg-snet-REGION-ENVIRONMENT-appgw-001",
             "type": "string",
             "metadata": {
                 "description": "Name for the Hub Subscription App Gateway network security group"
             }
         },
         "WebNsgName": {
-            "defaultValue": "nsg-snet-westus2-ENVIRONMENT-web-001",
+            "defaultValue": "nsg-snet-REGION-ENVIRONMENT-web-001",
             "type": "string",
             "metadata": {
                 "description": "Name for the Hub Subscription Web Tier network security group"
             }
         },
         "AppNsgName": {
-            "defaultValue": "nsg-snet-westus2-ENVIRONMENT-middle-001",
+            "defaultValue": "nsg-snet-REGION-ENVIRONMENT-middle-001",
             "type": "string",
             "metadata": {
                 "description": "Name for the Hub Subscription Application Middle Tier network security group"
             }
         },
         "DataNsgName": {
-            "defaultValue": "nsg-snet-westus2-ENVIRONMENT-data-001",
+            "defaultValue": "nsg-snet-REGION-ENVIRONMENT-data-001",
             "type": "string",
             "metadata": {
                 "description": "Name for the Hub Subscription Data Tier network security group"
@@ -113,14 +113,14 @@
         },
         "HubVnetName": {
             "type": "string",
-            "defaultValue": "vnet-westus2-platform-hub-prod",
+            "defaultValue": "vnet-REGION-platform-hub-ENVIRONMENT",
             "metadata": {
                 "description":"Name of the Hub subscription Vnet"
             }
         },
         "HubVNetResourceGroup": {
             "type": "string",
-            "defaultValue": "rg-westus2-network-ENVIRONMENT-001",
+            "defaultValue": "rg-REGION-network-ENVIRONMENT-001",
             "metadata": {
                 "description": "Resource Group name where the Hub VNet is stored"
             }
