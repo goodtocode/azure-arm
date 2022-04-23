@@ -38,7 +38,7 @@
     },
     "encryptConnection": {
       "type": "bool",
-      "defaultValue": "false"
+      "defaultValue": false
     },
     "privacySetting": {
       "type": "string",
