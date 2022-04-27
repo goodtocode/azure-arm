@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "sqldb-PRODUCT-ENVIRONMENT-001"
+      "value": "PRODUCT001"
     },
     "sku": {
       "value": "Basic"
@@ -15,7 +15,7 @@
       "value": "LocalAdmin"
     },
     "adminPassword": {
-      "value": ""
+      "value": "00000000-0000-0000-0000-000000000000"
     }
   }
 }
