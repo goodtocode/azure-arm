@@ -1,114 +1,61 @@
-{
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "name": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 60
-    },
-        "sku": {
-      "type": "string",
-      "defaultValue": "Basic",
-      "allowedValues": [
-        "Basic",
-        "Standard",
-        "Premium"
-      ]
-    },
-    "location": {
-      "type": "string",
-      "defaultValue": "[toLower(replace(resourceGroup().location, ' ', ''))]"
-    },
-    "sqlName": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 60
-    },
-    "adminLogin": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 60
-    },
-    "adminPassword": {
-      "type": "securestring",
-      "minLength": 1,
-      "maxLength": 128
-    },
-    "collation": {
-      "type": "string",
-      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
-    },
-    "maxSizeBytes": {
-      "type": "string",
-      "defaultValue": "1073741824"
-    },
-    "requestedServiceObjectiveName": {
-      "type": "string",
-      "defaultValue": "Basic",
-      "allowedValues": [
-        "Basic",
-        "S0",
-        "S1",
-        "S2",
-        "P1",
-        "P2",
-        "P3"
-      ],
-      "metadata": {
-        "description": "Describes the performance level for Sku"
-      }
-    }
-  },
-  "variables": {
-    "serverNameLower": "[toLower(parameters('sqlName'))]"
-  },
-  "resources": [
-    {
-      "name": "[variables('serverNameLower')]",
-      "type": "Microsoft.Sql/servers",
-      "location": "[parameters('location')]",
-      "tags": {
-        "displayName": "SqlServer"
-      },
-      "apiVersion": "2014-04-01-preview",
-      "properties": {
-        "administratorLogin": "[parameters('adminLogin')]",
-        "administratorLoginPassword": "[parameters('adminPassword')]"
-      },
-      "resources": [
-        {
-          "name": "[parameters('name')]",
-          "type": "databases",
-          "location": "[parameters('location')]",
-          "tags": {
-            "displayName": "Database"
-          },
-          "apiVersion": "2014-04-01-preview",
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers/', variables('serverNameLower'))]"
-          ],
-          "properties": {
-            "edition": "[parameters('sku')]",
-            "collation": "[parameters('collation')]",
-            "maxSizeBytes": "[parameters('maxSizeBytes')]",
-            "requestedServiceObjectiveName": "[parameters('requestedServiceObjectiveName')]"
-          }
-        },
-        {
-          "type": "firewallrules",
-          "apiVersion": "2014-04-01-preview",
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers/', variables('serverNameLower'))]"
-          ],
-          "location": "[resourceGroup().location]",
-          "name": "AllowAllWindowsAzureIps",
-          "properties": {
-            "endIpAddress": "0.0.0.0",
-            "startIpAddress": "0.0.0.0"
-          }
-        }
-      ]
-    }
-  ]
-}
+parameters:
+  - name: armPath
+    type: string 
+    default: "."
+  - name: subscriptionId
+    type: string 
+    default: "00000000-0000-0000-0000-000000000000"
+  - name: subscriptionName
+    type: string 
+    default: 'COMPANY-PRODUCT-001'
+  - name: rgName 
+    type: string 
+    default: 'COMPANY-rg-PRODUCT-001'
+  - name: rgLocation 
+    type: string 
+    default: "West US 3"
+  - name: sqlName
+    type: string 
+    default: "sb-PRODUCT-ENVIRONMENT-001"
+  - name: sqlUser
+    type: string 
+    default: "LocalAdmin"
+  - name: sqlPassword
+    type: string 
+  - name: sqldbName
+    type: string 
+    default: "sb-PRODUCT-ENVIRONMENT-001"
+  - name: sqldbSku
+    type: string 
+    default: "Basic"
+
+steps:  
+  - task: AzureResourceManagerTemplateDeployment@3
+    displayName: "Validate ${{ parameters.sqldbName }}"
+    inputs:
+        deploymentScope: "Resource Group"
+        azureResourceManagerConnection: "${{ parameters.subscriptionName }}"
+        subscriptionId: "${{ parameters.subscriptionId }}"
+        action: "Create Or Update Resource Group"
+        resourceGroupName: "${{ parameters.rgName }}"
+        location: "${{ parameters.rgLocation }}"
+        templateLocation: "Linked artifact"
+        csmFile: "${{ parameters.armPath }}/sqldb-sqldatabase.json"
+        csmParametersFile: "${{ parameters.armPath }}/sqldb-sqldatabase.parameters.json"
+        deploymentMode: "Validation"
+        overrideParameters: -name "${{ parameters.sqlName }}" -sku "${{ parameters.sqldbSku }}" -adminLogin "${{ parameters.sqlUser }}"-adminPassword "${{ parameters.sqlPassword }}" -databaseName "${{ parameters.sqldbName }}"
+
+  - task: AzureResourceManagerTemplateDeployment@3
+    displayName: "Deploy ${{ parameters.sqldbName }}"
+    inputs:
+        deploymentScope: "Resource Group"
+        azureResourceManagerConnection: "${{ parameters.subscriptionName }}"
+        subscriptionId: "${{ parameters.subscriptionId }}"
+        action: "Create Or Update Resource Group"
+        resourceGroupName: "${{ parameters.rgName }}"
+        location: "${{ parameters.rgLocation }}"
+        templateLocation: "Linked artifact"
+        csmFile: "${{ parameters.armPath }}/sqldb-sqldatabase.json"
+        csmParametersFile: "${{ parameters.armPath }}/sqldb-sqldatabase.parameters.json"
+        deploymentMode: "Incremental"
+        overrideParameters: -name "${{ parameters.sqlName }}" -sku "${{ parameters.sqldbSku }}" -adminLogin "${{ parameters.sqlUser }}"-adminPassword "${{ parameters.sqlPassword }}" -databaseName "${{ parameters.sqldbName }}"
