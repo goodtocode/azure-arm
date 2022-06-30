@@ -13,7 +13,7 @@ param
 (
     [string] $Name=$(throw '-Name is a required parameter. (myco-product-environment)'),
     [string] $TenantId=$(throw '-TenantId is a required parameter. (00000000-0000-0000-0000-000000000000)'),
-    [string] $SubscriptionId=$(throw '-TenantId is a required parameter. (00000000-0000-0000-0000-000000000000)')
+    [string] $SubscriptionId=$(throw '-SubscriptionId is a required parameter. (00000000-0000-0000-0000-000000000000)')
 )
 
 # ***
@@ -39,12 +39,12 @@ Install-Module -Name Az.Resources -AllowClobber -Scope CurrentUser
 Write-Host "*** Auth ***"
 Connect-AzAccount -Tenant $TenantId -Subscription $SubscriptionId
 
-$sp = New-AzADServicePrincipal 
-$clientsec = [System.Net.NetworkCredential]::new("", $sp.Secret).Password
-$tenantID = (get-aztenant).Id
+$sp = New-AzADServicePrincipal -DisplayName $Name 
+$clientsec = [System.Net.NetworkCredential]::new("", $sp.passwordCredentials.secretText).Password
 $jsonresp = 
-    @{client_id=$sp.ApplicationId 
-        client_secret=$clientsec
-        tenant_id=$tenantID}
-    $jsonresp | ConvertTo-Json
+    @{clientId=$sp.appId 
+        clientSecret=$clientsec
+        subscriptionId=$SubscriptionId
+        tenantId=$TenantId}
+$jsonresp | ConvertTo-Json
 
