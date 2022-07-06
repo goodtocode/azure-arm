@@ -1,9 +1,8 @@
 #-----------------------------------------------------------------------
-# New-AzServicePrinciple [-Name [<String>]] [-TenantId [<Guid>]] [-SubscriptionId [<Guid>]]
+# Set-AzKeyVaultPolicy [-Name [<String>]] [-ObjectId [<Guid>]] [-SecretPermissions [<string>]]
 #
-# Example: .\New-AzServicePrinciple -Name -TenantId -SubscriptionId
-# CLI: az ad sp create-for-rbac --name "myApp" --role contributor \
-#        --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} --sdk-auth
+# Example: .\Set-AzKeyVaultPolicy -Name kv-PRODUCT-ENVIRONMENT-001 -ObjectId 00000000-0000-0000-0000-000000000000 -SecretPermissions list get
+# CLI: az keyvault set-policy --name "<KeyVaultName>" --spn <ClientId> --secret-permissions list get
 #-----------------------------------------------------------------------
 
 # ***
@@ -11,9 +10,9 @@
 # ***
 param
 (
-    [string] $Name=$(throw '-Name is a required parameter. (myco-product-environment)'),
-    [string] $TenantId=$(throw '-TenantId is a required parameter. (00000000-0000-0000-0000-000000000000)'),
-    [string] $SubscriptionId=$(throw '-SubscriptionId is a required parameter. (00000000-0000-0000-0000-000000000000)')
+    [string] $Name=$(throw '-Name is a required parameter. (kv-PRODUCT-ENVIRONMENT-001)'),
+    [string] $ObjectId=$(throw '-ObjectId is a required parameter. (00000000-0000-0000-0000-000000000000)'),
+    [string] $SecretPermissions='list get'
 )
 
 # ***
@@ -39,12 +38,4 @@ Install-Module -Name Az.Resources -AllowClobber -Scope CurrentUser
 Write-Host "*** Auth ***"
 Connect-AzAccount -Tenant $TenantId -Subscription $SubscriptionId
 
-$sp = New-AzADServicePrincipal -DisplayName $Name 
-$clientsec = [System.Net.NetworkCredential]::new("", $sp.passwordCredentials.secretText).Password
-$jsonresp = 
-    @{clientId=$sp.appId 
-        clientSecret=$clientsec
-        subscriptionId=$SubscriptionId
-        tenantId=$TenantId}
-$jsonresp | ConvertTo-Json
-
+Set-AzKeyVaultAccessPolicy -VaultName $Name -ObjectId $ObjectId -PermissionsToSecrets $SecretPermissions
