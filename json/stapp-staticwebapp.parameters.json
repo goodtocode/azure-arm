@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "value": "stapp-PRODUCT-ENVIRONMENT-001"
+        },
+        "location": {
+            "value": "westus2"
+        },
+        "sku": {
+            "value": "Free"
+        },
+        "skucode": {
+            "value": "Free"
+        },
+        "repositoryUrl": {
+            "value": "https://github.com/MYORG/MYREPO"
+        },
+        "branch": {
+            "value": "main"
+        },
+        "repositoryToken": {
+            "value": null
+        },
+        "appLocation": {
+            "value": "/src"
+        },
+        "apiLocation": {
+            "value": "/api"
+        },
+        "appArtifactLocation": {
+            "value": "build"
+        }
+    }
+}
