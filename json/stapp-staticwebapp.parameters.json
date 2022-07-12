@@ -21,7 +21,7 @@
             "value": "main"
         },
         "repositoryToken": {
-            "value": null
+            "value": "TOKEN_FROM_GITHUB"
         },
         "appLocation": {
             "value": "/src"
