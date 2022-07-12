@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------
-# New-AzServicePrinciple [-TenantId [<Guid>]] [-SubscriptionId [<Guid>]]
+# New-AzServicePrinciple [-Name [<String>]] [-TenantId [<Guid>]] [-SubscriptionId [<Guid>]]
 #
-# Example: .\Remove-LandingZone -TenantId -SubscriptionId -ResourceGroup -KeyVault -StorageAccount -Workspace
+# Example: .\New-AzServicePrinciple -Name -TenantId -SubscriptionId
 # CLI: az ad sp create-for-rbac --name "myApp" --role contributor \
 #        --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} --sdk-auth
 #-----------------------------------------------------------------------
@@ -45,6 +45,13 @@ $jsonresp =
     @{clientId=$sp.appId 
         clientSecret=$clientsec
         subscriptionId=$SubscriptionId
-        tenantId=$TenantId}
+        tenantId=$TenantId
+        activeDirectoryEndpointUrl='https://login.microsoftonline.com'
+        resourceManagerEndpointUrl='https://management.azure.com/'
+        activeDirectoryGraphResourceId='https://graph.windows.net/'
+        sqlManagementEndpointUrl='https://management.core.windows.net:8443/'
+        galleryEndpointUrl='https://gallery.azure.com/'
+        managementEndpointUrl='https://management.core.windows.net/'        
+        }
 $jsonresp | ConvertTo-Json
 
