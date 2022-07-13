@@ -9,10 +9,8 @@
             "type": "string"
         },
         "sku": {
-            "type": "string"
-        },
-        "skucode": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "Free"
         },
         "repositoryUrl": {
             "type": "string"
@@ -52,7 +50,7 @@
             },
             "sku": {
                 "Tier": "[parameters('sku')]",
-                "Name": "[parameters('skuCode')]"
+                "Name": "[parameters('sku')]"
             }
         }
     ]

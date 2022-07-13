@@ -11,9 +11,6 @@
         "sku": {
             "value": "Free"
         },
-        "skucode": {
-            "value": "Free"
-        },
         "repositoryUrl": {
             "value": "https://github.com/MYORG/MYREPO"
         },
