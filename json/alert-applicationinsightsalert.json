@@ -38,7 +38,7 @@
     "actionGroupName": {
       "type": "string"
     },
-    "appInsightsQuery": {
+    "appiQuery": {
       "type": "string"
     }
   },
@@ -57,7 +57,7 @@
         "enabled": "true",
         "skuType": "L1",
         "source": {
-          "query": "[parameters('appInsightsQuery')]",
+          "query": "[parameters('appiQuery')]",
           "authorizedResources": null,
           "resourceId": null,
           "dataSourceId": "[resourceId('microsoft.insights/components', parameters('appiName'))]",

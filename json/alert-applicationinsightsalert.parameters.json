@@ -29,7 +29,7 @@
     "actionGroupName": {
       "value": "action-group"
     },
-    "appInsightsQuery": {
+    "appiQuery": {
       "value": "requests"
     }
   }
