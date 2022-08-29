@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "Provisioned Alert"
+    },
+    "description": {
+      "value": "This is the description"
+    },
+    "appiName": {
+      "value": "app-insights-name"
+    },
+    "triggerThresholdOperator": {
+      "value": "GreaterThan"
+    },
+    "triggerThreshold": {
+      "value": 5
+    },
+    "frequencyInMinutes": {
+      "value": 5
+    },
+    "timeWindowInMinutes": {
+      "value": 5
+    },
+    "severityLevel": {
+      "value": "3"
+    },
+    "actionGroupName": {
+      "value": "action-group"
+    },
+    "appiQuery": {
+      "value": "requests"
+    }
+  }
+}

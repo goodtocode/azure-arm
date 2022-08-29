@@ -101,7 +101,7 @@
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers/', variables('serverNameLower'))]"
           ],
-          "location": "[resourceGroup().location]",
+          "location": "[parameters('location')]",
           "name": "AllowAllWindowsAzureIps",
           "properties": {
             "endIpAddress": "0.0.0.0",
