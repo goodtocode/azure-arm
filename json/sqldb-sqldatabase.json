@@ -58,6 +58,14 @@
       "metadata": {
         "description": "Describes the performance level for Sku"
       }
+    },
+    "startIpAddress":{
+      "type": "string",
+      "defaultValue": "0.0.0.0"
+    },
+    "endIpAddress":{
+      "type": "string",
+      "defaultValue": "0.0.0.0"
     }
   },
   "variables": {
@@ -104,8 +112,8 @@
           "location": "[parameters('location')]",
           "name": "AllowAllWindowsAzureIps",
           "properties": {
-            "endIpAddress": "0.0.0.0",
-            "startIpAddress": "0.0.0.0"
+            "endIpAddress": "[parameters('endIpAddress')]",
+            "startIpAddress": "[parameters('startIpAddress')]"
           }
         }
       ]
