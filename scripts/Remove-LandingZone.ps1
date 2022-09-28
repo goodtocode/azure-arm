@@ -11,7 +11,7 @@ param
 (
 	[string] $TenantId=$(throw '-TenantId is a required parameter. (00000000-0000-0000-0000-000000000000)'),
     [string] $SubscriptionId=$(throw '-TenantId is a required parameter. (00000000-0000-0000-0000-000000000000)'),
-	[string] $ResourceGroup=$(throw '-ResourceGroup is a required parameter. (COMPANY-rg-PRODUCT-ENVIRONMENT-001)'),
+	[string] $ResourceGroup=$(throw '-ResourceGroup is a required parameter. (rg-PRODUCT-ENVIRONMENT-001)'),
     [string] $KeyVault=$(throw '-KeyVault is a required parameter. (kv-PRODUCT-ENVIRONMENT-001)'),
     [string] $StorageAccount=$(throw '-StorageAccount is a required parameter. (stPRODUCTENVIRONMENT001)'),
     [string] $Workspace=$(throw '-Workspace is a required parameter. (work-PRODUCT-ENVIRONMENT-001)')
