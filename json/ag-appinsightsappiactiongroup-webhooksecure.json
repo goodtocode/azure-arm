@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Unique name (within the Resource Group) for the Action group. ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
+      }
+    },
+    "webhookReceiver": {
+      "type": "object",
+      "defaultValue": {
+        "name": "secureHook1",
+        "serviceUri": "http://api.aacn.org/4rg68zx9",
+        "useCommonAlertSchema": false
+      },
+      "metadata": {
+        "description": "Receiver for this action group."
+      }
+    }
+  },
+  "variables": {
+    "shortname": "[toLower(replace(resourceGroup().location, ' ', ''))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/actionGroups",
+      "apiVersion": "2021-09-01",
+      "name": "[parameters('name')]",
+      "location": "Global",
+      "properties": {
+        "groupShortName": "[variables('shortname')]",
+        "enabled": true,
+        "smsReceivers": [],
+        "emailReceivers": [],
+        "webhookReceivers": [],
+        "SecurewebhookReceivers": [ "[parameters('webhookReceiver')]" ],
+        "eventHubReceivers": []
+      }
+    }
+  ],
+  "outputs": {
+    "actionGroupId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Insights/actionGroups',variables('shortname'))]"
+    }
+  }
+}
