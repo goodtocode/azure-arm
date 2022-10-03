@@ -28,7 +28,7 @@
     }
   },
   "variables": {
-    "shortname": "[toLower(replace(resourceGroup().location, ' ', ''))]"
+    "shortname": "[toLower(replace(parameters('name'), ' ', ''))]"
   },
   "resources": [
     {
