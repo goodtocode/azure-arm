@@ -8,13 +8,14 @@
         "description": "Unique name (within the Resource Group) for the Action group. ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
       }
     },
-    "emailReceiver": {
-      "type": "object",
-      "defaultValue": {
-        "name": "email1",
-        "emailAddress": "email1@aacn.org",
-        "useCommonAlertSchema": true
-      },
+    "receiverName": {
+      "type": "string",
+      "metadata": {
+        "description": "Receiver for this action group."
+      }
+    },
+    "emailAddress": {
+      "type": "string",
       "metadata": {
         "description": "Receiver for this action group."
       }
@@ -34,7 +35,11 @@
         "enabled": true,
         "smsReceivers": [],
         "emailReceivers": [
-          "[parameters('emailReceiver')]"
+          {
+            "name": "[parameters('receiverName')]",
+            "emailAddress": "[parameters('emailAddress')]",
+            "useCommonAlertSchema": true
+          }
         ],
         "webhookReceivers": [],
         "SecurewebhookReceivers": [],

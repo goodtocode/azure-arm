@@ -5,12 +5,11 @@
     "name": {
       "value": "ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
     },
-    "webhookReceiver": {
-      "value": {
-        "name": "webHook1",
-        "serviceUri": "http://api.aacn.org/1bq62iu1",
-        "useCommonAlertSchema": true
-      }
+    "receiverName": {
+      "value": ""
+    },
+    "serviceUri": {
+      "value": ""
     }
   }
 }

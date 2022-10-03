@@ -8,15 +8,16 @@
         "description": "Unique name (within the Resource Group) for the Action group. ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
       }
     },
-    "webhookReceiver": {
-      "type": "object",
-      "defaultValue": {
-        "name": "webHook1",
-        "serviceUri": "http://api.aacn.org/1bq62iu1",
-        "useCommonAlertSchema": true
-      },
+    "receiverName": {
+      "type": "string",
       "metadata": {
-        "description": "Receiver for this action group."
+        "description": "Receiver name"
+      }
+    },
+    "serviceUri": {
+      "type": "string",
+      "metadata": {
+        "description": "Webhook service URI"
       }
     }
   },
@@ -32,11 +33,17 @@
       "properties": {
         "groupShortName": "[variables('shortname')]",
         "enabled": true,
-        "smsReceivers": [ ],
-        "emailReceivers": [ ],
-        "webhookReceivers": [ "[parameters('webhookReceiver')]" ],
-        "SecurewebhookReceivers": [ ],
-        "eventHubReceivers": [ ]
+        "smsReceivers": [],
+        "emailReceivers": [],
+        "webhookReceivers": [
+          {
+            "name": "[parameters('receiverName')]",
+            "serviceUri": "[parameters('serviceUri')]",
+            "useCommonAlertSchema": true
+          }
+        ],
+        "SecurewebhookReceivers": [],
+        "eventHubReceivers": []
       }
     }
   ],

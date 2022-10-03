@@ -8,15 +8,22 @@
         "description": "Unique name (within the Resource Group) for the Action group. ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
       }
     },
-    "smsReceiver": {
-      "type": "object",
-      "defaultValue": {
-        "name": "smsRecepient1",
-        "countryCode": "1",
-        "phoneNumber": "5555551212"
-      },
+    "receiverName": {
+      "type": "string",
       "metadata": {
-        "description": "Receiver for this action group."
+        "description": "Receiver name"
+      }
+    },
+    "countryCode": {
+      "type": "string",
+      "metadata": {
+        "description": "Receiver country code"
+      }
+    },
+    "phoneNumber": {
+      "type": "string",
+      "metadata": {
+        "description": "Receiver phone number"
       }
     }
   },
@@ -32,11 +39,17 @@
       "properties": {
         "groupShortName": "[variables('shortname')]",
         "enabled": true,
-        "smsReceivers": [ "[parameters('smsReceiver')]" ],
-        "emailReceivers": [ ],
-        "webhookReceivers": [ ],
-        "SecurewebhookReceivers": [ ],
-        "eventHubReceivers": [ ]
+        "smsReceivers": [
+          {
+            "name": "[parameters('receiverName')]",
+            "countryCode": "[parameters('countryCode')]",
+            "phoneNumber": "[parameters('phoneNumber')]"
+          }
+        ],
+        "emailReceivers": [],
+        "webhookReceivers": [],
+        "SecurewebhookReceivers": [],
+        "eventHubReceivers": []
       }
     }
   ],

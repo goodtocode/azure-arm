@@ -5,12 +5,14 @@
     "name": {
       "value": "ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
     },
-    "emailReceivers": {
-      "value": {
-        "name": "smsRecepient1",
-        "countryCode": "1",
-        "phoneNumber": "5555551212"
-      }
+    "receiverName": {
+      "value": ""
+    },
+    "countryCode": {
+      "value": ""
+    },
+    "phoneNumber": {
+      "value": ""
     }
   }
 }

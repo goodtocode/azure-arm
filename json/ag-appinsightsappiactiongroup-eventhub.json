@@ -8,17 +8,22 @@
         "description": "Unique name (within the Resource Group) for the Action group. ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
       }
     },
-    "eventHubReceiver": {
-      "type": "object",
-      "defaultValue": {
-        "name": "eventHub1",
-        "subscriptionId": "AZURE_SUBSCRIPTION_ID",
-        "eventHubNameSpace": "eventHub1NameSpace",
-        "eventHubName": "eventHub1",
-        "useCommonAlertSchema": true
-      },
+    "receiverName": {
+      "type": "string",
       "metadata": {
-        "description": "Receiver for this action group."
+        "description": "Action group receiver name"
+      }
+    },
+    "eventHubName": {
+      "type": "string",
+      "metadata": {
+        "description": "Action group event hub name"
+      }
+    },
+    "eventHubNameSpace": {
+      "type": "string",
+      "metadata": {
+        "description": "Action group event hub namespace"
       }
     }
   },
@@ -38,7 +43,15 @@
         "emailReceivers": [],
         "webhookReceivers": [],
         "SecurewebhookReceivers": [],
-        "eventHubReceivers": [ "[parameters('eventHubReceiver')]" ]
+        "eventHubReceivers": [
+          {
+            "name": "[parameters('receiverName')]",
+            "subscriptionId": "[subscription().subscriptionId]",
+            "eventHubNameSpace": "[parameters('eventHubNameSpace')]",
+            "eventHubName": "[parameters('eventHubName')]",
+            "useCommonAlertSchema": true
+          }
+        ]
       }
     }
   ],

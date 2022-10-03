@@ -5,14 +5,14 @@
     "name": {
       "value": "ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
     },
-    "eventHubReceiver": {
-      "value": {
-        "name": "eventHub1",
-        "subscriptionId": "AZURE_SUBSCRIPTION_ID",
-        "eventHubNameSpace": "eventHub1NameSpace",
-        "eventHubName": "eventHub1",
-        "useCommonAlertSchema": true
-      }
+    "receiverName": {
+      "value": ""
+    },
+    "eventHubName": {
+      "value": ""
+    },
+    "eventHubNameSpace": {
+      "value": ""
     }
   }
 }

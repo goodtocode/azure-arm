@@ -5,12 +5,11 @@
     "name": {
       "value": "ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
     },
-    "emailReceiver": {
-      "value": {
-        "name": "email1",
-        "emailAddress": "email1@aacn.org",
-        "useCommonAlertSchema": true
-      }
+    "receiverName": {
+      "value": "email1"
+    },
+    "emailAddress": {
+      "value": "email1@aacn.org"
     }
   }
 }
