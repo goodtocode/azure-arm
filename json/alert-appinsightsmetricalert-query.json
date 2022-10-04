@@ -10,6 +10,7 @@
     },
     "description": {
       "type": "string",
+      "defaultValue": "Scheduled query metric alert",
       "metadata": {
         "description": "Resource description"
       }
