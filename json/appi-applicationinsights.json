@@ -9,7 +9,7 @@
       "type": "string",
       "defaultValue": "web"
     },
-     "tagsArray": {
+    "tagsArray": {
       "type": "object",
       "defaultValue": {}
     },
@@ -19,10 +19,18 @@
     },
     "workName": {
       "type": "string"
+    },
+    "workResourceGroupName": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]"
+    },
+    "workSubscriptionId": {
+      "type": "string",
+      "defaultValue": "[subscription().subscriptionId]"
     }
   },
   "variables": {
-    "workspaceResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/microsoft.operationalinsights/workspaces/', parameters('workName'))]"
+    "workspaceResourceId": "[concat('/subscriptions/', parameters('workSubscriptionId'), '/resourceGroups/', parameters('workResourceGroupName'), '/providers/microsoft.operationalinsights/workspaces/', parameters('workName'))]"
   },
   "resources": [
     {
@@ -35,7 +43,6 @@
       "properties": {
         "ApplicationId": "[parameters('name')]",
         "Application_Type": "[parameters('type')]",
-        "Flow_Type": "Redfield",
         "Request_Source": "[parameters('requestSource')]",
         "WorkspaceResourceId": "[variables('workspaceResourceId')]"
       }
