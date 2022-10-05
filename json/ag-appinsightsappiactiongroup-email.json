@@ -22,7 +22,7 @@
     }
   },
   "variables": {
-    "shortname": "[toLower(replace(parameters('name'), ' ', ''))]"
+    "shortname": "[take(toLower(replace(replace(parameters('name'), ' ', ''), '-', '')), 12)]"
   },
   "resources": [
     {
