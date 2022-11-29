@@ -16,8 +16,15 @@
             "type": "string",
             "defaultValue": "[subscription().id]"
         },
-        "tagsByResource": {
-            "type": "object"
+        "tags": {
+        "type": "object",
+        "defaultValue": {
+            "tag1": "tag-value-1",
+            "tag2": "tag-value-2"
+        },
+        "metadata": {
+            "description": "Adds tags for the resource. It's optional."
+        }
         }
     },
   "variables": {
@@ -30,7 +37,7 @@
             "name": "[parameters('name')]",
             "type": "Microsoft.Web/connectionGateways",
             "location": "[variables('locationShortName')]",
-            "tags": "[ if(contains(parameters('tagsByResource'), 'Microsoft.Web/connectionGateways'), parameters('tagsByResource')['Microsoft.Web/connectionGateways'], json('{}')) ]",
+            "tags": "[parameters('tags')]",
             "properties": {
                 "connectionGatewayInstallation": {
                     "Id": "[variables('gatewayInstallationId')]"
