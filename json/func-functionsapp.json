@@ -25,6 +25,10 @@
       "type": "string",
       "defaultValue": "Dynamic"
     },
+    "skuCapacity": {
+      "type": "string",
+      "defaultValue": "0"
+    },
     "sku": {
       "type": "string",
       "defaultValue": "Y1"
@@ -134,7 +138,8 @@
       },
       "sku": {
         "Tier": "[parameters('skuTier')]",
-        "Name": "[parameters('sku')]"
+        "Name": "[parameters('sku')]",
+        "Capacity": "[parameters('skuCapacity')]"
       }
     },
     {
