@@ -8,6 +8,9 @@
     "name": {
       "value": "api-PRODUCT-ENVIRONMENT-001"
     },
+    "location": {
+      "value": "West US 3"
+    },
     "appiKey": {
       "value": "[APPI_KEY]"
     },
