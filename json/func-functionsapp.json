@@ -65,7 +65,7 @@
       "tags": {},
       "properties": {
         "name": "[parameters('name')]",
-        "netFrameworkVersion": "[parameters('dotNetVersion')]",
+        "netFrameworkVersion": "[concat('v', parameters('dotNetVersion'), '.0')]",
         "siteConfig": {
           "appSettings": [
             {
