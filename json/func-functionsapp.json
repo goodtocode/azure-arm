@@ -5,6 +5,11 @@
     "name": {
       "type": "string"
     },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "minLength": 1
+    },
     "planName": {
       "type": "string",
       "minLength": 1
@@ -34,13 +39,18 @@
     },
     "funcRuntime": {
       "type": "string",
-      "defaultValue": "dotnet",
+      "defaultValue": "dotnet-isolated",
       "allowedValues": ["dotnet", "python", "dotnet-isolated"]
     },
     "funcVersion": {
       "type": "int",
       "defaultValue": 4,
       "allowedValues": [1, 2, 3, 4]
+    },
+    "dotNetVersion": {
+      "type": "int",
+      "defaultValue": 6,
+      "allowedValues": [4, 6, 7]
     }
   },
   "variables": {
@@ -51,10 +61,11 @@
       "name": "[parameters('name')]",
       "type": "Microsoft.Web/sites",
       "kind": "functionapp",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {},
       "properties": {
         "name": "[parameters('name')]",
+        "netFrameworkVersion": "[parameters('dotNetVersion')]",
         "siteConfig": {
           "appSettings": [
             {
