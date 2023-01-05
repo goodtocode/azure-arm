@@ -15,6 +15,11 @@
       "type": "string",
       "minLength": 1
     },
+    "planResourceGroupName": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]",
+      "minLength": 1
+    },
     "appiKey": {
       "type": "string"
     },
@@ -39,12 +44,12 @@
       "kind": "app",
       "location": "[parameters('location')]",
       "tags": {
-        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]": "Resource",
+        "[concat('hidden-related:', parameters('planResourceGroupName'), '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]": "Resource",
         "displayName": "Website"
       },
       "properties": {
         "name": "[variables('webSiteName')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]",
+        "serverFarmId": "[concat('/subscriptions/', subscription().id, '/resourcegroups/', parameters('planResourceGroupName'), '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]",
         "siteConfig": {
           "appSettings": [
             {

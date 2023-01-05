@@ -5,7 +5,7 @@ param location string = toLower(replace(resourceGroup().location, ' ', ''))
 param sku string
 param tags object
 
-resource name_resource 'Microsoft.OperationalInsights/workspaces@2017-03-15-preview' = {
+resource name_resource 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: name
   location: location
   tags: tags
