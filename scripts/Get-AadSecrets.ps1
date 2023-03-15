@@ -27,10 +27,10 @@ Install-Module -Name ImportExcel
 Connect-AzureAD
 
 # Get secrets that are expiring within 30 days
-$secrets = Get-AzureADApplication | Select-Object -ExpandProperty PasswordCredentials | Where-Object { $_.EndDate -le (Get-Date).AddDays(30) }
+$secrets = Get-AzureADApplication | Select-Object -ExpandProperty PasswordCredentials #| Where-Object { $_.EndDate -le (Get-Date).AddDays(30) }
 
 # Get certificates that are expiring within 30 days
-$certificates = Get-AzureADApplication | Select-Object -ExpandProperty KeyCredentials | Where-Object { $_.EndDate -le (Get-Date).AddDays(30) }
+$certificates = Get-AzureADApplication | Select-Object -ExpandProperty KeyCredentials #| Where-Object { $_.EndDate -le (Get-Date).AddDays(30) }
 
 # Combine secrets and certificates
 $expiringCredentials = $secrets + $certificates
