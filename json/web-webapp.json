@@ -7,10 +7,31 @@
       "minLength": 1,
       "maxLength": 60
     },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "minLength": 1
+    },
     "planName": {
       "type": "string",
+      "minLength": 1
+    },
+    "planResourceGroupName": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]",
+      "minLength": 1
+    },
+    "appiKey": {
+      "type": "string"
+    },
+    "appiConnection": {
+      "type": "string"
+    },
+    "rgEnvironment": {
+      "type": "string",
       "minLength": 1,
-      "maxLength": 60
+      "defaultValue": "Development",
+      "allowedValues": ["Development", "QA", "Staging", "Production"]
     }
   },
   "variables": {
@@ -20,16 +41,32 @@
       "apiVersion": "2018-11-01",
       "name": "[parameters('name')]",
       "type": "Microsoft.Web/sites",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
-        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]": "Resource",
+        "[concat('hidden-related:', parameters('planResourceGroupName'), '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]": "Resource",
         "displayName": "Website"
       },
       "dependsOn": [
       ],
       "properties": {
         "name": "[parameters('name')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]"
+        "serverFarmId": "[concat('/subscriptions/', subscription().id, '/resourcegroups/', parameters('planResourceGroupName'), '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[parameters('appiKey')]"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[parameters('appiConnection')]"
+            },
+            {
+              "name": "ASPNETCORE_ENVIRONMENT",
+              "value": "[parameters('rgEnvironment')]"
+            }
+          ]
+        }
       }
     }
   ]
