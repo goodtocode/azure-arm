@@ -31,6 +31,7 @@ Write-Host "*****************************"
 Import-Module "./System.psm1"
 Install-Module -Name Az.Accounts -AllowClobber -Scope CurrentUser
 Install-Module -Name Az.Resources -AllowClobber -Scope CurrentUser
+Install-Module -Name Az.Storage -AllowClobber -Scope CurrentUser
 
 # ***
 # *** Locals

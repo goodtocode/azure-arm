@@ -6,7 +6,7 @@ param workName string
 
 var workspaceResourceId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/microsoft.operationalinsights/workspaces/${workName}'
 
-resource name_resource 'microsoft.insights/components@2020-02-02-preview' = {
+resource name_resource 'Microsoft.Insights/components@2020-02-02' = {
   name: name
   location: resourceGroup().location
   tags: tagsArray

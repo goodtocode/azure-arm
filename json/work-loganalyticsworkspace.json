@@ -13,10 +13,12 @@
       }
     },
     "sku": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "pergb2018"
     },
     "tags": {
-      "type": "object"
+      "type": "object",
+      "defaultValue": {}
     }
   },
   "variables": {

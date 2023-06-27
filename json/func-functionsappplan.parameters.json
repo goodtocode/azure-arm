@@ -5,14 +5,8 @@
     "name": {
       "value": "func-PRODUCT-ENVIRONMENT-001"
     },
-    "location": {
-      "value": "West US 3"
-    },
-    "planName": {
-      "value": "plan-PRODUCT-ENVIRONMENT-001"
-    },
-    "planResourceGroupName": {
-      "value": "rg-SHARED-ENVIRONMENT-001"
+    "workName": {
+      "value": "work-PRODUCT-ENVIRONMENT-001"
     },
     "stName": {
       "value": "stPRODUCTENVIRONMENT001"
@@ -23,17 +17,29 @@
     "appiConnection": {
       "value": "APPI-CONNECTION-STRING"
     },
+    "skuTier": {
+      "value": "Dynamic"
+    },
+    "sku": {
+      "value": "Y1"
+    },
     "rgEnvironment": {
       "value": "Development"
     },
     "funcRuntime": {
       "value": "dotnet"
     },
+    "workerSize": {
+      "value": "0"
+    },
+    "workerSizeId": {
+      "value": "0"
+    },
     "funcVersion": {
       "value": 4
     },
-    "dotNetVersion": {
-      "value": 6
+    "numberOfWorkers": {
+      "value": "1"
     },
     "use32BitWorkerProcess": {
       "value": true

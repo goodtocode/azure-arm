@@ -5,21 +5,10 @@
     "name": {
       "type": "string"
     },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "minLength": 1
-    },
-    "planName": {
-      "type": "string",
-      "minLength": 1
-    },
-    "planResourceGroupName": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().name]",
-      "minLength": 1
-    },
     "stName": {
+      "type": "string"
+    },
+    "workName": {
       "type": "string"
     },
     "appiKey": {
@@ -32,6 +21,18 @@
       "type": "bool",
       "defaultValue": true
     },
+    "skuTier": {
+      "type": "string",
+      "defaultValue": "Dynamic"
+    },
+    "skuCapacity": {
+      "type": "string",
+      "defaultValue": "0"
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "Y1"
+    },
     "rgEnvironment": {
       "type": "string",
       "defaultValue": "Development",
@@ -39,21 +40,29 @@
     },
     "funcRuntime": {
       "type": "string",
-      "defaultValue": "dotnet-isolated",
+      "defaultValue": "dotnet",
       "allowedValues": ["dotnet", "python", "dotnet-isolated"]
+    },
+    "workerSize": {
+      "type": "string",
+      "defaultValue": "0"
+    },
+    "workerSizeId": {
+      "type": "string",
+      "defaultValue": "0"
     },
     "funcVersion": {
       "type": "int",
       "defaultValue": 4,
       "allowedValues": [1, 2, 3, 4]
     },
-    "dotNetVersion": {
-      "type": "int",
-      "defaultValue": 6,
-      "allowedValues": [4, 6, 7]
+    "numberOfWorkers": {
+      "type": "string",
+      "defaultValue": "1"
     }
   },
   "variables": {
+    "planName": "[concat('plan-', parameters('name'))]"
   },
   "resources": [
     {
@@ -61,11 +70,13 @@
       "name": "[parameters('name')]",
       "type": "Microsoft.Web/sites",
       "kind": "functionapp",
-      "location": "[parameters('location')]",
+      "location": "[resourceGroup().location]",
       "tags": {},
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('planName'))]"
+      ],
       "properties": {
         "name": "[parameters('name')]",
-        "netFrameworkVersion": "[concat('v', parameters('dotNetVersion'), '.0')]",
         "siteConfig": {
           "appSettings": [
             {
@@ -107,9 +118,54 @@
           ],
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"
         },
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', parameters('planResourceGroupName'), '/providers/Microsoft.Web/serverfarms/', parameters('planName'))]",        
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('planName'))]",
         "clientAffinityEnabled": true
       }
-    }    
+    },
+    {
+      "apiVersion": "2018-11-01",
+      "name": "[variables('planName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "kind": "",
+      "tags": {},
+      "dependsOn": [],
+      "properties": {
+        "name": "[variables('planName')]",
+        "workerSize": "[parameters('workerSize')]",
+        "workerSizeId": "[parameters('workerSizeId')]",
+        "numberOfWorkers": "[parameters('numberOfWorkers')]"
+      },
+      "sku": {
+        "Tier": "[parameters('skuTier')]",
+        "Name": "[parameters('sku')]",
+        "Capacity": "[parameters('skuCapacity')]"
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "newWorkspaceTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "subscriptionId": "[subscription().subscriptionId]",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "variables": {},
+          "resources": [
+            {
+              "apiVersion": "2020-08-01",
+              "name": "[parameters('workName')]",
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "location": "[resourceGroup().location]",
+              "properties": {}
+            }
+          ]
+        }
+      }
+    }
   ]
 }
