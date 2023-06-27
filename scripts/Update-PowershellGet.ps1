@@ -1,9 +1,9 @@
 #-----------------------------------------------------------------------
-# Set-Tls 
+# Update-PowerShellGet 
 #
-# Description: Required for nuget, powershellget and current operations
+# Description: Brings older OS up to speed, so we can install Az modules
 #
-# Example: .\Set-Tls
+# Example: .\Update-PowerShellGet
 #-----------------------------------------------------------------------
 
 # ***
@@ -33,6 +33,8 @@ Import-Module "./System.psm1"
 # *** Execute
 # ***
 Write-Host [Net.ServicePointManager]::SecurityProtocol
-Set-ItemProperty -Path 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\.NetFramework\v4.0.30319' -Name 'SchUseStrongCrypto' -Value '1' -Type DWord
-Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\.NetFramework\v4.0.30319' -Name 'SchUseStrongCrypto' -Value '1' -Type DWord
-Write-Host [Net.ServicePointManager]::SecurityProtocol
+Write-Host "TLS 1.2 or above must be enabled"
+Install-PackageProvider -Name NuGet -Force
+Install-Module PowerShellGet -AllowClobber -Force
+# Close/re-open powershell
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
