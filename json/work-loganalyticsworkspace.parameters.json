@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "work-PRODUCT-ENVIRONMENT-001"
+      "value": ""
     },
     "sku": {
       "value": "pergb2018"
