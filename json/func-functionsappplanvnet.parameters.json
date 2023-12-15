@@ -46,6 +46,9 @@
     },
     "subnetName": {
         "value": "snet-westus2-prod-eventcontent-dev-001" 
+    },
+    "dotNetVersion": {
+      "value": "v7.0"
     }
   }
 }

@@ -60,11 +60,15 @@
     "vnetName": {
       "type": "string",
       "defaultValue":"vnet-westus2-platform-hub-prod"
-  },
-    "subnetName": {
+    },
+      "subnetName": {
+        "type": "string",
+        "defaultvalue":"snet-westus2-prod-eventcontent-dev-001" 
+    },
+    "dotNetVersion": {
       "type": "string",
-      "defaultvalue":"snet-westus2-prod-eventcontent-dev-001" 
-  }
+      "defaultValue": "v7.0"
+    }
   },
   "variables": {
     "planName": "[concat('plan-', parameters('name'))]"
@@ -122,7 +126,8 @@
               "value": "[parameters('rgEnvironment')]"
             }
           ],
-          "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"
+          "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
+          "netFrameworkVersion": "[parameters('dotNetVersion')]"
         },
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('planName'))]",
         "clientAffinityEnabled": true

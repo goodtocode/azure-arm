@@ -56,6 +56,10 @@
     "numberOfWorkers": {
       "type": "string",
       "defaultValue": "1"
+    },
+    "dotNetVersion": {
+      "type": "string",
+      "defaultValue": "v7.0"
     }
   },
   "variables": {
@@ -113,7 +117,8 @@
               "value": "[parameters('rgEnvironment')]"
             }
           ],
-          "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"
+          "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
+          "netFrameworkVersion": "[parameters('dotNetVersion')]"
         },
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('planName'))]",
         "clientAffinityEnabled": true

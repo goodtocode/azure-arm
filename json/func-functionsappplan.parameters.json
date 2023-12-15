@@ -40,6 +40,9 @@
     },
     "use32BitWorkerProcess": {
       "value": true
+    },
+    "dotNetVersion": {
+      "value": "v7.0"
     }
   }
 }
