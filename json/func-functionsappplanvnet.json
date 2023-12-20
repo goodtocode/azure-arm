@@ -8,9 +8,6 @@
     "stName": {
       "type": "string"
     },
-    "workName": {
-      "type": "string"
-    },
     "appiKey": {
       "type": "string"
     },
@@ -24,6 +21,10 @@
     "skuTier": {
       "type": "string",
       "defaultValue": "Dynamic"
+    },
+    "skuCapacity": {
+      "type": "string",
+      "defaultValue": "0"
     },
     "sku": {
       "type": "string",
@@ -55,6 +56,18 @@
     "numberOfWorkers": {
       "type": "string",
       "defaultValue": "1"
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue":"vnet-westus2-platform-hub-prod"
+    },
+      "subnetName": {
+        "type": "string",
+        "defaultvalue":"snet-westus2-prod-eventcontent-dev-001" 
+    },
+    "dotNetVersion": {
+      "type": "string",
+      "defaultValue": "v7.0"
     }
   },
   "variables": {
@@ -69,7 +82,8 @@
       "location": "[resourceGroup().location]",
       "tags": {},
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('planName'))]"
+        "[concat('Microsoft.Web/serverfarms/', variables('planName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
       ],
       "properties": {
         "name": "[parameters('name')]",
@@ -112,7 +126,8 @@
               "value": "[parameters('rgEnvironment')]"
             }
           ],
-          "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]"
+          "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
+          "netFrameworkVersion": "[parameters('dotNetVersion')]"
         },
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('planName'))]",
         "clientAffinityEnabled": true
@@ -134,33 +149,23 @@
       },
       "sku": {
         "Tier": "[parameters('skuTier')]",
-        "Name": "[parameters('sku')]"
+        "Name": "[parameters('sku')]",
+        "Capacity": "[parameters('skuCapacity')]"
       }
     },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
-      "name": "newWorkspaceTemplate",
-      "resourceGroup": "[resourceGroup().name]",
-      "subscriptionId": "[subscription().subscriptionId]",
+     {
+      "type": "Microsoft.Web/sites/networkConfig",
+      "apiVersion": "2022-03-01",
+      "name": "[format('{0}/{1}', parameters('name'), 'virtualNetwork')]",
       "properties": {
-        "mode": "Incremental",
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "parameters": {},
-          "variables": {},
-          "resources": [
-            {
-              "apiVersion": "2020-08-01",
-              "name": "[parameters('workName')]",
-              "type": "Microsoft.OperationalInsights/workspaces",
-              "location": "[resourceGroup().location]",
-              "properties": {}
-            }
-          ]
-        }
-      }
+        "subnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]",
+        "swiftSupported": true
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('name'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+      ]
     }
   ]
 }
+   

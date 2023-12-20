@@ -17,7 +17,7 @@ param rgEnvironment string = 'Development'
 
 var webSiteName_var = name
 
-resource webSiteName 'Microsoft.Web/sites@2015-08-01' = {
+resource webSiteName 'Microsoft.Web/sites@2022-03-01' = {
   name: webSiteName_var
   kind: 'app'
   location: resourceGroup().location

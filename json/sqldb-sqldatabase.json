@@ -58,7 +58,19 @@
       "metadata": {
         "description": "Describes the performance level for Sku"
       }
-    }
+    },
+    "startIpAddress":{
+      "type": "string",
+      "defaultValue": "0.0.0.0"
+    },
+    "endIpAddress":{
+      "type": "string",
+      "defaultValue": "0.0.0.0"
+    },
+    "firewallRuleName":{
+      "type": "string",
+      "defaultValue": "AllowAllWindowsAzureIps"
+    }  
   },
   "variables": {
     "serverNameLower": "[toLower(parameters('sqlName'))]"
@@ -102,10 +114,10 @@
             "[resourceId('Microsoft.Sql/servers/', variables('serverNameLower'))]"
           ],
           "location": "[parameters('location')]",
-          "name": "AllowAllWindowsAzureIps",
+          "name": "[parameters('firewallRuleName')]",
           "properties": {
-            "endIpAddress": "0.0.0.0",
-            "startIpAddress": "0.0.0.0"
+            "endIpAddress": "[parameters('endIpAddress')]",
+            "startIpAddress": "[parameters('startIpAddress')]"
           }
         }
       ]

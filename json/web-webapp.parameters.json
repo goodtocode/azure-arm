@@ -5,8 +5,20 @@
     "name": {
       "value": "web-PRODUCT-ENVIRONMENT-001"
     },
+    "location": {
+      "value": "West US 3"
+    },
     "planName": {
       "value": "plan-PRODUCT-ENVIRONMENT-001"
+    },
+    "planResourceGroupName": {
+      "value": "COMPANY-rg-PRODUCT-ENVIRONMENT-001"
+    },
+    "appiKey": {
+      "value": "[APPI_KEY]"
+    },
+    "appiConnection": {
+      "value": "[APPI_CONNECTION_STRING]"
     }
   }
 }

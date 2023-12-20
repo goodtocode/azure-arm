@@ -1,0 +1,94 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource name"
+      }
+    },
+    "description": {
+      "type": "string",
+      "defaultValue": "Scheduled query metric alert",
+      "metadata": {
+        "description": "Resource description"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location of the resource"
+      }
+    },
+    "agName": {
+      "type": "string",
+      "metadata": {
+        "description": "ag-PRODUCT-ROLE-ENVIRONMENT-001"
+      }
+    },
+    "appiName": {
+      "type": "string",
+      "metadata": {
+        "description": "appi-PRODUCT-ENVIRONMENT-001"
+      }
+    },
+    "query": {
+      "type": "string",
+      "metadata": {
+        "description": "Query for alert"
+      }
+    },
+    "frequency": {
+      "type": "int",
+      "defaultValue": 5,
+      "metadata": {
+        "description": "Schedule frequency in minutes"
+      }
+    },
+    "window": {
+      "type": "int",
+      "defaultValue": 5,
+      "metadata": {
+        "description": "Time window to average, in minutes"
+      }
+    }
+  },
+  "variables": {},
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.Insights/scheduledQueryRules",
+      "apiVersion": "2018-04-16",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "description": "[parameters('description')]",
+        "enabled": "true",
+        "source": {
+          "query": "[parameters('query')]",
+          "authorizedResources": [],
+          "dataSourceId": "[concat(resourceGroup().id, '/providers/microsoft.insights/components/', parameters('appiName'))]",
+          "queryType": "ResultCount"
+        },
+        "schedule": {
+          "frequencyInMinutes": "[parameters('frequency')]",
+          "timeWindowInMinutes": "[parameters('window')]"
+        },
+        "action": {
+          "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction",
+          "severity": "2",
+          "aznsAction": {
+            "actionGroup": [ "[concat(resourceGroup().id, '/providers/Microsoft.Insights/actionGroups/', parameters('agName'))]" ]
+          },
+          "trigger": {
+            "thresholdOperator": "GreaterThan",
+            "threshold": 0
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}

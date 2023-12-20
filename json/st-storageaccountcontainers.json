@@ -22,7 +22,7 @@
         "Standard_RAGRS",
         "Standard_RAGZRS",
         "Standard_ZRS"
-        ],
+      ],
       "metadata": {
         "description": "Sku of the Storage Account."
       }
@@ -36,7 +36,7 @@
         "FileStorage",
         "Storage",
         "StorageV2"
-        ],
+      ],
       "metadata": {
         "description": "Kind of the Storage Account."
       }
@@ -52,12 +52,12 @@
       "type": "object",
       "defaultValue": {
         "resources": [
-            {
-              "name": "mycontainer",
-              "publicAccess": "None"
-            }
-          ]
-        },
+          {
+            "name": "mycontainer",
+            "publicAccess": "None"
+          }
+        ]
+      },
       "metadata": {
         "description": "Array of container JSON objects. value: {containers:[name:, publicAccess:Container|None]}"
       }
@@ -80,7 +80,7 @@
       "kind": "[parameters('kind')]",
       "properties": {
         "supportsHttpsTrafficOnly": true,
-        "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]"        
+        "allowBlobPublicAccess": "[parameters('allowBlobPublicAccess')]"
       }
     },
     {
@@ -88,7 +88,7 @@
       "apiVersion": "2021-06-01",
       "name": "[concat(parameters('name'), '/default')]",
       "dependsOn": [
-          "[resourceId('Microsoft.Storage/storageAccounts', parameters('name'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('name'))]"
       ],
       "sku": {
         "name": "[parameters('sku')]"
@@ -103,11 +103,11 @@
           "name": "resources",
           "count": "[length(parameters('containerResources').resources)]",
           "input": {
-            "name": "[concat('default/', parameters('containerResources').resources[copyIndex()].name)]",                
+            "name": "[concat('default/', parameters('containerResources').resources[copyIndex()].name)]",
             "type": "blobServices/containers",
             "apiVersion": "2021-06-01",
             "properties": {
-                "publicAccess": "[parameters('containerResources').resources[copyIndex()].publicAccess]"
+              "publicAccess": "[parameters('containerResources').resources[copyIndex()].publicAccess]"
             }
           }
         }

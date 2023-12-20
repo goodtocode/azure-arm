@@ -3,13 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
+      "value": "ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
+    },
+    "receiverName": {
       "value": ""
     },
-    "sku": {
-      "value": "pergb2018"
+    "countryCode": {
+      "value": ""
     },
-    "tags": {
-      "value": {}
+    "phoneNumber": {
+      "value": ""
     }
   }
 }

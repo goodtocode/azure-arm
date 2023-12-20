@@ -5,6 +5,9 @@
     "name": {
       "value": "plan-PRODUCT-ENVIRONMENT-001"
     },
+    "location": {
+      "value": "West US 3"
+    },
     "sku": {
       "value": "F1"
     }
