@@ -27,7 +27,7 @@ stages:
                 --template-file $(templatefile)
 
   - stage: Deploy
-    dependsOn: ValidateandDeploy
+    dependsOn: Validate
     displayName: Deploybicepfile
     jobs:  
     - job: DeployAzure
