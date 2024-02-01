@@ -1,0 +1,46 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+ templatefile: 'filepath'
+ resourceGroupName : Resourcegrpname
+
+stages:
+  - stage: Validate
+    displayName: Validatebicepfile
+    jobs: 
+    - job: Validate
+      displayName: Validatebicepfile
+      steps:
+       - task: AzureCLI@2
+         displayName: Validate deployment 
+         inputs:
+           azureSubscription: 'Bicep'
+           scriptType: 'bash'
+           scriptLocation: 'inlineScript'
+           inlineScript: |
+             az --version  
+             az deployment group what-if --resource-group $(resourceGroupName) \
+                --template-file $(templatefile)
+
+  - stage: Deploy
+    dependsOn: Validate
+    displayName: Deploybicepfile
+    jobs:  
+    - job: DeployAzure
+      displayName: Deploybicepfile
+      steps:       
+       - task: AzureCLI@2
+         condition: 
+         displayName: Resources deployment
+         inputs:
+           azureSubscription: 'Bicep'
+           scriptType: 'bash'
+           scriptLocation: 'inlineScript'
+           inlineScript: |
+             az --version  
+             az deployment group create --resource-group $(resourceGroupName) \
+                --template-file $(templatefile) 

@@ -1,0 +1,51 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+      "_generator": {
+        "name": "bicep",
+        "version": "0.23.1.45101",
+        "templateHash": "6008146766669353928"
+      }
+    },
+    "parameters": {
+      "location": {
+        "type": "string"
+      },
+      "appName": {
+        "type": "string"  
+      },
+      "VnetName": {
+        "type": "string"
+      },
+      "appServicePlanName": {
+        "type": "string"
+      }
+    },
+   
+    "resources": [
+      
+    {
+        "type": "Microsoft.Web/sites",
+        "apiVersion": "2021-01-01",
+        "name": "[parameters('appName')]",
+        "location": "[parameters('location')]",
+        "kind": "app",
+        "properties": {
+          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+          "virtualNetworkSubnetId": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('VnetName')), '2020-06-01').subnets[0].id]",
+          "httpsOnly": true,
+          "vnetRouteAllEnabled": true,
+          "siteConfig": {
+            "http20Enabled": true
+          }
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+        ]
+      }
+    ]
+  }
+  
+  
