@@ -41,11 +41,14 @@
     "use32BitWorkerProcess": {
       "value": true
     },
+    "vnetResourceGroupName": {
+      "value": "vnet-REGION-SUBSCRIPTION-ENVIRONMENT"
+    },
     "vnetName": {
-      "value": "vnet-westus2-platform-hub-prod"
+      "value": "vnet-REGION-SUBSCRIPTION-ENVIRONMENT"
     },
     "subnetName": {
-        "value": "snet-westus2-prod-eventcontent-dev-001" 
+      "value": "snet-REGION-SUBSCRIPTION-PRODUCT-ENVIRONMENT-###"
     },
     "dotNetVersion": {
       "value": "v7.0"

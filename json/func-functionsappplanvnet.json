@@ -5,6 +5,10 @@
     "name": {
       "type": "string"
     },
+    "rgName": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]"
+    },
     "stName": {
       "type": "string"
     },
@@ -33,12 +37,12 @@
     "rgEnvironment": {
       "type": "string",
       "defaultValue": "Development",
-      "allowedValues": ["Development", "QA", "Staging", "Production"]
+      "allowedValues": [ "Development", "QA", "Staging", "Production" ]
     },
     "funcRuntime": {
       "type": "string",
       "defaultValue": "dotnet",
-      "allowedValues": ["dotnet", "python", "dotnet-isolated"]
+      "allowedValues": [ "dotnet", "python", "dotnet-isolated" ]
     },
     "workerSize": {
       "type": "string",
@@ -51,19 +55,20 @@
     "funcVersion": {
       "type": "int",
       "defaultValue": 4,
-      "allowedValues": [1, 2, 3, 4]
+      "allowedValues": [ 1, 2, 3, 4 ]
     },
     "numberOfWorkers": {
       "type": "string",
       "defaultValue": "1"
     },
-    "vnetName": {
-      "type": "string",
-      "defaultValue":"vnet-westus2-platform-hub-prod"
+    "vnetResourceGroupName": {
+      "type": "string"
     },
-      "subnetName": {
-        "type": "string",
-        "defaultvalue":"snet-westus2-prod-eventcontent-dev-001" 
+    "vnetName": {
+      "type": "string"
+    },
+    "subnetName": {
+      "type": "string"
     },
     "dotNetVersion": {
       "type": "string",
@@ -71,7 +76,9 @@
     }
   },
   "variables": {
-    "planName": "[concat('plan-', parameters('name'))]"
+    "planName": "[concat('plan-', parameters('name'))]",
+    "planResourceId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', parameters('rgName'), '/providers/Microsoft.Web/serverfarms/', variables('planName'))]",
+    "snetResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('vnetResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('vnetName'), '/subnets/', parameters('subnetName'))]"
   },
   "resources": [
     {
@@ -82,8 +89,7 @@
       "location": "[resourceGroup().location]",
       "tags": {},
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', variables('planName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+        "[concat('Microsoft.Web/serverfarms/', variables('planName'))]"
       ],
       "properties": {
         "name": "[parameters('name')]",
@@ -107,11 +113,11 @@
             },
             {
               "name": "AzureWebJobsStorage",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('stName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('stName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('stName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,parameters('rgName'),'Microsoft.Storage/storageAccounts', parameters('stName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
             },
             {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('stName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,resourceGroup().name,'Microsoft.Storage/storageAccounts', parameters('stName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('stName'),';AccountKey=',listKeys(resourceId(subscription().subscriptionId,parameters('rgName'),'Microsoft.Storage/storageAccounts', parameters('stName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
             },
             {
               "name": "WEBSITE_CONTENTSHARE",
@@ -129,12 +135,12 @@
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
           "netFrameworkVersion": "[parameters('dotNetVersion')]"
         },
-        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('planName'))]",
+        "serverFarmId": "[variables('planResourceId')]",
         "clientAffinityEnabled": true
       }
     },
     {
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2022-09-01",
       "name": "[variables('planName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[resourceGroup().location]",
@@ -153,19 +159,17 @@
         "Capacity": "[parameters('skuCapacity')]"
       }
     },
-     {
+    {
       "type": "Microsoft.Web/sites/networkConfig",
       "apiVersion": "2022-03-01",
       "name": "[format('{0}/{1}', parameters('name'), 'virtualNetwork')]",
       "properties": {
-        "subnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]",
+        "subnetResourceId": "[variables('snetResourceId')]",
         "swiftSupported": true
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('name'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+        "[resourceId('Microsoft.Web/sites', parameters('name'))]"
       ]
     }
   ]
 }
-   
