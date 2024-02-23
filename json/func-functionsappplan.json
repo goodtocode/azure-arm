@@ -113,6 +113,10 @@
               "value": "[concat(toLower(parameters('name')), '9711')]"
             },
             {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "1"
+            },
+            {
               "name": "ASPNETCORE_ENVIRONMENT",
               "value": "[parameters('rgEnvironment')]"
             },
@@ -120,6 +124,10 @@
               "name": "AZURE_FUNCTIONS_ENVIRONMENT",
               "value": "[parameters('rgEnvironment')]"
             }
+            // ,{
+            //   "name": "AzureWebJobs.<FUNCTION_NAME>.Disabled",
+            //   "value": "true"
+            // }
           ],
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",
           "netFrameworkVersion": "[parameters('dotNetVersion')]"
