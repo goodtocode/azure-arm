@@ -60,6 +60,10 @@
     "dotNetVersion": {
       "type": "string",
       "defaultValue": "v7.0"
+    },
+    "alwaysOn": {
+      "type": "bool",
+      "defaultValue": false
     }
   },
   "variables": {
@@ -121,7 +125,8 @@
           "netFrameworkVersion": "[parameters('dotNetVersion')]"
         },
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('planName'))]",
-        "clientAffinityEnabled": true
+        "clientAffinityEnabled": true,
+        "alwaysOn": "[parameters('alwaysOn')]"
       }
     },
     {

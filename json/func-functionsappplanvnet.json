@@ -61,6 +61,10 @@
       "type": "string",
       "defaultValue": "1"
     },
+    "alwaysOn": {
+      "type": "bool",
+      "defaultValue": false
+    },
     "vnetResourceGroupName": {
       "type": "string"
     },
@@ -136,7 +140,8 @@
           "netFrameworkVersion": "[parameters('dotNetVersion')]"
         },
         "serverFarmId": "[variables('planResourceId')]",
-        "clientAffinityEnabled": true
+        "clientAffinityEnabled": true,
+        "alwaysOn": "[parameters('alwaysOn')]"
       }
     },
     {
