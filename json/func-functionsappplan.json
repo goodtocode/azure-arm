@@ -62,9 +62,9 @@
       "defaultValue": "v7.0"
     },
     "alwaysOn": {
-      "type": "bool",
-      "defaultValue": false
-    }
+      "type": "string",
+      "defaultValue": "false"
+    },
   },
   "variables": {
     "planName": "[concat('plan-', parameters('name'))]"

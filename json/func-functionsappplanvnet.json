@@ -62,8 +62,8 @@
       "defaultValue": "1"
     },
     "alwaysOn": {
-      "type": "bool",
-      "defaultValue": false
+      "type": "string",
+      "defaultValue": "false"
     },
     "vnetResourceGroupName": {
       "type": "string"
