@@ -14,29 +14,14 @@
     "appiConnection": {
       "value": "APPI-CONNECTION-STRING"
     },
-    "skuTier": {
-      "value": "Dynamic"
-    },
-    "sku": {
-      "value": "Y1"
-    },
     "rgEnvironment": {
       "value": "Development"
     },
     "funcRuntime": {
       "value": "dotnet"
     },
-    "workerSize": {
-      "value": "0"
-    },
-    "workerSizeId": {
-      "value": "0"
-    },
     "funcVersion": {
       "value": 4
-    },
-    "numberOfWorkers": {
-      "value": "1"
     },
     "use32BitWorkerProcess": {
       "value": true
