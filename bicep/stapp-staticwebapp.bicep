@@ -1,5 +1,6 @@
 //https://www.aaron-powell.com/posts/2022-06-29-deploy-swa-with-bicep/
 //https://stackoverflow.com/questions/77002723/deploy-blazor-wasm-with-net-8-using-github-actions
+//https://azure.github.io/static-web-apps-cli/docs/cli/swa-deploy/
 @description('Name of the Static Web App. (stapp)')
 param name string
 
