@@ -3,6 +3,9 @@
 @maxLength(24)
 param name string
 
+@description('Azure region of the deployment')
+param location string = resourceGroup().location
+
 @description('Sku of the Storage Account.')
 @allowed([
   'Premium_LRS'
@@ -26,15 +29,16 @@ param sku string = 'Standard_LRS'
 ])
 param kind string = 'StorageV2'
 
+@description('Tags to add to the resources')
+param tagsArray object = {}
+
 @description('Allow public access')
 param allowBlobPublicAccess bool = false
 
-resource name_resource 'Microsoft.Storage/storageAccounts@2021-06-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   name: name
-  location: resourceGroup().location
-  tags: {
-    displayName: name
-  }
+  location: location
+  tags: tagsArray
   sku: {
     name: sku
   }
@@ -42,51 +46,29 @@ resource name_resource 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   properties: {
     supportsHttpsTrafficOnly: true
     allowBlobPublicAccess: allowBlobPublicAccess
-  }
-}
-
-resource name_default 'Microsoft.Storage/storageAccounts/blobServices@2021-06-01' = {
-  parent: name_resource
-  name: 'default'
-  sku: {
-    name: sku
-  }
-  properties: {
-    cors: {
-      corsRules: []
+    encryption: {
+      keySource: 'Microsoft.Storage'
+      requireInfrastructureEncryption: false
+      services: {
+        blob: {
+          enabled: true
+          keyType: 'Account'
+        }
+        file: {
+          enabled: true
+          keyType: 'Account'
+        }
+        queue: {
+          enabled: true
+          keyType: 'Service'
+        }
+        table: {
+          enabled: true
+          keyType: 'Service'
+        }
+      }
     }
   }
 }
 
-resource Microsoft_Storage_storageAccounts_fileServices_name_default 'Microsoft.Storage/storageAccounts/fileServices@2021-06-01' = {
-  parent: name_resource
-  name: 'default'
-  sku: {
-    name: sku
-  }
-  properties: {
-    cors: {
-      corsRules: []
-    }
-  }
-}
-
-resource Microsoft_Storage_storageAccounts_queueServices_name_default 'Microsoft.Storage/storageAccounts/queueServices@2021-06-01' = {
-  parent: name_resource
-  name: 'default'
-  properties: {
-    cors: {
-      corsRules: []
-    }
-  }
-}
-
-resource Microsoft_Storage_storageAccounts_tableServices_name_default 'Microsoft.Storage/storageAccounts/tableServices@2021-06-01' = {
-  parent: name_resource
-  name: 'default'
-  properties: {
-    cors: {
-      corsRules: []
-    }
-  }
-}
+output storageAccountId string = storageAccount.id

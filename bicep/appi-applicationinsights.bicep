@@ -1,21 +1,40 @@
-param name string
-param type string = 'web'
+@description('Application Insights resource name')
+param name string = 'applicationInsightsName'
+
+@description('Azure region of the deployment')
+param location string = resourceGroup().location
+
+@description('Tags to add to the resources')
 param tagsArray object = {}
+
+@description('Type of application insights')
+param type string = 'web'
+
+@description('Kind of the Storage Account.')
+@allowed([  
+  'Bluefield'
+  'Redfield'
+])
+param flow string = 'Bluefield'
 param requestSource string = 'IbizaAIExtension'
+@description('Workspace Resource name')
 param workName string
+@description('Workspace Resource Group')
+param workSubscriptionId string = subscription().subscriptionId
+@description('Workspace Resource Group')
+param workResourceGroupName string = resourceGroup().name
 
-var workspaceResourceId = '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/microsoft.operationalinsights/workspaces/${workName}'
-
-resource name_resource 'Microsoft.Insights/components@2020-02-02' = {
+resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: name
-  location: resourceGroup().location
+  location: location
   tags: tagsArray
+  kind: type
   properties: {
-    ApplicationId: name
     Application_Type: type
-    Flow_Type: 'Redfield'
+    Flow_Type: flow
     Request_Source: requestSource
-    WorkspaceResourceId: workspaceResourceId
+    WorkspaceResourceId: resourceId(workSubscriptionId, workResourceGroupName, 'Microsoft.OperationalInsights/workspaces', workName)    
   }
-  dependsOn: []
 }
+
+output applicationInsightsId string = applicationInsights.id
