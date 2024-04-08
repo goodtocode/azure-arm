@@ -1,11 +1,11 @@
 @description('Application Insights resource name')
-param name string = 'applicationInsightsName'
+param name string
 
 @description('Azure region of the deployment')
 param location string = resourceGroup().location
 
 @description('Tags to add to the resources')
-param tagsArray object = {}
+param tags object = {}
 
 @description('Type of application insights')
 param type string = 'web'
@@ -16,18 +16,22 @@ param type string = 'web'
   'Redfield'
 ])
 param flow string = 'Bluefield'
+
 param requestSource string = 'IbizaAIExtension'
+
 @description('Workspace Resource name')
 param workName string
-@description('Workspace Resource Group')
+
+@description('Workspace Subscription')
 param workSubscriptionId string = subscription().subscriptionId
+
 @description('Workspace Resource Group')
 param workResourceGroupName string = resourceGroup().name
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: name
   location: location
-  tags: tagsArray
+  tags: tags
   kind: type
   properties: {
     Application_Type: type

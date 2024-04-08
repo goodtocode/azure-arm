@@ -30,7 +30,7 @@ param sku string = 'Standard_LRS'
 param kind string = 'StorageV2'
 
 @description('Tags to add to the resources')
-param tagsArray object = {}
+param tags object = {}
 
 @description('Allow public access')
 param allowBlobPublicAccess bool = false
@@ -38,7 +38,7 @@ param allowBlobPublicAccess bool = false
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   name: name
   location: location
-  tags: tagsArray
+  tags: tags
   sku: {
     name: sku
   }
