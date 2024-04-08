@@ -13,26 +13,10 @@ param sku string = 'Free'
 @description('Tags to add to the resources')
 param tags object = {}
 
-@secure()
-param repositoryToken string
-param appLocation string
-param apiLocation string
-param appArtifactLocation string
-
 resource name_resource 'Microsoft.Web/staticSites@2022-09-01' = {
   name: name
   location: location
   tags: tags
-  properties: {
-    repositoryUrl: repositoryUrl
-    branch: branch
-    repositoryToken: repositoryToken
-    buildProperties: {
-      appLocation: appLocation
-      apiLocation: apiLocation
-      appArtifactLocation: appArtifactLocation
-    }
-  }
   sku: {
     tier: sku
     name: sku
