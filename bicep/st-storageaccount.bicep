@@ -48,7 +48,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' = {
     allowBlobPublicAccess: allowBlobPublicAccess
     encryption: {
       keySource: 'Microsoft.Storage'
-      requireInfrastructureEncryption: false
       services: {
         blob: {
           enabled: true
