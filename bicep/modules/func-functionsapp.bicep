@@ -1,13 +1,10 @@
 param name string
 param location string
-param tags object
+param planId string
 param stName string
-param workName string
 param appiKey string
 param appiConnection string
 param use32BitWorkerProcess bool = true
-param skuTier string = 'Dynamic'
-param sku string = 'Y1'
 
 @allowed([
   'Development'
@@ -23,8 +20,6 @@ param rgEnvironment string = 'Development'
   'dotnet-isolated'
 ])
 param funcRuntime string = 'dotnet'
-param workerSize string = '0'
-param workerSizeId string = '0'
 
 @allowed([
   1
@@ -33,16 +28,14 @@ param workerSizeId string = '0'
   4
 ])
 param funcVersion int = 4
-param numberOfWorkers string = '1'
 
-var planName_var = 'plan-${name}'
-
-resource name_resource 'Microsoft.Web/sites@2023-12-01' = {
-  name: name
+resource functionapp 'Microsoft.Web/sites@2023-01-01' = {
+  name: name 
   kind: 'functionapp'
   location: location
-  tags: tags
+  tags: {}
   properties: {
+    serverFarmId: planId
     siteConfig: {
       appSettings: [
         {
@@ -71,7 +64,7 @@ resource name_resource 'Microsoft.Web/sites@2023-12-01' = {
         }
         {
           name: 'WEBSITE_CONTENTSHARE'
-          value: '${toLower(name)}9711'
+          value: toLower(name)
         }
         {
           name: 'ASPNETCORE_ENVIRONMENT'
@@ -84,36 +77,6 @@ resource name_resource 'Microsoft.Web/sites@2023-12-01' = {
       ]
       use32BitWorkerProcess: use32BitWorkerProcess
     }
-    serverFarmId: '/subscriptions/${subscription().subscriptionId}/resourcegroups/${resourceGroup().name}/providers/Microsoft.Web/serverfarms/${planName_var}'
-    clientAffinityEnabled: true
-  }
-  dependsOn: [
-    planName
-  ]
-}
-
-resource planName 'Microsoft.Web/serverfarms@2018-11-01' = {
-  name: planName_var
-  location: resourceGroup().location
-  kind: ''
-  tags: {}
-  properties: {
-    name: planName_var
-    workerSize: workerSize
-    workerSizeId: workerSizeId
-    numberOfWorkers: numberOfWorkers
-  }
-  sku: {
-    Tier: skuTier
-    Name: sku
-  }
-  dependsOn: []
-}
-
-module newWorkspaceTemplate './nested_newWorkspaceTemplate.bicep' = {
-  name: 'newWorkspaceTemplate'
-  scope: resourceGroup(subscription().subscriptionId, resourceGroup().name)
-  params: {
-    workName: workName
+    
   }
 }
