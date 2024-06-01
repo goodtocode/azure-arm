@@ -1,8 +1,8 @@
-using 'landingzone-shared.bicep'
+using '../templates/landingzone-shared.bicep'
 
 // Common
 param location = 'West US 2'
-param tags = { Environment: 'prod', CostCenter: '1111' }
+param tags = { Environment: 'dev', CostCenter: '0000' }
 
 // Workspace
 param workName = 'work-SHARED-dev-001'

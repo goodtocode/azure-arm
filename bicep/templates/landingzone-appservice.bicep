@@ -12,11 +12,11 @@ param appiName string
 param Application_Type string 
 param Flow_Type string 
 // Key Vault
-param keyVaultName string 
-param skuName string 
+param kvName string 
+param kvSku string 
 // Storage Account
-param storageName string 
-param storageSkuName string 
+param stName string 
+param stSku string 
 // App Service
 param planName string 
 param appName string 
@@ -28,7 +28,7 @@ resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' exis
   scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
 }
 
-module appiModule 'appi-applicationinsights.bicep' = {
+module appiModule '../modules/appi-applicationinsights.bicep' = {
   name: 'appiName'
   params:{
     location: location
@@ -40,24 +40,24 @@ module appiModule 'appi-applicationinsights.bicep' = {
   }
 }
 
-module kvModule 'kv-keyvault.bicep'= {
-   name:'keyVaultName'
+module kvModule '../modules/kv-keyvault.bicep'= {
+   name:'kvName'
    params:{
     location: location
     tags: tags
-    name: keyVaultName
-    sku: skuName
+    name: kvName
+    sku: kvSku
     tenantId: tenantId
    }
 }
 
-module stModule 'st-storageaccount.bicep' = {
+module stModule '../modules/st-storageaccount.bicep' = {
   name:'storagename'
   params:{
     tags: tags
     location: location
-    storageName: storageName
-    storageSkuName: storageSkuName
+    name: stName
+    sku: stSku
   }
 }
 
@@ -66,7 +66,7 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
 }
 
-module apiModule 'api-appservice.bicep' = {
+module apiModule '../modules/api-appservice.bicep' = {
   name: 'app'
   params:{
     name: appName
