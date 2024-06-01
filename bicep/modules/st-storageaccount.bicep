@@ -1,17 +1,14 @@
 param location string
-
 param tags object
-
-param storageName string 
-
-param storageSkuName string 
+param name string 
+param sku string 
 
 resource stResource 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: storageName
+  name: name
   location: location
   tags: tags
   sku: {
-    name: storageSkuName
+    name: sku
   }
   kind: 'StorageV2'
   properties: {

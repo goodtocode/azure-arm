@@ -1,4 +1,6 @@
 param name string
+param location string
+param tags object
 param stName string
 param workName string
 param appiKey string
@@ -35,13 +37,12 @@ param numberOfWorkers string = '1'
 
 var planName_var = 'plan-${name}'
 
-resource name_resource 'Microsoft.Web/sites@2018-11-01' = {
+resource name_resource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
   kind: 'functionapp'
-  location: resourceGroup().location
-  tags: {}
+  location: location
+  tags: tags
   properties: {
-    name: name
     siteConfig: {
       appSettings: [
         {
