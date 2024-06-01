@@ -1,9 +1,21 @@
 param name string
-param location string
-param sku string
-param tags object
 
-resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
+@description('Specifies the Azure location where the app configuration store should be created.')
+param location string = resourceGroup().location
+
+@allowed([
+  'Free'
+  'Standalone'
+  'PerNode'
+  'PerGB2018'
+])
+@description('Specifies the service tier of the workspace: Free, Standalone, PerNode, Per-GB.')
+param sku string = 'PerGB2018'
+
+@description('Tags to add to the resources')
+param tags object = {}
+
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: name
   location: location
   tags: tags
@@ -14,4 +26,4 @@ resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   }
 }
 
-output id string  = workResource.id
+output logAnalyticsWorkspaceId string = logAnalyticsWorkspace.id
