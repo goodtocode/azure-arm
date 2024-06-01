@@ -24,4 +24,4 @@ param kvSku = 'standard'
 
 // App Service
 param appName = 'api-PRODUCT-prod-001'
-param planName = 'plan-PRODUCT-prod-001'
+param planName = 'plan-SHARED-prod-001'
