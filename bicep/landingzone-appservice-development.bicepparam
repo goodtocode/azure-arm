@@ -1,4 +1,4 @@
-using '../templates/landingzone-appservice.bicep'
+using 'landingzone-appservice.bicep'
 // Common
 param tenantId = 'TENANT_ID'
 param rgEnvironment = 'Development'

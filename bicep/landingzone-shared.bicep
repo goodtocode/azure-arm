@@ -10,7 +10,7 @@ param workSku string
 param planName string 
 param planSku string 
 
-module workModule '../modules/work-loganalyticsworkspace.bicep' = {
+module workModule 'work-loganalyticsworkspace.bicep' = {
   name: 'logAnalyticsWorkspaceName'
   params: {
     name: workName
@@ -20,7 +20,7 @@ module workModule '../modules/work-loganalyticsworkspace.bicep' = {
   }
 }
 
-module planModule '../modules/plan-appserviceplan.bicep' = {
+module planModule 'plan-appserviceplan.bicep' = {
   name: 'appservicename'
   params: {
     name: planName

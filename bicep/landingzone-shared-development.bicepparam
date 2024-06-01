@@ -1,4 +1,4 @@
-using '../templates/landingzone-shared.bicep'
+using 'landingzone-shared.bicep'
 
 // Common
 param location = 'West US 2'

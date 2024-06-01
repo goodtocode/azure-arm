@@ -28,7 +28,7 @@ resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' exis
   scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
 }
 
-module appiModule '../modules/appi-applicationinsights.bicep' = {
+module appiModule 'appi-applicationinsights.bicep' = {
   name: 'appiName'
   params:{
     location: location
@@ -40,7 +40,7 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
   }
 }
 
-module kvModule '../modules/kv-keyvault.bicep'= {
+module kvModule 'kv-keyvault.bicep'= {
    name:'keyVaultName'
    params:{
     location: location
@@ -51,7 +51,7 @@ module kvModule '../modules/kv-keyvault.bicep'= {
    }
 }
 
-module stModule '../modules/st-storageaccount.bicep' = {
+module stModule 'st-storageaccount.bicep' = {
   name:'storagename'
   params:{
     tags: tags
@@ -66,7 +66,7 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
 }
 
-module apiModule '../modules/api-appservice.bicep' = {
+module apiModule 'api-appservice.bicep' = {
   name: 'app'
   params:{
     name: appName
