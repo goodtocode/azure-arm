@@ -22,6 +22,10 @@ param planName string
 param appName string 
 // workspace
 param workName string
+// Sql Server
+param sqlServerName string
+param sqldbName string
+param sqldbSku string
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: workName 
@@ -78,3 +82,20 @@ module apiModule '../modules/api-appservice.bicep' = {
     planId: planResource.id  
   }
 }
+
+resource sqlServerResource 'Microsoft.Sql/servers@2023-08-01-preview' existing = {
+  name: sqlServerName 
+  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+}
+
+module sqlServerModule '../modules/sqldb-sqldatabase.bicep' = {
+  name: 'sqlserver'
+  params:{
+    name: sqldbName
+    location: location    
+    tags: tags
+    sku: sqldbSku
+    sqlServerName: sqlServerName
+  }
+}
+

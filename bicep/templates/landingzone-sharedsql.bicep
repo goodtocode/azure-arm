@@ -9,6 +9,12 @@ param workSku string
 // App Service Plan
 param planName string 
 param planSku string 
+// Sql Server
+param sqlName string 
+param sqlAdminLogin string
+@secure()
+param sqlAdminPassword string
+param sqldbSku string
 
 module workModule '../modules/work-loganalyticsworkspace.bicep' = {
   name: 'logAnalyticsWorkspaceName'
@@ -21,11 +27,22 @@ module workModule '../modules/work-loganalyticsworkspace.bicep' = {
 }
 
 module planModule '../modules/plan-appserviceplan.bicep' = {
-  name: 'appservicename'
+  name: 'appServiceName'
   params: {
     name: planName
     sku: planSku
     tags: tags
     location: location    
+  }
+}
+
+module sqlserverModule '../modules/sql-sqlserver.bicep' = {
+  name: 'sqlServerName'
+  params: {
+    name: sqlName
+    location: location    
+    tags: tags    
+    adminLogin: sqlAdminLogin
+    adminPassword: sqlAdminPassword
   }
 }
