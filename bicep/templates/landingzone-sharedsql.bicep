@@ -14,7 +14,6 @@ param sqlName string
 param sqlAdminLogin string
 @secure()
 param sqlAdminPassword string
-param sqldbSku string
 
 module workModule '../modules/work-loganalyticsworkspace.bicep' = {
   name: 'logAnalyticsWorkspaceName'
