@@ -4,6 +4,8 @@ param name string
 
 param location string = resourceGroup().location
 
+param tags object
+
 param collation string = 'SQL_Latin1_General_CP1_CI_AS'
 
 param maxSizeBytes int = 1073741824
@@ -21,9 +23,7 @@ param sku string = 'Basic'
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-08-01-preview' = {
   name: '${sqlServerName}/${name}'
   location: location
-  tags: {
-    displayName: 'Database'
-  }
+  tags: tags
   sku: {
     name: sku
     tier: sku // Replace with the desired SKU tier (e.g., Basic, GeneralPurpose, BusinessCritical)
