@@ -23,7 +23,11 @@ param appName string
 // workspace
 param workName string
 // Sql Server
-param sqlName string
+// Sql Server
+param sqlName string 
+param sqlAdminUser string
+@secure()
+param sqlAdminPassword string
 param sqldbName string
 param sqldbSku string
 
@@ -33,7 +37,7 @@ resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' exis
 }
 
 module appiModule '../modules/appi-applicationinsights.bicep' = {
-  name: 'appiName'
+  name: 'appiModuleName'
   params:{
     location: location
     tags: tags
@@ -45,7 +49,7 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
 }
 
 module kvModule '../modules/kv-keyvault.bicep'= {
-   name:'kvName'
+   name:'kvModuleName'
    params:{
     location: location
     tags: tags
@@ -56,7 +60,7 @@ module kvModule '../modules/kv-keyvault.bicep'= {
 }
 
 module stModule '../modules/st-storageaccount.bicep' = {
-  name:'storagename'
+  name:'stModuleName'
   params:{
     tags: tags
     location: location
@@ -71,7 +75,7 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
 }
 
 module apiModule '../modules/api-appservice.bicep' = {
-  name: 'app'
+  name: 'apiModuleName'
   params:{
     name: appName
     location: location    
@@ -83,19 +87,16 @@ module apiModule '../modules/api-appservice.bicep' = {
   }
 }
 
-resource sqlServerResource 'Microsoft.Sql/servers@2023-08-01-preview' existing = {
-  name: sqlName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
-}
-
-module sqldbModule '../modules/sqldb-sqldatabase.bicep' = {
-  name: 'sqldb'
+module sqlModule '../modules/sql-sqlserverdatabase.bicep' = {
+  name: 'sqlModuleName'
   params:{
-    name: sqldbName
+    name: sqlName
     location: location    
-    tags: tags
+    tags: tags    
+    adminLogin: sqlAdminUser
+    adminPassword: sqlAdminPassword
+    sqldbName: sqldbName
     sku: sqldbSku
-    sqlResourceId: sqlServerResource.id
   }
 }
 
