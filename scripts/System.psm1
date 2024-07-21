@@ -626,49 +626,32 @@ export-modulemember -function Remove-Path
 
 #-----------------------------------------------------------------------
 # Remove-Subfolders [-Path [<String>]]
-# [-Include [<String[]>] [-Exclude [<String[]>]]
+#                  [-Include [<String[]>] [-Exclude [<String[]>]]
 #
-# Example: .\Remove-Subfolders -Path \\source\path
+# Example usage:
+# 	Remove-Subfolders -Path "C:\YourProjectPath" -Subfolder "bin"
+#	 Remove-Subfolders -Path "C:\YourProjectPath" -Subfolder "obj"
 #-----------------------------------------------------------------------
-function Remove-Subfolders
-{
-	param (
-		[Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true)]
-		[string]$Path = $(throw '-Path is a required parameter.'),
-		[Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true)]
-		[string]$Subfolder = $(throw '-Subfolder is a required parameter.'),
-		[Int32]$First = 1000
-	)
-	Write-Verbose "Remove-Subfolders -Path $Path -Subfolder $Subfolder -First $First"
-	$Path = Set-Unc -Path $Path
-	
-	if (test-folder -Path $Path) {
-		$Affected = 0
-		if(Test-Unc -Path $Path)
-		{
-			$Folders=Get-ChildItem $Path -Recurse | Where-Object {($_.Name -EQ $Subfolder) -and ($_.PSIsContainer)} | select -First $First
-			foreach ($Folder in $Folders) {
-				if ($Folder.FullName)
-				{
-					[String]$FolderToRemove=Add-Suffix -String $Folder.FullName -Add "\"
-					Remove-Path -Path $FolderToRemove
-					$Affected = $Affected + 1
-				}
-			}
-		}
-		else
-		{
-			$Remove = Add-Suffix -String $Path -Add '\'
-			$Remove = Add-Suffix -String $Remove -Add $Subfolder
-			Remove-Path -Path $Remove
-			$Affected = 1
-		}
-		Write-Verbose "[Success] $Affected items affected. $(Get-CurrentFile) at $(Get-CurrentLine). -Path $Path -Subfolder $Subfolder removed."
-	}
-	else
-	{
-		Write-Verbose "[Warning] 0 items affected. $(Get-CurrentFile) at $(Get-CurrentLine). -Path $Path does not exist."
-	}
+function Remove-Subfolders {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$Path,
+        [Parameter(Mandatory=$true)]
+        [string]$Subfolder
+    )
+
+    Write-Verbose "Removing subfolders -Path $Path -Subfolder $Subfolder"
+
+    if (Test-Path -Path $Path) {
+        $Folders = Get-ChildItem -Path $Path -Recurse -Directory -Filter $Subfolder
+        foreach ($Folder in $Folders) {
+            Remove-Item -Path $Folder.FullName -Recurse -Force
+            Write-Verbose "Removed $($Folder.FullName)"
+        }
+        Write-Verbose "[Success] Removed $($Folders.Count) '$Subfolder' folders."
+    } else {
+        Write-Verbose "[Warning] Path $Path does not exist."
+    }
 }
 export-modulemember -function Remove-Subfolders
 
