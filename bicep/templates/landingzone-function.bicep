@@ -4,7 +4,6 @@ targetScope='resourceGroup'
 param tenantId string 
 param location string 
 param tags object 
-param rgEnvironment string 
 param sharedSubscriptionId string
 param sharedResourceGroupName string
 // Azure Monitor
@@ -17,11 +16,13 @@ param kvSku string
 // Storage Account
 param stName string 
 param stSku string 
-// App Service
-param planName string 
-param appName string 
 // workspace
 param workName string
+// function
+param rgEnvironment string
+param funcName string
+param planName string
+
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: workName 
@@ -69,10 +70,10 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
 module funcModule '../modules/func-functionsapp.bicep' = {
   name: 'funcName'
   params:{
-    name: appName
+    name: funcName
     location: location    
     tags: tags
-    environment: rgEnvironment
+    rgEnvironment: rgEnvironment
     appiKey:appiModule.outputs.InstrumentationKey
     appiConnection:appiModule.outputs.Connectionstring
     planId: planResource.id  

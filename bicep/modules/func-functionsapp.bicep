@@ -1,7 +1,10 @@
 param name string
 param location string
+param tags object
 param planId string
 param stName string
+param stSubscriptionId string = subscription().subscriptionId
+param stResourceGroupName string = resourceGroup().name
 param appiKey string
 param appiConnection string
 param use32BitWorkerProcess bool = true
@@ -33,7 +36,7 @@ resource functionapp 'Microsoft.Web/sites@2023-01-01' = {
   name: name 
   kind: 'functionapp'
   location: location
-  tags: {}
+  tags: tags
   properties: {
     serverFarmId: planId
     siteConfig: {
@@ -56,11 +59,11 @@ resource functionapp 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${stName};AccountKey=${listKeys(resourceId(subscription().subscriptionId, resourceGroup().name, 'Microsoft.Storage/storageAccounts', stName), '2019-06-01').keys[0].value};EndpointSuffix=core.windows.net'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${stName};AccountKey=${listKeys(resourceId(stSubscriptionId, stResourceGroupName, 'Microsoft.Storage/storageAccounts', stName), '2019-06-01').keys[0].value};EndpointSuffix=core.windows.net'
         }
         {
           name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${stName};AccountKey=${listKeys(resourceId(subscription().subscriptionId, resourceGroup().name, 'Microsoft.Storage/storageAccounts', stName), '2019-06-01').keys[0].value};EndpointSuffix=core.windows.net'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${stName};AccountKey=${listKeys(resourceId(stSubscriptionId, stResourceGroupName, 'Microsoft.Storage/storageAccounts', stName), '2019-06-01').keys[0].value};EndpointSuffix=core.windows.net'
         }
         {
           name: 'WEBSITE_CONTENTSHARE'
@@ -76,7 +79,6 @@ resource functionapp 'Microsoft.Web/sites@2023-01-01' = {
         }
       ]
       use32BitWorkerProcess: use32BitWorkerProcess
-    }
-    
+    }    
   }
 }
