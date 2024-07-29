@@ -1,7 +1,4 @@
-@description('Name of the Key Vault. (kv)')
-@minLength(3)
-@maxLength(24)
-param name string
+param name string 
 
 param location string 
 
@@ -22,7 +19,7 @@ resource kvResource 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enabledForDiskEncryption: true
     enabledForTemplateDeployment: true
     tenantId: tenantId
-    publicNetworkAccess:'Enabled'    
+    publicNetworkAccess:'Enabled'
     sku: {
       name: sku
       family: 'A'

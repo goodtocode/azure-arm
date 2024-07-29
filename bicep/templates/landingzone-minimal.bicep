@@ -12,7 +12,8 @@ param Application_Type string
 param Flow_Type string 
 // Key Vault
 param kvName string 
-param kvSku string 
+param kvSku string
+param accessPolicies array 
 // Storage Account
 param stName string 
 param stSku string 
@@ -44,6 +45,7 @@ module kvModule '../modules/kv-keyvault.bicep'= {
     name: kvName
     sku: kvSku
     tenantId: tenantId
+    accessPolicies: accessPolicies
    }
 }
 

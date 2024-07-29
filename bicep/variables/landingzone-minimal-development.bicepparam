@@ -18,3 +18,12 @@ param stSku = 'Standard_LRS'
 // Key Vault
 param kvName = 'kv-PRODUCT-dev-001'
 param kvSku = 'standard'
+param accessPolicies = [
+  {
+    tenantId: 'TENANT_ID'
+    objectId: 'PIPELINE_PRINCIPLE_OBJECT_ID'
+    permissions: {
+      secrets: ['Get', 'List']
+    }
+  }
+]
