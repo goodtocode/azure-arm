@@ -10,4 +10,4 @@ param workSku = 'PerGB2018'
 
 // App Service
 param planName = 'plan-PRODUCT-dev-001'
-param planSku = 'S1'
+param planSku = 'B1'

@@ -77,5 +77,6 @@ module funcModule '../modules/func-functionsapp.bicep' = {
     appiKey:appiModule.outputs.InstrumentationKey
     appiConnection:appiModule.outputs.Connectionstring
     planId: planResource.id  
+    stName: stName
   }
 }
