@@ -1,9 +1,9 @@
 targetScope='resourceGroup'
 
 // Common
-param tenantId string 
-param location string 
-param tags object 
+param tenantId string = tenant().tenantId
+param location string = resourceGroup().location
+param tags object
 // Azure Monitor
 param appiName string 
 param Application_Type string 
@@ -19,7 +19,7 @@ param workName string
 param workSku string
 
 module workModule '../modules/work-loganalyticsworkspace.bicep' = {
-  name: 'workName'
+  name: 'workModuleName'
   params:{
     name: workName
     location: location
@@ -29,7 +29,7 @@ module workModule '../modules/work-loganalyticsworkspace.bicep' = {
 }
 
 module appiModule '../modules/appi-applicationinsights.bicep' = {
-  name: 'appiName'
+  name: 'appiModuleName'
   params:{
     location: location
     tags: tags
@@ -41,7 +41,7 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
 }
 
 module kvModule '../modules/kv-keyvault.bicep'= {
-   name:'keyVaultName'
+   name:'kvModuleName'
    params:{
     location: location
     tags: tags
@@ -52,7 +52,7 @@ module kvModule '../modules/kv-keyvault.bicep'= {
 }
 
 module stModule '../modules/st-storageaccount.bicep' = {
-  name:'storagename'
+  name:'stModuleName'
   params:{
     tags: tags
     location: location

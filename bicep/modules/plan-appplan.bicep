@@ -23,7 +23,7 @@ param sku string = 'F1'
 @minValue(1)
 param skuCapacity int = 1
 
-resource name_resource 'Microsoft.Web/serverfarms@2018-11-01' = {
+resource name_resource 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: name
   location: resourceGroup().location
   tags: {

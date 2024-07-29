@@ -1,7 +1,6 @@
 using '../templates/landingzone-standalone.bicep'
 
 // Common
-param tenantId = 'TENANT_ID'
 param location = 'West US 2'
 param tags = { Environment: 'dev', CostCenter: '0000' }
 // Workspace

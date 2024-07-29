@@ -1,11 +1,9 @@
 using '../templates/landingzone-appservice.bicep'
 // Common
-param tenantId = 'TENANT_ID'
 param rgEnvironment = 'Development'
 param location = 'West US 2'
 param tags = { Environment: 'dev', CostCenter: '0000' }
 // Workspace
-param sharedSubscriptionId = 'SUBSCRIPTION_ID'
 param sharedResourceGroupName = 'rg-SHARED-dev-001'
 param workName = 'work-SHARED-dev-001'
 

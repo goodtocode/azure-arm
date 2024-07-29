@@ -5,6 +5,7 @@ param tenantId string = tenant().tenantId
 param location string = resourceGroup().location
 param sharedSubscriptionId string = subscription().subscriptionId
 param sharedResourceGroupName string
+param rgEnvironment string 
 param tags object
 // Azure Monitor
 param appiName string 
@@ -16,8 +17,19 @@ param kvSku string
 // Storage Account
 param stName string 
 param stSku string 
+// App Service
+param planName string 
+param appName string 
 // workspace
 param workName string
+// Sql Server
+// Sql Server
+param sqlName string 
+param sqlAdminUser string
+@secure()
+param sqlAdminPassword string
+param sqldbName string
+param sqldbSku string
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: workName 
@@ -56,3 +68,35 @@ module stModule '../modules/st-storageaccount.bicep' = {
     sku: stSku
   }
 }
+
+resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
+  name: planName 
+  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+}
+
+module apiModule '../modules/api-appservice.bicep' = {
+  name: 'apiModuleName'
+  params:{
+    name: appName
+    location: location    
+    tags: tags
+    environment: rgEnvironment
+    appiKey:appiModule.outputs.InstrumentationKey
+    appiConnection:appiModule.outputs.Connectionstring
+    planId: planResource.id  
+  }
+}
+
+module sqlModule '../modules/sql-sqlserverdatabase.bicep' = {
+  name: 'sqlModuleName'
+  params:{
+    name: sqlName
+    location: location    
+    tags: tags    
+    adminLogin: sqlAdminUser
+    adminPassword: sqlAdminPassword
+    sqldbName: sqldbName
+    sku: sqldbSku
+  }
+}
+
