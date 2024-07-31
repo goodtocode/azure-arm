@@ -1,4 +1,4 @@
-using '../templates/landingzone-minimal.bicep'
+using '../templates/landingzone-function.bicep'
 // Common
 param location = 'West US 2'
 param tags = { Environment: 'dev', CostCenter: '0000' }
@@ -29,3 +29,10 @@ param accessPolicies = [
     }
   }
 ]
+
+// Azure Functions
+param rgEnvironment = 'Development'
+param funcName = 'func-PRODUCT-dev-001'
+param planName = 'plan-SHARED-dev-001'
+param alwaysOn = true
+

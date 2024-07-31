@@ -32,6 +32,8 @@ param funcRuntime string = 'dotnet'
 ])
 param funcVersion int = 4
 
+param alwaysOn bool = false
+
 resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
   name: name 
   kind: 'functionapp'
@@ -40,6 +42,7 @@ resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
   properties: {
     serverFarmId: planId
     siteConfig: {
+      alwaysOn: alwaysOn
       appSettings: [
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'

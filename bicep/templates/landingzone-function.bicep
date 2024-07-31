@@ -14,6 +14,7 @@ param Flow_Type string
 // Key Vault
 param kvName string 
 param kvSku string 
+param accessPolicies array 
 // Storage Account
 param stName string 
 param stSku string 
@@ -22,6 +23,7 @@ param workName string
 // function
 param funcName string
 param planName string
+param alwaysOn bool = false
 
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
@@ -49,6 +51,7 @@ module kvModule '../modules/kv-keyvault.bicep'= {
     name: kvName
     sku: kvSku
     tenantId: tenantId
+    accessPolicies: accessPolicies
    }
 }
 
@@ -76,7 +79,8 @@ module funcModule '../modules/func-functionsapp.bicep' = {
     rgEnvironment: rgEnvironment
     appiKey:appiModule.outputs.InstrumentationKey
     appiConnection:appiModule.outputs.Connectionstring
-    planId: planResource.id  
+    planId: planResource.id
     stName: stName
+    alwaysOn: alwaysOn
   }
 }

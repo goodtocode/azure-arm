@@ -1,19 +1,19 @@
 targetScope='resourceGroup'
 
 // Common
-param tenantId string = tenant().tenantId
-param location string = resourceGroup().location
-param sharedSubscriptionId string = subscription().subscriptionId
+param tenantId string 
+param location string 
+param tags object 
+param sharedSubscriptionId string
 param sharedResourceGroupName string
-param tags object
 // Azure Monitor
 param appiName string 
 param Application_Type string 
 param Flow_Type string 
 // Key Vault
 param kvName string 
-param kvSku string
-param accessPolicies array 
+param kvSku string 
+param accessPolicies array
 // Storage Account
 param stName string 
 param stSku string 
@@ -26,7 +26,7 @@ resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' exis
 }
 
 module appiModule '../modules/appi-applicationinsights.bicep' = {
-  name: 'appiModuleName'
+  name: 'appiName'
   params:{
     location: location
     tags: tags
@@ -38,7 +38,7 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
 }
 
 module kvModule '../modules/kv-keyvault.bicep'= {
-   name:'kvModuleName'
+   name:'kvName'
    params:{
     location: location
     tags: tags
@@ -50,7 +50,7 @@ module kvModule '../modules/kv-keyvault.bicep'= {
 }
 
 module stModule '../modules/st-storageaccount.bicep' = {
-  name:'stModuleName'
+  name:'storagename'
   params:{
     tags: tags
     location: location
