@@ -17,9 +17,9 @@ param kvSku string
 param stName string 
 param stSku string 
 // Static Web App
-param appName string
+param stappName string
 param repositoryUrl string
-param branch string
+param branch string = 'main'
 // workspace
 param workName string
 
@@ -61,10 +61,10 @@ module stModule '../modules/st-storageaccount.bicep' = {
   }
 }
 
-module apiModule '../modules/stapp-staticwebapp.bicep' = {
-  name: 'apiModuleName'
+module stappModule '../modules/stapp-staticwebapp.bicep' = {
+  name: 'stappModuleName'
   params:{
-    name: appName
+    name: stappName
     location: location    
     tags: tags
     repositoryUrl: repositoryUrl

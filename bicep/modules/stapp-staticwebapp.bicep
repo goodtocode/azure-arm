@@ -1,73 +1,35 @@
-targetScope='resourceGroup'
+//https://www.aaron-powell.com/posts/2022-06-29-deploy-swa-with-bicep/
+//https://stackoverflow.com/questions/77002723/deploy-blazor-wasm-with-net-8-using-github-actions
+//https://azure.github.io/static-web-apps-cli/docs/cli/swa-deploy/
+@description('Name of the Static Web App. (stapp)')
+param name string
 
-// Common
-param tenantId string = tenant().tenantId
+@description('Azure region of the deployment')
 param location string = resourceGroup().location
-param sharedSubscriptionId string = subscription().subscriptionId
-param sharedResourceGroupName string
-param tags object
-// Azure Monitor
-param appiName string 
-param Application_Type string 
-param Flow_Type string 
-// Key Vault
-param kvName string 
-param kvSku string 
-// Storage Account
-param stName string 
-param stSku string 
-// Static Web App
-param stappName string
+
+@allowed([ 'Free', 'Standard' ])
+param sku string = 'Free'
+
+@description('Tags to add to the resources')
+param tags object = {}
+
+@description('Git Repository URL')
 param repositoryUrl string
+
+@description('Git Branch')
 param branch string = 'main'
-// workspace
-param workName string
 
-resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
-  name: workName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
-}
-
-module appiModule '../modules/appi-applicationinsights.bicep' = {
-  name: 'appiModuleName'
-  params:{
-    location: location
-    tags: tags
-    name: appiName
-    Application_Type: Application_Type
-    Flow_Type: Flow_Type
-    workResourceId: workResource.id
+resource name_resource 'Microsoft.Web/staticSites@2022-09-01' = {
+  name: name
+  location: location
+  tags: tags
+  sku: {
+    tier: sku
+    name: sku
   }
-}
-
-module kvModule '../modules/kv-keyvault.bicep'= {
-   name:'kvModuleName'
-   params:{
-    location: location
-    tags: tags
-    name: kvName
-    sku: kvSku
-    tenantId: tenantId
-   }
-}
-
-module stModule '../modules/st-storageaccount.bicep' = {
-  name:'stModuleName'
-  params:{
-    tags: tags
-    location: location
-    name: stName
-    sku: stSku
-  }
-}
-
-module apiModule '../modules/stapp-staticwebapp.bicep' = {
-  name: 'apiModuleName'
-  params:{
-    name: stappName
-    location: location    
-    tags: tags
+  properties: {
     repositoryUrl: repositoryUrl
     branch: branch
   }
 }
+
