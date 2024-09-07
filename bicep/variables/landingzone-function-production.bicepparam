@@ -1,6 +1,6 @@
 using '../templates/landingzone-function.bicep'
 // Common
-var subscriptionName = 'production'
+var organizationName = 'gtc'
 var productName = 'PRODUCT'
 var environmentIac = 'prod'
 param environmentApp = 'Production'
@@ -9,7 +9,7 @@ param tags = { Environment: environmentIac, CostCenter: '0000' }
 // Workspace
 param tenantId = '00000000-0000-0000-0000-000000000000'
 param sharedSubscriptionId = '00000000-0000-0000-0000-000000000000'
-param sharedResourceGroupName = 'rg-${subscriptionName}-shared-${environmentIac}-001'
+param sharedResourceGroupName = '${organizationName}-rg-shared-${environmentIac}-001'
 param workName = 'work-shared-${environmentIac}-001'
 
 // Azure Monitor

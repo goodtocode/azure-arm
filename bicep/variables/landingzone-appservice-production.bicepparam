@@ -1,13 +1,13 @@
 using '../templates/landingzone-appservice.bicep'
 // Common
-var subscriptionName = 'production'
+var organizationName = 'gtc'
 var productName = 'PRODUCT'
 var environmentIac = 'prod'
 param environmentApp = 'Production'
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 // Workspace
-param sharedResourceGroupName = 'rg-${subscriptionName}-shared-${environmentIac}-001'
+param sharedResourceGroupName = '${organizationName}-rg-shared-${environmentIac}-001'
 param workName = 'work-shared-${environmentIac}-001'
 
 // Azure Monitor
@@ -26,4 +26,4 @@ param kvSku = 'standard'
 // App Service
 var planSku = 'F1'
 param appName = 'api-${productName}-${environmentIac}-001'
-param planName = 'plan-shared-${environmentIac}-${planSku}-001'
+param planName = 'plan-shared-${planSku}-${environmentIac}-001'

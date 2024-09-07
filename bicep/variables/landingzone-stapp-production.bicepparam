@@ -1,12 +1,12 @@
 using '../templates/landingzone-stapp.bicep'
 // Common
-var subscriptionName = 'production'
+var organizationName = 'gtc'
 var productName = 'PRODUCT'
 var environmentIac = 'prod'
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 // Workspace
-param sharedResourceGroupName = 'rg-${subscriptionName}-shared-${environmentIac}-001'
+param sharedResourceGroupName = '${organizationName}-rg-shared-${environmentIac}-001'
 param workName = 'work-shared-${environmentIac}-001'
 
 // Azure Monitor

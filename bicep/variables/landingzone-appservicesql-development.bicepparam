@@ -1,14 +1,12 @@
-using '../templates/landingzone-function.bicep'
+using '../templates/landingzone-appservicesql.bicep'
 // Common
 var organizationName = 'gtc'
 var productName = 'PRODUCT'
-var environmentIac = 'dev'
 param environmentApp = 'Development'
+var environmentIac = 'dev'
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 // Workspace
-param tenantId = '00000000-0000-0000-0000-000000000000'
-param sharedSubscriptionId = '00000000-0000-0000-0000-000000000000'
 param sharedResourceGroupName = '${organizationName}-rg-shared-${environmentIac}-001'
 param workName = 'work-shared-${environmentIac}-001'
 
@@ -24,19 +22,15 @@ param stSku = 'Standard_LRS'
 // Key Vault
 param kvName = 'kv-${productName}-${environmentIac}-001'
 param kvSku = 'standard'
-param accessPolicies = [
-  {
-    tenantId: tenantId
-    objectId: 'PIPELINE_PRINCIPLE_OBJECT_ID'
-    permissions: {
-      secrets: ['Get', 'List']
-    }
-  }
-]
 
-// Azure Functions
+// App Service
 var planSku = 'F1'
-param funcName = 'func-${productName}-${environmentIac}-001'
+param appName = 'api-${productName}-${environmentIac}-001'
 param planName = 'plan-shared-${planSku}-${environmentIac}-001'
-param alwaysOn = true
 
+// SQL Server
+param sqlName = 'sql-${productName}-${environmentIac}-001'
+param sqlAdminUser = ''
+param sqlAdminPassword = ''
+param sqldbName = 'sqldb-${productName}-${environmentIac}-001'
+param sqldbSku = 'Basic'

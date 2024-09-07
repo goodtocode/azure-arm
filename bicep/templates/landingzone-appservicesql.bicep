@@ -99,4 +99,3 @@ module sqlModule '../modules/sql-sqlserverdatabase.bicep' = {
     sku: sqldbSku
   }
 }
-

@@ -15,7 +15,7 @@ param use32BitWorkerProcess bool = true
   'Staging'
   'Production'
 ])
-param environmentApp string = 'Development'
+param environmentApp string
 
 @allowed([
   'dotnet'
