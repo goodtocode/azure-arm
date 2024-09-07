@@ -31,7 +31,7 @@ param stName string = 'storageaccountname'
 param appiKey string = 'appikey'
 param appiConnection string = 'appiConnection'
 param use32BitWorkerProcess bool = true
-param rgEnvironment string = 'Development'
+param environmentApp string = 'Development'
 param funcRuntime string = 'dotnet'
 param funcVersion int = 4
 
@@ -110,7 +110,7 @@ module functionapp 'func-functionapp.bicep' = {
     appiKey:appiKey
     appiConnection:appiConnection
     use32BitWorkerProcess:use32BitWorkerProcess
-    rgEnvironment:rgEnvironment
+    environmentApp:environmentApp
     funcRuntime:funcRuntime
     funcVersion:funcVersion
   }

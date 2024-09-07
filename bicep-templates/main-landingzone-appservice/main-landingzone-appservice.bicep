@@ -32,7 +32,7 @@ param appiKey string = 'appiKey'
 
 param appiConnection string = 'appiConnection'
 
-param rgEnvironment string = 'Development'
+param environmentApp string = 'Development'
 
 module loganalystics 'LogAnalyticsworkspace.bicep'= {
   name:'logAnalyticsWorkspace' 
@@ -94,7 +94,7 @@ module appservice 'app-service.bicep' = {
     appName: appName
     appiKey: appiKey
     appiConnection: appiConnection
-    rgEnvironment: rgEnvironment
+    environmentApp: environmentApp
   }
 }
   

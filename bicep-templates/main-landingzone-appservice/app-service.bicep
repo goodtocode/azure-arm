@@ -8,7 +8,7 @@ param appiKey string = 'appiKey'
 
 param appiConnection string = 'appiConnection'
 
-param rgEnvironment string = 'Development'
+param environmentApp string = 'Development'
 
 resource existingserviceplan 'Microsoft.Web/serverfarms@2023-01-01' existing ={
   name: 'existingserviceplan'
@@ -33,7 +33,7 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'ASPNETCORE_ENVIRONMENT'
-          value: rgEnvironment
+          value: environmentApp
         }
       ]
     }

@@ -15,7 +15,7 @@ param use32BitWorkerProcess bool = true
   'Staging'
   'Production'
 ])
-param rgEnvironment string = 'Development'
+param environmentApp string = 'Development'
 
 @allowed([
   'dotnet'
@@ -74,11 +74,11 @@ resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
         }
         {
           name: 'ASPNETCORE_ENVIRONMENT'
-          value: rgEnvironment
+          value: environmentApp
         }
         {
           name: 'AZURE_FUNCTIONS_ENVIRONMENT'
-          value: rgEnvironment
+          value: environmentApp
         }
       ]
       use32BitWorkerProcess: use32BitWorkerProcess

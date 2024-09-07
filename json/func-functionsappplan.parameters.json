@@ -20,7 +20,7 @@
     "sku": {
       "value": "Y1"
     },
-    "rgEnvironment": {
+    "environmentApp": {
       "value": "Development"
     },
     "funcRuntime": {

@@ -32,7 +32,7 @@ param appiKey string = 'appiKey'
 
 param appiConnection string = 'appiConnection'
 
-param rgEnvironment string = 'Development'
+param environmentApp string = 'Development'
 
 param serverName string = 'serverName'
 
@@ -107,7 +107,7 @@ module appservice 'app-service.bicep' = {
     appName: appName
     appiKey: appiKey
     appiConnection: appiConnection
-    rgEnvironment: rgEnvironment
+    environmentApp: environmentApp
   }
 }
 

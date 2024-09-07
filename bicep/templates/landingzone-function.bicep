@@ -4,7 +4,7 @@ targetScope='resourceGroup'
 param tenantId string 
 param location string 
 param tags object 
-param rgEnvironment string 
+param environmentApp string 
 param sharedSubscriptionId string
 param sharedResourceGroupName string
 // Azure Monitor
@@ -76,7 +76,7 @@ module funcModule '../modules/func-functionsapp.bicep' = {
     name: funcName
     location: location    
     tags: tags
-    rgEnvironment: rgEnvironment
+    environmentApp: environmentApp
     appiKey:appiModule.outputs.InstrumentationKey
     appiConnection:appiModule.outputs.Connectionstring
     planId: planResource.id
