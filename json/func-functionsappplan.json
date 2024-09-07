@@ -30,7 +30,7 @@
       "type": "string",
       "defaultValue": "Y1"
     },
-    "rgEnvironment": {
+    "environmentApp": {
       "type": "string",
       "defaultValue": "Development",
       "allowedValues": ["Development", "QA", "Staging", "Production"]
@@ -118,11 +118,11 @@
             },
             {
               "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "[parameters('rgEnvironment')]"
+              "value": "[parameters('environmentApp')]"
             },
             {
               "name": "AZURE_FUNCTIONS_ENVIRONMENT",
-              "value": "[parameters('rgEnvironment')]"
+              "value": "[parameters('environmentApp')]"
             }
           ],
           "use32BitWorkerProcess": "[parameters('use32BitWorkerProcess')]",

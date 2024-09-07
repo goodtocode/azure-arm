@@ -3,29 +3,29 @@ targetScope='resourceGroup'
 // Common
 param tenantId string = tenant().tenantId
 param location string = resourceGroup().location
+param sharedSubscriptionId string = subscription().subscriptionId
+param sharedResourceGroupName string
 param tags object
 // Azure Monitor
 param appiName string 
 param Application_Type string 
 param Flow_Type string 
 // Key Vault
-param keyVaultName string 
-param skuName string 
+param kvName string 
+param kvSku string 
 // Storage Account
-param storageName string 
-param storageSkuName string 
+param stName string 
+param stSku string 
+// Static Web App
+param stappName string
+param repositoryUrl string
+param branch string = 'main'
 // workspace
 param workName string
-param workSku string
 
-module workModule '../modules/work-loganalyticsworkspace.bicep' = {
-  name: 'workModuleName'
-  params:{
-    name: workName
-    location: location
-    tags: tags    
-    sku: workSku
-  }
+resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
+  name: workName 
+  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
 }
 
 module appiModule '../modules/appi-applicationinsights.bicep' = {
@@ -36,7 +36,7 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
     name: appiName
     Application_Type: Application_Type
     Flow_Type: Flow_Type
-    workResourceId: workModule.outputs.id
+    workResourceId: workResource.id
   }
 }
 
@@ -45,8 +45,8 @@ module kvModule '../modules/kv-keyvault.bicep'= {
    params:{
     location: location
     tags: tags
-    name: keyVaultName
-    sku: skuName
+    name: kvName
+    sku: kvSku
     tenantId: tenantId
    }
 }
@@ -56,7 +56,18 @@ module stModule '../modules/st-storageaccount.bicep' = {
   params:{
     tags: tags
     location: location
-    name: storageName
-    sku: storageSkuName
+    name: stName
+    sku: stSku
+  }
+}
+
+module apiModule '../modules/stapp-staticwebapp.bicep' = {
+  name: 'stappModuleName'
+  params:{
+    name: stappName
+    location: location    
+    tags: tags
+    repositoryUrl: repositoryUrl
+    branch: branch
   }
 }

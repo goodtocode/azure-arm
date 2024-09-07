@@ -14,7 +14,7 @@
     "appiConnection": {
       "value": "APPI-CONNECTION-STRING"
     },
-    "rgEnvironment": {
+    "environmentApp": {
       "value": "Development"
     },
     "funcRuntime": {

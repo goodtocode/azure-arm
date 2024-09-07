@@ -27,7 +27,7 @@
     "appiConnection": {
       "type": "string"
     },
-    "rgEnvironment": {
+    "environmentApp": {
       "type": "string",
       "minLength": 1,
       "defaultValue": "Development",
@@ -63,7 +63,7 @@
             },
             {
               "name": "ASPNETCORE_ENVIRONMENT",
-              "value": "[parameters('rgEnvironment')]"
+              "value": "[parameters('environmentApp')]"
             }
           ]
         }
