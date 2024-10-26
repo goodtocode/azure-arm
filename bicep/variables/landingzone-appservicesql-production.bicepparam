@@ -2,8 +2,8 @@ using '../templates/landingzone-appservicesql.bicep'
 // Common
 var organizationName = 'gtc'
 var productName = 'PRODUCT'
-param environmentApp = 'Production'
 var environmentIac = 'prod'
+param environmentApp = 'Production'
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 // Workspace
