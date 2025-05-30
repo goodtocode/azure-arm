@@ -14,7 +14,7 @@ param stSku string
 // App Service
 param planName string 
 param webName string 
-param appName string 
+param apiName string 
 
 module stModule '../modules/st-storageaccount.bicep' = {
   name:'stModuleName'
@@ -39,7 +39,7 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
 module apiModule '../modules/api-appservice.bicep' = {
   name: 'apiModuleName'
   params:{
-    name: appName
+    name: apiName
     location: location    
     tags: tags
     environment: environmentApp

@@ -14,14 +14,6 @@ param stSku string
 // App Service
 param planName string 
 param webName string 
-param apiName string 
-// Sql Server
-param sqlName string 
-param sqlAdminUser string
-@secure()
-param sqlAdminPassword string
-param sqldbName string
-param sqldbSku string
 
 module stModule '../modules/st-storageaccount.bicep' = {
   name:'stModuleName'
@@ -43,19 +35,6 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
 }
 
-module apiModule '../modules/api-appservice.bicep' = {
-  name: 'apiModuleName'
-  params:{
-    name: apiName
-    location: location    
-    tags: tags
-    environment: environmentApp
-    appiKey:appiResource.properties.InstrumentationKey
-    appiConnection:appiResource.properties.ConnectionString
-    planId: planResource.id  
-  }
-}
-
 module webModule '../modules/web-webapp.bicep' = {
   name: 'webModuleName'
   params:{
@@ -66,18 +45,5 @@ module webModule '../modules/web-webapp.bicep' = {
     appiKey:appiResource.properties.InstrumentationKey
     appiConnection:appiResource.properties.ConnectionString
     planId: planResource.id  
-  }
-}
-
-module sqlModule '../modules/sql-sqlserverdatabase.bicep' = {
-  name: 'sqlModuleName'
-  params:{
-    name: sqlName
-    location: location    
-    tags: tags    
-    adminLogin: sqlAdminUser
-    adminPassword: sqlAdminPassword
-    sqldbName: sqldbName
-    sku: sqldbSku
   }
 }
