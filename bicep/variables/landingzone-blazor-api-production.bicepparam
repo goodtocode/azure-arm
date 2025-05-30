@@ -20,5 +20,5 @@ param stSku = 'Standard_LRS'
 // App Service
 var planSku = 'F1'
 param webName = 'web-${productName}-${environmentIac}-001'
-param appName = 'api-${productName}-${environmentIac}-001'
+param apiName = 'api-${productName}-${environmentIac}-001'
 param planName = 'plan-shared-${planSku}-${environmentIac}-001'
