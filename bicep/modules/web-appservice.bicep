@@ -40,6 +40,9 @@ resource webAppResource 'Microsoft.Web/sites@2023-12-01' = {
       ]
     }
   }
+  identity: {
+    type: 'SystemAssigned'
+  }
 }
 
 output id string = webAppResource.id
