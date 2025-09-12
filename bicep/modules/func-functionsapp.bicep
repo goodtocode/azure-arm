@@ -38,7 +38,7 @@ resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
   name: name 
   kind: 'functionapp'
   location: location
-  tags: tags
+  tags: tags == null ? null : tags
   properties: {
     serverFarmId: planId
     siteConfig: {

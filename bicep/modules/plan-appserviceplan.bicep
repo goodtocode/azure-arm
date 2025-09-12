@@ -8,7 +8,7 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: name
   kind:'Windows'
   location: location
-  tags: tags
+  tags: tags == null ? null : tags
   properties: {
     reserved: false    
   }

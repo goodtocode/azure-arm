@@ -14,7 +14,7 @@ var location = resourceGroup().location
 resource name_resource 'Microsoft.Web/certificates@2023-12-01' = {
   name: name
   location: location
-  tags: tags
+  tags: tags == null ? null : tags
   properties: {
     hostNames: [
       hostnames

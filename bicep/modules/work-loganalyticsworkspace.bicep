@@ -6,7 +6,7 @@ param tags object
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: name
   location: location
-  tags: tags
+  tags: tags == null ? null : tags
   properties: {
     sku: {
       name: sku

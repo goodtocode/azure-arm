@@ -7,5 +7,5 @@ param tags object
 resource rgResource 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   name: name
   location: location
-  tags: tags
+  tags: tags == null ? null : tags
 }

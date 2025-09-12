@@ -24,7 +24,7 @@ var nameLower = toLower(name)
 resource sqlServer 'Microsoft.Sql/servers@2023-08-01-preview' = {
   name: nameLower
   location: location  
-  tags: tags  
+  tags: tags == null ? null : tags  
   properties: {
     administratorLogin: adminLogin
     administratorLoginPassword: adminPassword

@@ -6,7 +6,7 @@ param sku string
 resource stResource 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: name
   location: location
-  tags: tags
+  tags: tags == null ? null : tags
   sku: {
     name: sku
   }

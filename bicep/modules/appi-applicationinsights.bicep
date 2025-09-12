@@ -9,7 +9,7 @@ param workResourceId string
 resource appiResource 'Microsoft.Insights/components@2020-02-02' = {
   name: name
   location: location
-  tags: tags
+  tags: tags == null ? null : tags
   kind:'web'
   properties: {
     Application_Type: Application_Type

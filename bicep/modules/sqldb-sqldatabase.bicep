@@ -18,7 +18,7 @@ param sqlName string
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-08-01-preview' = {
   name: '${sqlName}/${name}'
   location: location
-  tags: tags
+  tags: tags == null ? null : tags
   sku: {
     name: sku
     tier: sku // (e.g., Basic, GeneralPurpose, BusinessCritical)

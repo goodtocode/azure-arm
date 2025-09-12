@@ -30,7 +30,7 @@ param maxSizeBytes int = 1073741824
 resource sqlServer 'Microsoft.Sql/servers@2023-08-01-preview' = {
   name: name
   location: location
-  tags: tags
+  tags: tags == null ? null : tags
   properties: {
     administratorLogin: adminLogin
     administratorLoginPassword: adminPassword

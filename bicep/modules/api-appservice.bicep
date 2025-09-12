@@ -16,7 +16,7 @@ resource apiResource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
   location: location
   kind: kind
-  tags: tags
+  tags: tags == null ? null : tags
   properties: {
     serverFarmId: planId
     siteConfig: {
