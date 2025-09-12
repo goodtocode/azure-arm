@@ -49,7 +49,7 @@ module apiModule '../modules/api-appservice.bicep' = {
   }
 }
 
-module webModule '../modules/web-webapp.bicep' = {
+module webModule '../modules/web-appservice.bicep' = {
   name: 'webModuleName'
   params:{
     name: webName

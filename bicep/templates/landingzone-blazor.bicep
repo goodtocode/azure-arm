@@ -35,7 +35,7 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
 }
 
-module webModule '../modules/web-webapp.bicep' = {
+module webModule '../modules/web-appservice.bicep' = {
   name: 'webModuleName'
   params:{
     name: webName
