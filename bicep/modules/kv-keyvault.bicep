@@ -2,13 +2,13 @@ param name string
 param location string 
 param sku string 
 param tenantId string 
-param tags object
+param tags object = {}
 param accessPolicies array = []
 
 resource kvResource 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: name
   location: location
-  tags: tags == null ? null : tags
+  tags: empty(tags) ? null : tags
   properties: {
     enabledForDeployment: true
     enabledForDiskEncryption: true
