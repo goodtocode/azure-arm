@@ -11,6 +11,7 @@ resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
     sku: {
       name: sku
     }
+    retentionInDays: 30
   }
 }
 
