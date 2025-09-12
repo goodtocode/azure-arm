@@ -84,4 +84,7 @@ resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
       use32BitWorkerProcess: use32BitWorkerProcess
     }    
   }
+  identity: {
+    type: 'SystemAssigned'
+  }
 }
