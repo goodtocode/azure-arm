@@ -1,9 +1,9 @@
-using '../templates/landingzone-appservice.bicep'
+using '../templates/landingzone-api.bicep'
 // Common
 var organizationName = 'gtc'
 var productName = 'PRODUCT'
-var environmentIac = 'prod'
-param environmentApp = 'Production'
+var environmentIac = 'dev'
+param environmentApp = 'Development'
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 // Workspace
