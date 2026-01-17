@@ -1,27 +1,23 @@
 targetScope='resourceGroup'
 
-// ESA CAF Hub main deployment template
-// All modules parameterized, no hard-coded values
-// Follows repo conventions and CAF naming
-
-param location string
-param prefix string
-param environment string
+// Common
+param tenantId string = tenant().tenantId
+param location string = resourceGroup().location
 param tags object
-param vnetAddressPrefix string
-param workName string
-param kvName string
-param firewallName string
 
-module workModule '../modules/work-loganalyticsworkspace.bicep' = {
-  name: 'workName'
-  params: {
-    name: workName
-    location: location
-    tags: tags    
-    sku: workSku
-  }
-}
+// Identity
+param kvName string
+param kvSku string
+param sentName string
+param sentSku string
+
+// Networking
+var afdName string = '' // Purposely want it to default
+param afdSku string = 'Standard_AzureFrontDoor'
+param vnetName string
+param vnetCidr string
+param snetName string
+param snetCidr string
 
 module sentModule '../modules/sent-loganalyticsworkspace.bicep' = {
   name: 'sentName'
@@ -34,7 +30,7 @@ module sentModule '../modules/sent-loganalyticsworkspace.bicep' = {
 }
 
 module kvModule '../modules/kv-keyvault.bicep'= {
-   name:'kvModuleName'
+   name:'kvName'
    params:{
     location: location
     tags: tags
@@ -45,11 +41,30 @@ module kvModule '../modules/kv-keyvault.bicep'= {
 }
 
 module vnet '../modules/vnet-virtualnetwork.bicep' = {
-  name: 'hubVnet'
+  name: 'vnetName'
   params: {
-    name: '${prefix}-hub-vnet'
-    addressPrefix: vnetAddressPrefix
+    name: vnetName
+    addressPrefix: vnetCidr
     location: location
     tags: tags
+  }
+}
+
+module snet '../modules/snet-virtualnetworksubnet.bicep' = {
+  name: 'snetName'
+  params: {
+    vnetName: vnetName
+    snetName: snetName
+    cidr: snetCidr
+  }
+}
+
+module afd '../modules/afd-azurefrontdoor.bicep' = {
+  name: 'afdName'
+  params: {
+    name: empty(afdName) ? '${vnetName}-afd' : afdName
+    location: 'global'
+    tags: tags
+    sku: afdSku
   }
 }

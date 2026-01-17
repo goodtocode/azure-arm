@@ -23,7 +23,6 @@ resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
 }
 
 
-
 resource onboarding 'Microsoft.OperationalInsights/workspaces/providers/onboardingStates@2021-03-01-preview' = {
   name: '${workResource.name}/Microsoft.SecurityInsights/default'
   properties: {}

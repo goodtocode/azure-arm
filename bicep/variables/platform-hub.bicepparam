@@ -1,4 +1,4 @@
-using '../templates/esa-hub.bicep'
+using '../templates/platform-hub.bicep'
 
 // =====================
 // Common
