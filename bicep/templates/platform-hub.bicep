@@ -23,6 +23,16 @@ module workModule '../modules/work-loganalyticsworkspace.bicep' = {
   }
 }
 
+module sentModule '../modules/sent-loganalyticsworkspace.bicep' = {
+  name: 'sentName'
+  params: {
+    name: sentName
+    location: location
+    tags: tags    
+    sku: sentSku
+  }
+}
+
 module kvModule '../modules/kv-keyvault.bicep'= {
    name:'kvModuleName'
    params:{
