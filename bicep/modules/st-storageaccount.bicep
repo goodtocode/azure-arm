@@ -21,6 +21,10 @@ param name string
 ])
 param sku string = 'Standard_LRS'
 
+
+@description('List of allowed IP addresses for Storage Account access. Default is empty (no IPs allowed).')
+param allowedIpRules array = []
+
 resource stResource 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: name
   location: location
@@ -32,9 +36,18 @@ resource stResource 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   properties: {
     allowBlobPublicAccess: false
     supportsHttpsTrafficOnly: true
+    minimumTlsVersion: 'TLS1_2'
+    allowSharedKeyAccess: false
+    publicNetworkAccess: 'Enabled'
+    networkAcls: {
+      defaultAction: 'Deny'
+      bypass: 'AzureServices'
+      ipRules: allowedIpRules
+      virtualNetworkRules: []
+    }
     encryption: {
       keySource: 'Microsoft.Storage'
-      requireInfrastructureEncryption: false
+      requireInfrastructureEncryption: true
       services: {
         blob: {
           enabled: true
@@ -53,6 +66,14 @@ resource stResource 'Microsoft.Storage/storageAccounts@2023-01-01' = {
           keyType: 'Service'
         }
       }
+    }
+    deleteRetentionPolicy: {
+      enabled: true
+      days: 7
+    }
+    containerDeleteRetentionPolicy: {
+      enabled: true
+      days: 7
     }
   }
 }

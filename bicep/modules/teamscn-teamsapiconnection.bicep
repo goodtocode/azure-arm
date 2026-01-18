@@ -1,3 +1,7 @@
+
+@description('The name of the Teams API Connection. Must be 1-80 characters, using only alphanumeric characters and hyphens.')
+@minLength(1)
+@maxLength(80)
 param name string
 
 var locationShortName = toLower(replace(resourceGroup().location, ' ', ''))

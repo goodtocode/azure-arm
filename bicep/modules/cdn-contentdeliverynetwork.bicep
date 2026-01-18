@@ -4,7 +4,6 @@
 @maxLength(24)
 param name string
 
-
 @description('The SKU (pricing tier) for the Storage Account. Allowed values: Standard_LRS, Standard_GRS, Standard_RAGRS, Standard_ZRS, Premium_LRS, Premium_ZRS. Default is Standard_LRS.')
 @allowed([
   'Standard_LRS'

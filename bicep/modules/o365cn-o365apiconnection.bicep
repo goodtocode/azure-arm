@@ -1,3 +1,7 @@
+
+@description('The name of the Office 365 API Connection. Must be 1-80 characters, using only alphanumeric characters and hyphens. Default is teams.')
+@minLength(1)
+@maxLength(80)
 param name string = 'teams'
 
 var locationLower = toLower(replace(resourceGroup().location, ' ', ''))

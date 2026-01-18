@@ -1,7 +1,27 @@
+
+@description('The name of the FTP API Connection. Must be 1-80 characters, using only alphanumeric characters and hyphens. Default is azureblob.')
+@minLength(1)
+@maxLength(80)
 param name string = 'azureblob'
+
+@description('The address of the FTP server.')
+@minLength(1)
+@maxLength(255)
 param ftpServerAddress string
-param ftpServerPort string
+
+@description('The port of the FTP server. Default is 21.')
+@minLength(1)
+@maxLength(5)
+param ftpServerPort string = '21'
+
+@description('The username for the FTP server.')
+@minLength(1)
+@maxLength(128)
 param ftpUsername string
+
+@description('The password for the FTP server.')
+@minLength(1)
+@maxLength(128)
 param ftpPassword string
 
 var locationShortName = toLower(replace(resourceGroup().location, ' ', ''))

@@ -1,4 +1,12 @@
+
+@description('The name of the Storage Tables API Connection. Must be 1-80 characters, using only alphanumeric characters and hyphens. Default is azureblob.')
+@minLength(1)
+@maxLength(80)
 param name string = 'azureblob'
+
+@description('The name of the target Storage Account for the connection.')
+@minLength(3)
+@maxLength(24)
 param stName string
 
 var locationShortName = toLower(replace(resourceGroup().location, ' ', ''))

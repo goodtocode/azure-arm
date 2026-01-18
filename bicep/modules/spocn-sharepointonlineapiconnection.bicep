@@ -1,4 +1,10 @@
+
+@description('The name of the SharePoint Online API Connection. Must be 1-80 characters, using only alphanumeric characters and hyphens.')
+@minLength(1)
+@maxLength(80)
 param name string
+
+@description('The Azure AD tenant ID for the SharePoint Online connection. Defaults to the current subscription tenant.')
 param tenantId string = subscription().tenantId
 
 var locationShortName = toLower(replace(resourceGroup().location, ' ', ''))

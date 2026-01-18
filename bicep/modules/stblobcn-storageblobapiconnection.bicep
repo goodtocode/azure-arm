@@ -1,4 +1,12 @@
+
+@description('The name of the Blob Storage API Connection. Must be 1-80 characters, using only alphanumeric characters and hyphens.')
+@minLength(1)
+@maxLength(80)
 param name string
+
+@description('The name of the target Storage Account for the connection.')
+@minLength(3)
+@maxLength(24)
 param stName string
 
 var locationShortName = toLower(replace(resourceGroup().location, ' ', ''))

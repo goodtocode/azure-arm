@@ -1,8 +1,32 @@
+
+@description('The name of the SFTP SSH API Connection. Must be 1-80 characters, using only alphanumeric characters and hyphens. Default is azureblob.')
+@minLength(1)
+@maxLength(80)
 param name string = 'azureblob'
+
+@description('The address of the SFTP server.')
+@minLength(1)
+@maxLength(255)
 param ftpServerAddress string
-param ftpServerPort string
+
+@description('The port of the SFTP server. Default is 22.')
+@minLength(1)
+@maxLength(5)
+param ftpServerPort string = '22'
+
+@description('The username for the SFTP server.')
+@minLength(1)
+@maxLength(128)
 param ftpUsername string
+
+@description('The password for the SFTP server.')
+@minLength(1)
+@maxLength(128)
 param ftpPassword string
+
+@description('The root folder for the SFTP connection. Default is /.')
+@minLength(1)
+@maxLength(255)
 param ftpRootFolder string = '/'
 
 @description('SSH private key (the content of the file should be provided entirely as is, in the multiline format)')
