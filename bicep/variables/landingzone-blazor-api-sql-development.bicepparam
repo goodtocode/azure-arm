@@ -1,31 +1,35 @@
 using '../templates/landingzone-blazor-api-sql.bicep'
 // Common
-var organizationName = 'COMPANY'
-var productName = 'PRODUCT'
+
+var tenantIac = 'myco'
+var productIac = 'product'
 var environmentIac = 'dev'
+var regionIac = 'wus2'
+var instanceIac = '001'
+var planSku = 'F1'
+
 param environmentApp = 'Development'
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
-// Workspace
-param sharedResourceGroupName = '${organizationName}-rg-shared-${environmentIac}-001'
+// Resource Group (shared)
+param sharedResourceGroupName = '${tenantIac}-${productIac}-${environmentIac}-${instanceIac}-rg'
 
-// Azure Monitor
-param appiName = 'appi-${productName}-${environmentIac}-001'
+// Azure Monitor App Insights
+param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // Storage
-param stName = 'st${productName}${environmentIac}001'
+param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}-st'
 param stSku = 'Standard_LRS'
 
 // App Service
-var planSku = 'F1'
-param webName = 'web-${productName}-${environmentIac}-001'
-param apiName = 'api-${productName}-${environmentIac}-001'
-param planName = 'plan-shared-${planSku}-${environmentIac}-001'
+param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
+param apiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
+param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 
 // SQL Server
-param sqlName = 'sql-${productName}-${environmentIac}-001'
+param sqlName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sql'
 param sqlAdminUser = ''
 param sqlAdminPassword = ''
-param sqldbName = 'sqldb-${productName}-${environmentIac}-001'
+param sqldbName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sqldb'
 param sqldbSku = 'Basic'

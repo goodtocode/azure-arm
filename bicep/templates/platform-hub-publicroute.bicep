@@ -15,9 +15,7 @@ param sentSku string
 param appiName string
 
 // Networking
-param afdSku string = 'Standard_AzureFrontDoor'
-param apimPublisherName string
-param apimPublisherEmail string
+param afdSku string = 'Standard_AzureFrontDoor' // Required for public front door
 param vnetName string
 param vnetCidr string
 param snetNameHubShared string
@@ -185,15 +183,3 @@ module afd '../modules/afd-azurefrontdoor.bicep' = {
     sku: afdSku
   }
 }
-
-module apim '../modules/apim-apimanagement.bicep' = {
-  name: 'apimName'
-  params: {
-    name: '${vnetName}-apim'
-    tags: tags
-    publisherName: apimPublisherName
-    publisherEmail: apimPublisherEmail
-  }
-}
-
-// Configure AFD to route to APIM

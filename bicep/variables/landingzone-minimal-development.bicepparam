@@ -1,25 +1,30 @@
 using '../templates/landingzone-minimal.bicep'
 // Common
-var organizationName = 'gtc'
-var productName = 'PRODUCT'
+
+var tenantIac = 'myco'
+var productIac = 'product'
 var environmentIac = 'dev'
+var regionIac = 'wus2'
+var instanceIac = '001'
+
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
+
 // Workspace
 param tenantId = '00000000-0000-0000-0000-000000000000'
 param sharedSubscriptionId = '00000000-0000-0000-0000-000000000000'
-param sharedResourceGroupName = '${organizationName}-rg-shared-${environmentIac}-001'
-param workName = 'work-shared-${environmentIac}-001'
+param sharedResourceGroupName = '${tenantIac}-${productIac}-${environmentIac}-${instanceIac}-rg'
+param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-law'
 
-// Azure Monitor
-param appiName = 'appi-${productName}-${environmentIac}-001'
+// Azure Monitor App Insights
+param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // Storage
-param stName = 'st${productName}${environmentIac}001'
+param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}-st'
 param stSku = 'Standard_LRS'
 
 // Key Vault
-param kvName = 'kv-${productName}-${environmentIac}-001'
+param kvName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-kv'
 param kvSku = 'standard'
 param accessPolicies = [
   {
