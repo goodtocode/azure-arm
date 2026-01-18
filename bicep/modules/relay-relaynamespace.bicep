@@ -1,7 +1,13 @@
+
+@description('The name of the Azure Relay namespace. Must be 6-50 characters, using only alphanumeric characters and hyphens.')
+@minLength(6)
+@maxLength(50)
 param name string
+
+@description('The Azure region where the Relay namespace will be deployed.')
 param location string = resourceGroup().location
 
-@description('Describes plan\'s pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/')
+@description('The SKU (pricing tier) for the Azure Relay namespace. Allowed value: Standard. Default is Standard.')
 @allowed([
   'Standard'
 ])

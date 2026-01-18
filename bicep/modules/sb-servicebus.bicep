@@ -1,7 +1,19 @@
+
+@description('The name of the Service Bus namespace. Must be 6-50 characters, using only alphanumeric characters and hyphens.')
+@minLength(6)
+@maxLength(50)
 param name string
+
+@description('The SKU (pricing tier) for the Service Bus namespace. Allowed values: Basic, Standard, Premium. Default is Basic.')
+@allowed([
+  'Basic'
+  'Standard'
+  'Premium'
+])
 param sku string = 'Basic'
 
-@description('Specifies the Azure location where the resource should be created.')
+
+@description('Specifies the Azure location where the Service Bus namespace should be created.')
 param location string = toLower(replace(resourceGroup().location, ' ', ''))
 
 var nameAlphaNumeric_var = replace(replace(name, '-', ''), '.', '')

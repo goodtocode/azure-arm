@@ -1,9 +1,10 @@
-@description('Name of the Storage Account. (st)')
+
+@description('The name of the Storage Account. Must be globally unique, 3-24 characters, using only lowercase letters and numbers.')
 @minLength(3)
 @maxLength(24)
 param name string
 
-@description('Sku of the Storage Account.')
+@description('The SKU (pricing tier) of the Storage Account. Allowed values: Premium_LRS, Premium_ZRS, Standard_GRS, Standard_GZRS, Standard_LRS, Standard_RAGRS, Standard_RAGZRS, Standard_ZRS. Default is Standard_LRS.')
 @allowed([
   'Premium_LRS'
   'Premium_ZRS'
@@ -16,7 +17,7 @@ param name string
 ])
 param sku string = 'Standard_LRS'
 
-@description('Kind of the Storage Account.')
+@description('The kind of the Storage Account. Allowed values: BlobStorage, BlockBlobStorage, FileStorage, Storage, StorageV2. Default is StorageV2.')
 @allowed([
   'BlobStorage'
   'BlockBlobStorage'
@@ -26,10 +27,10 @@ param sku string = 'Standard_LRS'
 ])
 param kind string = 'StorageV2'
 
-@description('Allow public access')
+@description('Allow public access to blobs in the Storage Account. Default is false.')
 param allowBlobPublicAccess bool = false
 
-@description('Array of container JSON objects. value: {containers:[name:, publicAccess:Container|None]}')
+@description('Array of container JSON objects. Example: {resources: [{name: \'mycontainer\', publicAccess: \'None\'}]}')
 param containerResources object = {
   resources: [
     {
