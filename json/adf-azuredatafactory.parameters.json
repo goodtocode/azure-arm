@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "planName": {
+        "value": "plan-PRODUCT-ENVIRONMENT-001"
+      },
+      "name": {
+        "value": "adf-PRODUCT-ENVIRONMENT-001"
+      },
+      "stName": {
+        "value": "st-PRODUCT-ENVIRONMENT-001"
+      },
+      "blobContainer": {
+        "value": "[BLOB_CONAINER_NAME]"
+      }
+    }
+  }

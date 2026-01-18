@@ -17,8 +17,31 @@ flowchart TD
   G --> H[User Directory]
 ```
 
----
 
+## Network & DNS Architecture
+
+```mermaid
+flowchart TD
+  subgraph Hub
+    FD[Front Door]
+    DNS1[Private DNS Zone: privatelink.azurefd.net]
+    DNS2[Private DNS Zone: privatelink.azure-api.net]
+    DNSFWD[DNS Forwarder]
+  end
+  subgraph Spoke
+    APIM[API Management (Private Endpoint)]
+    APP[App Service (Private Endpoint)]
+  end
+  FD -- Private Link --> APIM
+  APIM -- Private Link --> APP
+  DNS1 -- Resolves --> FD
+  DNS2 -- Resolves --> APIM
+  Hub <--> Spoke
+  DNSFWD -- Forwards/Links --> DNS1
+  DNSFWD -- Forwards/Links --> DNS2
+```
+
+---
 ## Key Components
 
 - **ESA Hub API**: Entry point for all user and system requests.

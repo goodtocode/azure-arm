@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string"
+    },
+     "stName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "locationShortName": "[toLower(replace(resourceGroup().location, ' ', ''))]",
+    "nameLower": "[toLower(replace(replace(parameters('name'), '-', ''), ' ', ''))]",
+    "storageId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('stName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('nameLower')]",
+      "location": "[variables('locationShortName')]",
+      "kind": "V1",
+      "scale": null,
+      "properties": {
+        "displayName": "[parameters('name')]",
+        "customParameterValues": {},
+        "api": {
+            "name": "[concat(variables('nameLower'), 'azureblob')]",
+            "displayName": "Azure Blob Storage",
+            "description": "Microsoft Azure Storage provides a massively scalable, durable, and highly available storage for data on the cloud, and serves as the data storage solution for modern applications. Connect to Blob Storage to perform various operations such as create, update, get and delete on blobs in your Azure Storage account.",
+            "iconUri": "https://connectoricons-prod.azureedge.net/releases/v1.0.1507/1.0.1507.2528/azureblob/icon.png",
+            "brandColor": "#804998",
+            "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/azureblob')]",
+            "type": "Microsoft.Web/locations/managedApis"
+        },
+        "parameterValues": {
+            "accountName": "[parameters('stName')]",
+            "accessKey": "[listKeys(variables('storageId'), '2019-04-01').keys[0].value]"            
+        }
+      },
+      "dependsOn": [
+      ]
+    }
+  ]
+}

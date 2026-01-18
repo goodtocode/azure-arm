@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "dgwcn-PRODUCT-ENVIRONMENT-001"
+    },
+    "subscriptionId": {
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    "sqlServerName": {
+      "value": "SQLSERVER"
+    },
+    "sqlDatabaseName": {
+      "value": "SQLDATABASE"
+    },
+    "sqlUserName": {
+      "value": "SQLUSER"
+    },
+    "sqlUserPassword": {
+      "value": "SQLPASSWORD"
+    },
+    "dgwResourceGroupName": {
+      "value": "rg-PRODUCT-ENVIRONMENT-001"
+    },
+    "dgwName": {
+      "value": "cc-dgw-PRODUCT-ENVIRONMENT-001"
+    }
+  }
+}

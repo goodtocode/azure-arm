@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "api-PRODUCT-ENVIRONMENT-001"
+    },
+    "location": {
+      "value": "West US 3"
+    },
+    "planName": {
+      "value": "plan-PRODUCT-ENVIRONMENT-001"
+    },
+    "planResourceGroupName": {
+      "value": "COMPANY-rg-PRODUCT-ENVIRONMENT-001"
+    },
+    "appiKey": {
+      "value": "[APPI_KEY]"
+    },
+    "appiConnection": {
+      "value": "[APPI_CONNECTION_STRING]"
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "String"
+        },
+        "sku": {
+            "type": "String",
+            "defaultValue": "Basic",
+            "allowedVAlues": ["Basic", "Standard", "Premium"]
+        },
+            "location": {
+            "type": "string",
+            "defaultValue": "[toLower(replace(resourceGroup().location, ' ', ''))]",
+            "metadata": {
+                "description": "Specifies the Azure location where the resource should be created."
+            }
+        }
+    },
+    "variables": {
+        "nameAlphaNumeric": "[replace(replace(parameters('name'), '-', ''), '.', '')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ServiceBus/namespaces",
+            "apiVersion": "2021-01-01-preview",
+            "name": "[variables('nameAlphaNumeric')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('sku')]",
+                "tier": "[parameters('sku')]"
+            },
+            "properties": {
+                "zoneRedundant": false
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
+            "apiVersion": "2021-01-01-preview",
+            "name": "[concat(variables('nameAlphaNumeric'), '/RootManageSharedAccessKey')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', variables('nameAlphaNumeric'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "condition": "[equals(parameters('sku'),'Premium')]",
+            "type": "Microsoft.ServiceBus/namespaces/networkRuleSets",
+            "apiVersion": "2021-01-01-preview",
+            "name": "[concat(variables('nameAlphaNumeric'), '/default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', variables('nameAlphaNumeric'))]"
+            ],
+            "properties": {
+                "defaultAction": "Deny",
+                "virtualNetworkRules": [],
+                "ipRules": []
+            }
+        }
+    ]
+}

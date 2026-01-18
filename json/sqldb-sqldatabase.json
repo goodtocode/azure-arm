@@ -1,0 +1,126 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ]
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[toLower(replace(resourceGroup().location, ' ', ''))]"
+    },
+    "sqlName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "adminLogin": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "collation": {
+      "type": "string",
+      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "maxSizeBytes": {
+      "type": "string",
+      "defaultValue": "1073741824"
+    },
+    "requestedServiceObjectiveName": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "S0",
+        "S1",
+        "S2",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "metadata": {
+        "description": "Describes the performance level for Sku"
+      }
+    },
+    "startIpAddress":{
+      "type": "string",
+      "defaultValue": "0.0.0.0"
+    },
+    "endIpAddress":{
+      "type": "string",
+      "defaultValue": "0.0.0.0"
+    },
+    "firewallRuleName":{
+      "type": "string",
+      "defaultValue": "AllowAllWindowsAzureIps"
+    }  
+  },
+  "variables": {
+    "serverNameLower": "[toLower(parameters('sqlName'))]"
+  },
+  "resources": [
+    {
+      "name": "[variables('serverNameLower')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[parameters('location')]",
+      "tags": {
+        "displayName": "SqlServer"
+      },
+      "apiVersion": "2014-04-01-preview",
+      "properties": {
+        "administratorLogin": "[parameters('adminLogin')]",
+        "administratorLoginPassword": "[parameters('adminPassword')]"
+      },
+      "resources": [
+        {
+          "name": "[parameters('name')]",
+          "type": "databases",
+          "location": "[parameters('location')]",
+          "tags": {
+            "displayName": "Database"
+          },
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers/', variables('serverNameLower'))]"
+          ],
+          "properties": {
+            "edition": "[parameters('sku')]",
+            "collation": "[parameters('collation')]",
+            "maxSizeBytes": "[parameters('maxSizeBytes')]",
+            "requestedServiceObjectiveName": "[parameters('requestedServiceObjectiveName')]"
+          }
+        },
+        {
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers/', variables('serverNameLower'))]"
+          ],
+          "location": "[parameters('location')]",
+          "name": "[parameters('firewallRuleName')]",
+          "properties": {
+            "endIpAddress": "[parameters('endIpAddress')]",
+            "startIpAddress": "[parameters('startIpAddress')]"
+          }
+        }
+      ]
+    }
+  ]
+}

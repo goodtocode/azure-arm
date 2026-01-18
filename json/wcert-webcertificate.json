@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object"
+    },
+    "password": {
+      "type": "string"
+    },
+    "keyVaultId": {
+      "type": "string"
+    },
+    "keyVaultSecretName": {
+      "type": "string"
+    },
+    "serverFarmId": {
+      "type": "string"
+    },
+    "canonicalName": {
+      "type": "string"
+    },
+    "domainValidationMethod": {
+      "type": "string"
+    },
+    "hostnames": {
+      "type": "array"
+    },
+    "pfxBlob": {
+      "type": "array"
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]"
+  },
+  "resources": [
+    {      
+      "name": "[parameters('name')]",
+      "location": "[variables('location')]",
+      "tags": "[parameters('tags')]",
+      "type": "Microsoft.Web/certificates",
+      "apiVersion": "2020-12-01",
+      "properties": {
+        "hostNames": [
+          "[parameters('hostNames')]"
+        ],
+        "pfxBlob": [
+          "[parameters('pfxBlob')]"
+        ],
+        "password": "[parameters('password')]",
+        "keyVaultId": "[parameters('keyVaultId')]",
+        "keyVaultSecretName": "[parameters('keyVaultSecretName')]",
+        "serverFarmId": "[parameters('serverFarmId')]",
+        "canonicalName": "[parameters('canonicalName')]",
+        "domainValidationMethod": "[parameters('domainValidationMethod')]"
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string"
+    },
+    "webName": {
+      "type": "string"
+    },
+    "webLocation": {
+      "type": "string"
+    },
+    "agName": {
+      "type": "string"
+    }
+  },
+  "variables": { },
+  "functions": [ ],
+  "resources": [
+    {
+      "name": "[parameters('name')]",
+      "type": "Microsoft.Insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "location": "global",
+      "tags": {},
+      "properties": {
+        "description": "The Web application has thrown at least 5 HTTP 500 errors in the last 5 minutes.",
+        "severity": 2,
+        "enabled": true,
+        "scopes": [
+          "[concat(resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('webName'))]"
+        ],
+        "evaluationFrequency": "PT1M",
+        "windowSize": "PT5M",
+        "targetResourceType": "Microsoft.Web/sites",
+        "targetResourceRegion": "[parameters('webLocation')]",
+        "criteria": {
+          "allOf": [
+            {
+              "metricName": "Http5xx",
+              "metricNamespace": "Microsoft.Web/sites",
+              "operator": "GreaterThan",
+              "timeAggregation": "Total",
+              "name": "Metric1",
+              "dimensions": [],
+              "monitorTemplateType": "8",
+              "criterionType": "StaticThresholdCriterion",
+              "threshold": 5
+            }
+          ],
+          "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+        },
+        "autoMitigate": true,
+        "actions": [
+          {
+            "actionGroupId": "[concat(resourceGroup().id, '/providers/microsoft.insights/actiongroups/', parameters('agName'))]",
+            "webhookProperties": {}
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": { }
+}

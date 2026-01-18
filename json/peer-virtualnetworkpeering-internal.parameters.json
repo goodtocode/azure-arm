@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "DeployVNet": {
+            "value": false
+        },
+        "SpokeVNetName": {
+            "value": "vnet-REGION-lz-ENVIRONMENTUCT-ENVIRONMENT"
+        },
+        "SpokeVNetPrefix": {
+            "value": "10.1.8.0/21"
+        },
+        "AgSubnetName": {
+            "value": "snet-REGION-ENVIRONMENT-appgw-001"
+        },
+        "AgSubnetPrefix": {
+            "value": "10.1.8.0/24"
+        },
+        "WebSubnetName": {
+            "value": "snet-REGION-ENVIRONMENT-web-001"
+        },
+        "WebSubnetPrefix": {
+            "value": "10.1.11.0/24"
+        },
+        "AppSubnetName": {
+            "value": "snet-REGION-ENVIRONMENT-middle-001"
+        },
+        "AppSubnetPrefix": {
+            "value": "10.1.10.0/24"
+        },
+        "DataSubnetName": {
+            "value": "snet-REGION-ENVIRONMENT-data-001"
+        },
+        "DataSubnetPrefix": {
+            "value": "10.1.9.0/24"
+        },
+        "AgNsgName": {
+            "value": "nsg-snet-REGION-ENVIRONMENT-appgw-001"
+        },
+        "WebNsgName": {
+            "value": "nsg-snet-REGION-ENVIRONMENT-web-001"
+        },
+        "AppNsgName": {
+            "value": "nsg-snet-REGION-ENVIRONMENT-middle-001"
+        },
+        "DataNsgName": {
+            "value": "nsg-snet-REGION-ENVIRONMENT-data-001"
+        },
+        "HubSubscriptionId": {
+            "value": "7daa1d35-dc46-4683-9c8c-b175bf57817a"
+        },
+        "HubVnetName": {
+            "value": "vnet-REGION-platform-hub-ENVIRONMENT"
+        },
+        "HubVNetResourceGroup": {
+            "value": "rg-REGION-network-ENVIRONMENT-001"
+        }
+    }
+}

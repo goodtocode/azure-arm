@@ -1,0 +1,175 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "F0",
+            "allowedValues": ["F0", "S0"]
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "westus",
+            "allowedValues": ["westus", "eastus"]
+        },
+        "location2": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "location3": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "azureSearchLocation": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "azureSearchSku": {
+            "type": "string",
+            "defaultValue": "free",
+            "allowedValues": ["free", "basic", "standard"]
+        },
+        "searchHostingMode": {
+            "type": "string",
+            "defaultValue": "Default",
+            "allowedValues": ["Default"]
+        },
+        "farmSku": {
+            "type": "string",
+            "defaultValue": "F0",
+            "allowedValues": ["F0", "S1"]
+        }
+    },
+    "variables": {
+        "puredAzureSearchName": "[replace(parameters('name'), '-', '')]",
+        "normalizedAzureSearchName": "[if(greater(length(variables('puredAzureSearchName')), 40), substring(variables('puredAzureSearchName'), sub(length(variables('puredAzureSearchName')), 40), 40) , variables('puredAzureSearchName'))]",
+        "azureSearchName": "[toLower(concat('srch-', variables('normalizedAzureSearchName')))]",
+        "appiName": "[concat('appi-', parameters('name'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "kind": "QnAMaker",
+            "name": "[parameters('name')]",
+            "apiVersion": "2017-04-18",
+            "location": "[parameters('location')]",            
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "properties": {
+                "apiProperties": {
+                    "qnaRuntimeEndpoint": "[concat('https://',reference(resourceId('Microsoft.Web/sites', parameters('name'))).hostNames[0])]"
+                },
+                "customSubDomainName": "[parameters('name')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites', parameters('name'))]",
+                "[resourceId('Microsoft.Search/searchServices/', variables('azureSearchName'))]",
+                "[resourceId('microsoft.insights/components/', variables('appiName'))]"
+            ]
+        },
+        {
+            "name": "[variables('azureSearchName')]",
+            "type": "Microsoft.Search/searchServices",
+            "apiVersion": "2015-08-19",
+            "location": "[parameters('azureSearchLocation')]",
+            "tags": {},
+            "properties": {
+                "replicaCount": 1,
+                "partitionCount": 1,
+                "hostingMode": "[parameters('searchHostingMode')]"
+            },
+            "sku": {
+                "name": "[parameters('azureSearchSku')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2016-08-01",
+            "name": "[parameters('name')]",
+            "location": "[parameters('location3')]",
+            "properties": {
+                "enabled": true,
+                "siteConfig": {
+                    "cors": {
+                        "allowedOrigins": [
+                            "*"
+                        ]
+                    }
+                },
+                "name": "[parameters('name')]",
+                "serverFarmId": "[concat('/subscriptions/', subscription().SubscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', parameters('name'))]",
+                "hostingEnvironment": ""
+            },
+            "tags": {
+                "[concat('hidden-related:', '/subscriptions/', subscription().SubscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', parameters('name'))]": "empty"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Web/serverfarms/', parameters('name'))]"
+            ],
+            "resources": [
+                {
+                    "name": "[variables('appiName')]",
+                    "type": "microsoft.insights/components",
+                    "kind": "web",
+                    "apiVersion": "2015-05-01",
+                    "location": "[parameters('location2')]",
+                    "tags": {
+                        "[concat('hidden-link:', resourceId('Microsoft.Web/sites/', parameters('name')))]": "Resource"
+                    },
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/sites/', parameters('name'))]"
+                    ],
+                    "properties": {
+                        "ApplicationId": "[parameters('name')]"
+                    }
+                },
+                {
+                    "apiVersion": "2021-06-01",
+                    "name": "appsettings",
+                    "type": "config",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites', parameters('name'))]",
+                        "[resourceId('Microsoft.Search/searchServices/', variables('azureSearchName'))]"
+                    ],
+                    "properties": {
+                        "AzureSearchName": "[variables('azureSearchName')]",
+                        "AzureSearchAdminKey": "[listAdminKeys(resourceId('Microsoft.Search/searchServices/', variables('azureSearchName')), '2015-08-19').primaryKey]",
+                        "UserappiKey": "[reference(resourceId('microsoft.insights/components/', variables('appiName')), '2015-05-01').InstrumentationKey]",
+                        "UserappiName": "[variables('appiName')]",
+                        "UserAppInsightsAppId": "[reference(resourceId('microsoft.insights/components/', variables('appiName')), '2015-05-01').AppId]",
+                        "PrimaryEndpointKey": "[concat(parameters('name'), '-PrimaryEndpointKey')]",
+                        "SecondaryEndpointKey": "[concat(parameters('name'), '-SecondaryEndpointKey')]",
+                        "DefaultAnswer": "No good match found in KB.",
+                        "QNAMAKER_EXTENSION_VERSION": "latest"
+                    }
+                }
+            ]
+        },
+        {
+            "apiVersion": "2016-09-01",
+            "name": "[parameters('name')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[parameters('location3')]",
+            "properties": {
+                "name": "[parameters('name')]",
+                "workerSizeId": "0",
+                "reserved": false,
+                "numberOfWorkers": "1",
+                "hostingEnvironment": ""
+            },
+            "sku": {
+                "Name": "[parameters('farmSku')]"
+            }
+        }
+    ],
+    "outputs": {
+        "qnaRuntimeEndpoint": {
+            "type": "string",
+            "value": "[concat('https://',reference(resourceId('Microsoft.Web/sites', parameters('name'))).hostNames[0])]"
+        }
+    }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "defaultValue": "azureblob"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "cosmosName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "locationShortName": "[toLower(replace(resourceGroup().location, ' ', ''))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2021-06-01",
+      "name": "[parameters('name')]",
+      "location": "[variables('locationShortName')]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[parameters('displayName')]",
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/documentdb')]"
+        },
+        "parameterValues": {
+          "databaseAccount": "[parameters('cosmosName')]",
+          "accessKey": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosName')), '2018-07-01-preview').primaryMasterKey]"
+        }
+      },
+      "dependsOn": [
+      ]
+    }
+  ]
+}

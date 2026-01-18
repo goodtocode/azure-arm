@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "alert-PRODUCT-PURPOSE-ENVIRONMENT-001"
+    },
+    "description": {
+      "value": ""
+    },
+    "location": {
+      "value": "westus2"
+    },
+    "agName": {
+      "value": "ag-PRODUCT-GROUP-ENVIRONMENT-001"
+    },
+    "appiName": {
+      "value": "appi-PRODUCT-GROUP-ENVIRONMENT-001"
+    },
+    "query": {
+      "value": ""
+    },
+    "frequency": {
+      "value": 5
+    },
+    "window": {
+      "value": 5
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Unique name (within the Resource Group) for the Action group. ag-PRODUCT-PURPOSE-ENVIRONMENT-001"
+      }
+    },
+    "receiverName": {
+      "type": "string",
+      "metadata": {
+        "description": "Receiver for this action group."
+      }
+    },
+    "emailAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "Receiver for this action group."
+      }
+    }
+  },
+  "variables": {
+    "shortname": "[take(toLower(replace(replace(parameters('name'), ' ', ''), '-', '')), 12)]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/actionGroups",
+      "apiVersion": "2021-09-01",
+      "name": "[parameters('name')]",
+      "location": "Global",
+      "properties": {
+        "groupShortName": "[variables('shortname')]",
+        "enabled": true,
+        "smsReceivers": [],
+        "emailReceivers": [
+          {
+            "name": "[parameters('receiverName')]",
+            "emailAddress": "[parameters('emailAddress')]",
+            "useCommonAlertSchema": true
+          }
+        ],
+        "webhookReceivers": [],
+        "SecurewebhookReceivers": [],
+        "eventHubReceivers": []
+      }
+    }
+  ],
+  "outputs": {
+    "actionGroupId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Insights/actionGroups', variables('shortname'))]"
+    }
+  }
+}

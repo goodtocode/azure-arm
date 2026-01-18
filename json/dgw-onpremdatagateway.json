@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "dgwInstallationId": {
+            "type": "string"
+        },
+        "subscriptionId": {
+            "type": "string",
+            "defaultValue": "[subscription().id]"
+        },
+        "tags": {
+        "type": "object",
+        "defaultValue": {
+            "tag1": "tag-value-1",
+            "tag2": "tag-value-2"
+        },
+        "metadata": {
+            "description": "Adds tags for the resource. It's optional."
+        }
+        }
+    },
+  "variables": {
+    "locationShortName": "[toLower(replace(parameters('location'), ' ', ''))]",
+    "gatewayInstallationId": "[concat(parameters('subscriptionId'), '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/connectionGatewayInstallations/', parameters('dgwInstallationId'))]"
+  },
+    "resources": [
+        {
+            "apiVersion": "2016-06-01",
+            "name": "[parameters('name')]",
+            "type": "Microsoft.Web/connectionGateways",
+            "location": "[variables('locationShortName')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+                "connectionGatewayInstallation": {
+                    "Id": "[variables('gatewayInstallationId')]"
+                }
+            }
+        }
+    ]
+}

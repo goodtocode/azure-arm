@@ -1,0 +1,106 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string"
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "S1",
+            "allowedValues": [
+                "F0",
+                "S1"
+            ]
+        },
+        "msAppId": {
+            "type": "string"
+        },
+        "msAppValue": {
+            "type": "string"
+        },
+        "displayName": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "resourceTags": {
+            "type": "object",
+            "defaultValue": {
+                "Microsoft.BotService/botServices": {}
+            }
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "uniqueSuffix": "[toLower(substring(uniqueString(resourceGroup().id, 'Microsoft.BotService/bots', parameters('name')), 0, 6))]",
+        "botDisplayName": "[if(empty(parameters('displayName')), parameters('name'), parameters('displayName'))]",
+        "keyVaultName": "[concat('kv-', parameters('name'))]",
+        "appPasswordSecret": "[concat('bot-', replace(parameters('name'), '_', '-'), '-pwd-', variables('uniqueSuffix'))]",
+        "appPasswordSecretId": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), variables('appPasswordSecret'))]",
+        "empty": {},
+        "botTags": "[if(contains(parameters('resourceTags'), 'Microsoft.BotService/botServices'), parameters('resourceTags')['Microsoft.BotService/botServices'], variables('empty'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[variables('keyVaultName')]",
+            "location": "[variables('location')]",
+            "apiVersion": "2019-09-01",
+            "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                    "family": "A",
+                    "name": "Standard"
+                },
+                "accessPolicies": [],
+                "enabledForTemplateDeployment": true
+            },
+            "resources": [
+                {
+                    "type": "secrets",
+                    "name": "[variables('appPasswordSecret')]",
+                    "condition": "[not(empty(parameters('msAppValue')))]",
+                    "apiVersion": "2019-09-01",
+                    "properties": {
+                        "value": "[parameters('msAppValue')]"
+                    },
+                    "dependsOn": [
+                        "[variables('keyVaultName')]"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.BotService/botServices",
+            "name": "[parameters('name')]",
+            "kind": "azurebot",
+            "apiVersion": "2018-07-12",
+            "location": "global",
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "tags": "[variables('botTags')]",
+            "dependsOn": [],
+            "properties": {
+                "displayName": "[variables('botDisplayName')]",
+                "msaAppId": "[parameters('msAppId')]",
+                "openWithHint": "bfcomposer://",
+                "appPasswordHint": "[variables('appPasswordSecretId')]"
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets/providers/links",
+            "name": "[concat(variables('keyVaultName'), '/', variables('appPasswordSecret'),  '/Microsoft.Resources/provisioned-for')]",
+            "apiVersion": "2018-02-01",
+            "location": "[variables('location')]",
+            "properties": {
+                "targetId": "[resourceId('Microsoft.BotService/bots', parameters('name'))]",
+                "sourceId": "[variables('appPasswordSecretId')]"
+            },
+            "dependsOn": [
+                "[variables('keyVaultName')]",
+                "[parameters('name')]"
+            ]
+        }
+    ]
+}

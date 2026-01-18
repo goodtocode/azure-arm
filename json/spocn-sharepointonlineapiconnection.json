@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "defaultValue": "[subscription().tenantId]"
+    }
+  },
+  "variables": {
+    "locationShortName": "[toLower(replace(resourceGroup().location, ' ', ''))]",
+    "nameLower": "[toLower(replace(replace(parameters('name'), '-', ''), ' ', ''))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2018-07-01-preview",
+      "name": "[variables('nameLower')]",
+      "location": "[variables('locationShortName')]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[parameters('name')]",
+        "customParameterValues": {},
+        "api": {
+            "name": "[variables('nameLower')]",
+            "displayName": "SharePoint",
+            "description": "SharePoint helps organizations share and collaborate with colleagues, partners, and customers. You can connect to SharePoint Online or to an on-premises SharePoint 2013 or 2016 farm using the On-Premises Data Gateway to manage documents and list items.",
+            "iconUri": "[concat('https://connectoricons-prod.azureedge.net/releases/v1.0.1533/1.0.1533.2600/', variables('nameLower'), '/icon.png')]",
+            "brandColor": "#036C70",
+            "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', variables('locationShortName'), '/managedApis/', 'sharepointonline')]",
+            "type": "Microsoft.Web/locations/managedApis"
+        },
+        "nonSecretParameterValues": {
+          "token:TenantId": "[parameters('tenantId')]"
+        },
+        "parameterValues": {
+        }
+      },
+      "dependsOn": [        
+      ]
+    }
+  ]
+}
