@@ -6,7 +6,7 @@ param name string = 'apiservice${uniqueString(resourceGroup().id)}'
 
 @description('The email address of the owner of the API Management service. Must be a valid email address.')
 @minLength(5)
-@maxLength(254)
+@maxLength(100)
 param publisherEmail string
 
 @description('The name of the owner of the API Management service. Must be at least 1 character.')

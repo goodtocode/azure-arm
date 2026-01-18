@@ -22,6 +22,7 @@ param ftpUsername string
 @description('The password for the SFTP server.')
 @minLength(1)
 @maxLength(128)
+@secure()
 param ftpPassword string
 
 @description('The root folder for the SFTP connection. Default is /.')
@@ -44,16 +45,16 @@ param ftpAcceptAnySshKey bool = true
 param ftpHostKeyFingerprint string = ''
 
 var locationShortName = toLower(replace(resourceGroup().location, ' ', ''))
-var nameLower_var = toLower(replace(replace(name, '-', ''), ' ', ''))
+var nameLower = toLower(replace(replace(name, '-', ''), ' ', ''))
 
-resource nameLower 'MICROSOFT.WEB/CONNECTIONS@2018-07-01-preview' = {
-  name: nameLower_var
+resource connection 'Microsoft.Web/connections@2016-06-01' = {
+  name: nameLower
   location: locationShortName
   properties: {
     api: {
       id: '${subscription().id}/providers/Microsoft.Web/locations/${locationShortName}/managedApis/sftpwithssh'
       type: 'Microsoft.Web/locations/managedApis'
-      name: '${nameLower_var}sftpwithssh'
+      name: '${nameLower}sftpwithssh'
       displayName: 'SFTP - SSH'
       description: 'SFTP (SSH File Transfer Protocol) is a network protocol that provides file access, file transfer, and file management over any reliable data stream. It was designed by the Internet Engineering Task Force (IETF) as an extension of the Secure Shell protocol (SSH) version 2.0 to provide secure file transfer capabilities.'
       iconUri: 'https://connectoricons-prod.azureedge.net/releases/v1.0.1518/1.0.1518.2564/sftpwithssh/icon.png'
@@ -67,7 +68,7 @@ resource nameLower 'MICROSOFT.WEB/CONNECTIONS@2018-07-01-preview' = {
       sshPrivateKey: ftpPrivateKey
       sshPrivateKeyPassphrase: ftpPassphrase
       portNumber: ftpServerPort
-      acceptAnySshHostKey: ftpAcceptAnySshKey
+      acceptAnySshHostKey: string(ftpAcceptAnySshKey)
       sshHostKeyFingerprint: ftpHostKeyFingerprint
       rootFolder: ftpRootFolder
     }

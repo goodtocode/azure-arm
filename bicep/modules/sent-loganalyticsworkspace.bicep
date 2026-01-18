@@ -22,9 +22,6 @@ param tags object = {}
 @minValue(30)
 param retentionInDays int = 30
 
-@description('Specifies whether customer-managed key encryption is enabled. Default is false.')
-param customerManagedKey bool = false
-
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: name
   location: location
@@ -38,10 +35,10 @@ resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
 }
 
 
-resource onboarding 'Microsoft.OperationalInsights/workspaces/providers/onboardingStates@2021-03-01-preview' = {
-  name: '${workResource.name}/Microsoft.SecurityInsights/default'
+resource onboarding 'Microsoft.SecurityInsights/onboardingStates@2021-03-01-preview' = {
+  name: 'default'
+  scope: workResource
   properties: {}
-  dependsOn: [ workResource ]
 }
 
 output id string  = workResource.id

@@ -46,6 +46,7 @@ param sqlUserName string
 @description('The SQL user password.')
 @minLength(1)
 @maxLength(128)
+@secure()
 param sqlUserPassword string
 
 @description('Whether to encrypt the SQL connection. Default is false.')
@@ -56,10 +57,9 @@ param privacySetting string = 'None'
 
 var locationShortName = toLower(replace(location, ' ', ''))
 
-resource name_resource 'Microsoft.Web/connections@2016-06-01' = {
+resource conection 'Microsoft.Web/connections@2016-06-01' = {
   name: name
   location: locationShortName
-  kind: 'V1'
   properties: {
     displayName: name
     customParameterValues: {}

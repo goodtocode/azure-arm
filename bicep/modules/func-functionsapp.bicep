@@ -69,24 +69,6 @@ param funcVersion int = 4
 @description('Whether the Function App is always on. Default is false.')
 param alwaysOn bool = false
 
-@description('The SKU (pricing tier) for the App Service Plan. Allowed values: Y1, EP1, EP2, EP3, B1, B2, B3, S1, S2, S3, P1V2, P2V2, P3V2. Default is Y1.')
-@allowed([
-  'Y1'
-  'EP1'
-  'EP2'
-  'EP3'
-  'B1'
-  'B2'
-  'B3'
-  'S1'
-  'S2'
-  'S3'
-  'P1V2'
-  'P2V2'
-  'P3V2'
-])
-param sku string = 'Y1'
-
 resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
   name: name 
   kind: 'functionapp'

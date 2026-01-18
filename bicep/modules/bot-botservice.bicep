@@ -25,22 +25,17 @@ param msAppValue string
 param displayName string = ''
 
 @description('Tags to apply to the Bot Service resource.')
-param resourceTags object = {
-  'Microsoft.BotService/botServices': {}
-}
-
+param tags object = {}
 
 var location = resourceGroup().location
 var uniqueSuffix = toLower(substring(uniqueString(resourceGroup().id, 'Microsoft.BotService/bots', name), 0, 6))
 var botDisplayName = empty(displayName) ? name : displayName
-var keyVaultName_var = 'kv-${name}'
+var kvName = 'kv-${name}'
 var appPasswordSecret = 'bot-${replace(name, '_', '-')}-pwd-${uniqueSuffix}'
-var emptyObj = {}
-var botTags = contains(resourceTags, 'Microsoft.BotService/botServices') ? resourceTags['Microsoft.BotService/botServices'] : emptyObj
 var appPasswordSecretId = empty(msAppValue) ? '' : keyVaultName_appPasswordSecret.id
 
 resource keyVaultName 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: keyVaultName_var
+  name: kvName
   location: location
   properties: {
     tenantId: subscription().tenantId
@@ -70,25 +65,12 @@ resource name_resource 'Microsoft.BotService/botServices@2022-09-15' = {
   sku: {
     name: sku
   }
-  tags: botTags
+  tags: tags
   properties: {
     displayName: botDisplayName
     msaAppId: msAppId
     openWithHint: 'bfcomposer://'
     appPasswordHint: appPasswordSecretId
+    endpoint: 'https://REPLACE-WITH-YOUR-BOT-ENDPOINT/api/messages'
   }
-}
-
-
-resource keyVaultName_appPasswordSecret_Microsoft_Resources_provisioned_for 'Microsoft.KeyVault/vaults/secrets/providers/links@2018-02-01' = if (!empty(msAppValue)) {
-  name: '${keyVaultName_var}/${appPasswordSecret}/Microsoft.Resources/provisioned-for'
-  location: location
-  properties: {
-    targetId: resourceId('Microsoft.BotService/botServices', name)
-    sourceId: appPasswordSecretId
-  }
-  dependsOn: [
-    keyVaultName
-    name_resource
-  ]
 }

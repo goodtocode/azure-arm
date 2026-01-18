@@ -18,7 +18,4 @@ resource name_resource 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
     name: sku
   }
   kind: 'CognitiveServices'
-  properties: {
-    statisticsEnabled: false
-  }
 }

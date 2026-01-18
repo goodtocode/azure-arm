@@ -9,11 +9,11 @@ param name string
 @maxLength(60)
 param location string = toLower(replace(resourceGroup().location, ' ', ''))
 
-@description('The SKU (pricing tier) for the Job Collection. Allowed value: standard. Default is standard.')
+@description('The SKU (pricing tier) for the Job Collection. Allowed value: Standard. Default is Standard.')
 @allowed([
-  'standard'
+  'Standard'
 ])
-param sku string = 'standard'
+param sku string = 'Standard'
 
 @description('The name of the associated Web App. Must be 1-60 characters, using only alphanumeric characters and hyphens.')
 @minLength(1)

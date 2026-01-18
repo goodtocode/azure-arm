@@ -16,10 +16,10 @@ param sku string = 'Basic'
 @description('Specifies the Azure location where the Service Bus namespace should be created.')
 param location string = toLower(replace(resourceGroup().location, ' ', ''))
 
-var nameAlphaNumeric_var = replace(replace(name, '-', ''), '.', '')
+var nameAlphanumeric = replace(replace(name, '-', ''), '.', '')
 
-resource nameAlphaNumeric 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
-  name: nameAlphaNumeric_var
+resource namespace 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
+  name: nameAlphanumeric
   location: location
   sku: {
     name: sku
@@ -30,10 +30,9 @@ resource nameAlphaNumeric 'Microsoft.ServiceBus/namespaces@2021-11-01' = {
   }
 }
 
-resource nameAlphaNumeric_RootManageSharedAccessKey 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2021-11-01' = {
-  parent: nameAlphaNumeric
+resource authrule 'Microsoft.ServiceBus/namespaces/AuthorizationRules@2021-11-01' = {
+  parent: namespace
   name: 'RootManageSharedAccessKey'
-  location: location
   properties: {
     rights: [
       'Listen'
@@ -43,10 +42,9 @@ resource nameAlphaNumeric_RootManageSharedAccessKey 'Microsoft.ServiceBus/namesp
   }
 }
 
-resource nameAlphaNumeric_default 'Microsoft.ServiceBus/namespaces/networkRuleSets@2021-11-01' = if (sku == 'Premium') {
-  parent: nameAlphaNumeric
+resource netruleset 'Microsoft.ServiceBus/namespaces/networkRuleSets@2021-11-01' = if (sku == 'Premium') {
+  parent: namespace
   name: 'default'
-  location: location
   properties: {
     defaultAction: 'Deny'
     virtualNetworkRules: []

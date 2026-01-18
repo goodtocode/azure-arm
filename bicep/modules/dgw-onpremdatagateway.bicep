@@ -16,7 +16,7 @@ param dgwInstallationId string
 param subscriptionId string = subscription().id
 
 @description('Tags to apply to the On-premises Data Gateway resource.')
-param tagsByResource object
+param tags object = {}
 
 var locationShortName = toLower(replace(location, ' ', ''))
 var gatewayInstallationId = '${subscriptionId}/providers/Microsoft.Web/locations/${locationShortName}/connectionGatewayInstallations/${dgwInstallationId}'
@@ -24,7 +24,7 @@ var gatewayInstallationId = '${subscriptionId}/providers/Microsoft.Web/locations
 resource name_resource 'Microsoft.Web/connectionGateways@2016-06-01' = {
   name: name
   location: locationShortName
-  tags: (contains(tagsByResource, 'Microsoft.Web/connectionGateways') ? tagsByResource.Microsoft.Web / connectionGateways : json('{}'))
+  tags: tags
   properties: {
     connectionGatewayInstallation: {
       id: gatewayInstallationId

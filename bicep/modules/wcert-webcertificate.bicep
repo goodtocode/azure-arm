@@ -9,6 +9,7 @@ param tags object = {}
 
 @description('The password for the PFX certificate. Must be at least 8 characters.')
 @minLength(8)
+@secure()
 param password string
 
 @description('The resource ID of the Key Vault containing the certificate secret.')
@@ -50,9 +51,7 @@ resource name_resource 'Microsoft.Web/certificates@2023-12-01' = {
   location: location
   tags: empty(tags) ? null : tags
   properties: {
-    hostNames: [
-      hostnames
-    ]
+    hostNames: hostnames
     pfxBlob: [
       pfxBlob
     ]

@@ -36,7 +36,4 @@ resource name_resource 'Microsoft.Web/serverfarms@2023-12-01' = {
     name: sku
     capacity: skuCapacity
   }
-  properties: {
-    name: name
-  }
 }

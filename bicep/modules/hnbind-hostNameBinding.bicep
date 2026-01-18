@@ -24,7 +24,6 @@ var deployHeadlessDn = (empty(headlessDn) ? bool('false') : bool('true'))
 
 resource siteName_fqdn 'Microsoft.Web/sites/hostNameBindings@2023-12-01' = if (deployFqdn) {
   name: '${siteName}/${fqdn}'
-  location: resourceGroup().location
   properties: {
     siteName: siteName
     sslState: 'SniEnabled'
@@ -34,7 +33,6 @@ resource siteName_fqdn 'Microsoft.Web/sites/hostNameBindings@2023-12-01' = if (d
 
 resource siteName_headlessDn 'Microsoft.Web/sites/hostNameBindings@2023-12-01' = if (deployHeadlessDn) {
   name: '${siteName}/${headlessDn}'
-  location: resourceGroup().location
   properties: {
     siteName: siteName
     sslState: 'SniEnabled'

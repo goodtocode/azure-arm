@@ -15,13 +15,11 @@ param name string
 ])
 param sku string = 'Standard_LRS'
 
-var storageAccountName_var = name
-
 resource storageAccountName 'Microsoft.Storage/storageAccounts@2023-05-01' = {
-  name: storageAccountName_var
+  name: name
   location: resourceGroup().location
   tags: {
-    displayName: storageAccountName_var
+    displayName: name
   }
   sku: {
     name: sku

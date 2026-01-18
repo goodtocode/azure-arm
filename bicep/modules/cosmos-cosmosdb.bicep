@@ -29,12 +29,18 @@ resource name_resource 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {
   name: name
   location: resourceGroup().location
   properties: {
-    name: name
     databaseAccountOfferType: offerType
     consistencyPolicy: {
       defaultConsistencyLevel: consistencyLevel
       maxStalenessPrefix: maxStalenessPrefix
       maxIntervalInSeconds: maxIntervalInSeconds
     }
+    locations: [
+      {
+        locationName: resourceGroup().location
+        failoverPriority: 0
+        isZoneRedundant: false
+      }
+    ]
   }
 }

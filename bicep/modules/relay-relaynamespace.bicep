@@ -26,7 +26,6 @@ resource name_resource 'Microsoft.Relay/namespaces@2018-01-01-preview' = {
 resource name_RootManageSharedAccessKey 'Microsoft.Relay/namespaces/authorizationRules@2021-11-01' = {
   parent: name_resource
   name: 'RootManageSharedAccessKey'
-  location: location
   properties: {
     rights: [
       'Listen'
@@ -39,7 +38,6 @@ resource name_RootManageSharedAccessKey 'Microsoft.Relay/namespaces/authorizatio
 resource name_default 'Microsoft.Relay/namespaces/networkRuleSets@2021-11-01' = {
   parent: name_resource
   name: 'default'
-  location: location
   properties: {
     defaultAction: 'Deny'
     ipRules: []

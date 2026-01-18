@@ -67,14 +67,6 @@ resource stResource 'Microsoft.Storage/storageAccounts@2023-01-01' = {
         }
       }
     }
-    deleteRetentionPolicy: {
-      enabled: true
-      days: 7
-    }
-    containerDeleteRetentionPolicy: {
-      enabled: true
-      days: 7
-    }
   }
 }
 

@@ -51,24 +51,6 @@ param kind string = 'app'
 ])
 param dotnetVersion string = 'v8.0'
 
-@description('The SKU (pricing tier) for the App Service Plan. Allowed values: F1, D1, B1, B2, B3, S1, S2, S3, P1, P2, P3, P4, Y1. Default is F1.')
-@allowed([
-  'F1'
-  'D1'
-  'B1'
-  'B2'
-  'B3'
-  'S1'
-  'S2'
-  'S3'
-  'P1'
-  'P2'
-  'P3'
-  'P4'
-  'Y1'
-])
-param sku string = 'F1'
-
 resource webAppResource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
   location: location

@@ -9,12 +9,8 @@ param name string
 @maxLength(50)
 param relayName string
 
-@description('The Azure region where the Hybrid Connection will be deployed.')
-param location string = resourceGroup().location
-
 resource relayName_name 'Microsoft.Relay/namespaces/hybridConnections@2021-11-01' = {
   name: '${relayName}/${name}'
-  location: location
   properties: {
     requiresClientAuthorization: true
   }

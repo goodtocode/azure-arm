@@ -15,7 +15,8 @@ param location string = resourceGroup().location
 param sku string = 'standard'
 
 @description('The tenant ID of the Azure Active Directory that will be used for authentication.')
-@minLength(1)
+@minLength(36)
+@maxLength(36)
 param tenantId string = tenant().tenantId
 
 @description('Tags to apply to the Key Vault resource.')
