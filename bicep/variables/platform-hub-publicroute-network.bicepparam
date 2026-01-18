@@ -1,4 +1,4 @@
-using '../templates/platform-hub-publicroute.bicep'
+using '../templates/platform-hub-publicroute-network.bicep'
 
 // =====================
 // Common
@@ -8,7 +8,6 @@ var productIac = 'platformhub'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'
-param tenantId = '00000000-0000-0000-0000-000000000000'
 param location = 'West US 2'
 param tags = {
   Environment: environmentIac
@@ -16,19 +15,6 @@ param tags = {
   project: productIac
   owner: tenantIac
 }
-
-// =====================
-// Identity
-// =====================
-param kvName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-kv'
-param kvSku = 'standard'
-
-// =====================
-// Management
-// =====================
-param sentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
-param sentSku = 'PerGB2018'
-param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // =====================
 // Networking
