@@ -1,15 +1,56 @@
-param name string 
-param location string 
+
+@description('The name of the App Service Web App. Must be 1-60 characters, using only alphanumeric characters and hyphens.')
+@minLength(1)
+@maxLength(60)
+param name string
+
+@description('The Azure region where the Web App will be deployed.')
+param location string
+
+@description('Tags to apply to the Web App resource.')
 param tags object = {}
-@allowed(['Development', 'QA', 'Staging', 'Production'])
+
+@description('The environment for the Web App. Allowed values: Development, QA, Staging, Production. Default is Development.')
+@allowed([
+  'Development'
+  'QA'
+  'Staging'
+  'Production'
+])
 param environment string = 'Development'
+
+@description('The Application Insights instrumentation key for the Web App.')
+@minLength(1)
 param appiKey string
+
+@description('The Application Insights connection string for the Web App.')
+@minLength(1)
 param appiConnection string
+
+@description('The resource ID of the App Service Plan.')
+@minLength(1)
 param planId string
-@allowed(['api', 'app', 'app,linux', 'functionapp', 'functionapp,linux'])
+
+@description('The kind of the Web App. Allowed values: api, app, app,linux, functionapp, functionapp,linux. Default is app.')
+@allowed([
+  'api'
+  'app'
+  'app,linux'
+  'functionapp'
+  'functionapp,linux'
+])
 param kind string = 'app'
-@allowed(['v4.8', 'v6.0', 'v7.0', 'v8.0', 'v9.0'])
-param dotnetVersion string = 'v8.0'
+
+@description('The .NET version for the Web App. Allowed values: v4.8, v6.0, v7.0, v8.0, v9.0. Default is v8.0.')
+@allowed([
+  'v4.8'
+  'v6.0'
+  'v7.0'
+  'v8.0'
+  'v9.0'
+  'v10.0'
+])
+param dotnetVersion string = 'v10.0'
 
 resource webAppResource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
