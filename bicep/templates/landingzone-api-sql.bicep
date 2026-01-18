@@ -9,8 +9,6 @@ param environmentApp string
 param tags object
 // Azure Monitor
 param appiName string 
-param Application_Type string 
-param Flow_Type string 
 // Key Vault
 param kvName string 
 param kvSku string 
@@ -42,8 +40,6 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
     location: location
     tags: tags
     name: appiName
-    Application_Type: Application_Type
-    Flow_Type: Flow_Type
     workResourceId: workResource.id
   }
 }

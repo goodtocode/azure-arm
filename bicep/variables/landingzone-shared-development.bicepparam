@@ -1,14 +1,18 @@
 using '../templates/landingzone-shared.bicep'
 
+
 // Common
+var productIac = 'shared'
 var environmentIac = 'dev'
+var regionIac = 'wus2'
+var instanceIac = '001'
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
-// Workspace
-param workName = 'work-shared-${environmentIac}-001'
+// Workspace (Log Analytics)
+param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-law'
 param workSku = 'PerGB2018'
 
-// App Service
+// App Service Plan
 param planSku = 'F1'
-param planName = 'plan-shared-${planSku}-${environmentIac}-001'
+param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'

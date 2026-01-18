@@ -1,5 +1,5 @@
 @description('The name of the API Management service instance')
-param apiManagementServiceName string = 'apiservice${uniqueString(resourceGroup().id)}'
+param name string = 'apiservice${uniqueString(resourceGroup().id)}'
 
 @description('The email address of the owner of the service')
 @minLength(1)
@@ -17,22 +17,25 @@ param publisherName string
 ])
 param sku string = 'Developer'
 
+param tags object = {}
+
 @description('The instance size of this API Management service.')
 @allowed([
   1
   2
 ])
-param skuCount int = 1
+param capacity int = 1
 
 @description('Location for all resources.')
 param location string = resourceGroup().location
 
-resource apiManagementServiceName_resource 'Microsoft.ApiManagement/service@2022-08-01' = {
-  name: apiManagementServiceName
+resource apimResource 'Microsoft.ApiManagement/service@2023-05-01-preview' = {
+  name: name
   location: location
+  tags: tags
   sku: {
     name: sku
-    capacity: skuCount
+    capacity: capacity
   }
   properties: {
     publisherEmail: publisherEmail

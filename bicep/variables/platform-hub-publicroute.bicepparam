@@ -1,0 +1,42 @@
+using '../templates/platform-hub-publicroute.bicep'
+
+// =====================
+// Common
+// =====================
+var tenantIac = 'myco'
+var productIac = 'platformhub'
+var environmentIac = 'prod'
+var regionIac = 'wus2'
+var instanceIac = '001'
+param tenantId = '00000000-0000-0000-0000-000000000000'
+param location = 'West US 2'
+param tags = {
+  Environment: environmentIac
+  CostCenter: '0000'
+  project: productIac
+  owner: tenantIac
+}
+
+// =====================
+// Identity
+// =====================
+param kvName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-kv'
+param kvSku = 'standard'
+
+// =====================
+// Management
+// =====================
+param sentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
+param sentSku = 'PerGB2018'
+param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
+
+// =====================
+// Networking
+// =====================
+param afdSku = 'Standard_AzureFrontDoor'
+param vnetName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-vnet'
+param vnetCidr = '10.10.0.0/16'
+param snetNameHubShared = '${productIac}-hub-shared-${instanceIac}-snet'
+param snetCidrHubShared = '10.10.1.0/24'
+param snetNameAzureBastion = '${productIac}-azure-bastion-${instanceIac}-snet'
+param snetCidrAzureBastion = '10.10.2.0/24'

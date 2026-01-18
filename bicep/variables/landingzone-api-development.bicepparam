@@ -1,29 +1,34 @@
 using '../templates/landingzone-api.bicep'
 // Common
-var organizationName = 'gtc'
-var productName = 'PRODUCT'
+
+var tenantIac = 'myco'
+var productIac = 'product'
 var environmentIac = 'dev'
+var regionIac = 'wus2'
+var instanceIac = '001'
+var planSku = 'F1'
+
 param environmentApp = 'Development'
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
-// Workspace
-param sharedResourceGroupName = '${organizationName}-rg-shared-${environmentIac}-001'
-param workName = 'work-shared-${environmentIac}-001'
 
-// Azure Monitor
-param appiName = 'appi-${productName}-${environmentIac}-001'
-param Flow_Type = 'Bluefield'
-param Application_Type = 'web'
+// Resource Group (shared)
+param sharedResourceGroupName = '${tenantIac}-${productIac}-${environmentIac}-${instanceIac}-rg'
+
+// Log Analytics Workspace
+param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-log'
+
+// Azure Monitor App Insights
+param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // Storage
-param stName = 'st${productName}${environmentIac}001'
+param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}-st'
 param stSku = 'Standard_LRS'
 
 // Key Vault
-param kvName = 'kv-${productName}-${environmentIac}-001'
+param kvName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-kv'
 param kvSku = 'standard'
 
 // App Service
-var planSku = 'F1'
-param appName = 'api-${productName}-${environmentIac}-001'
-param planName = 'plan-shared-${planSku}-${environmentIac}-001'
+param appName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
+param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'

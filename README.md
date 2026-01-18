@@ -1,25 +1,65 @@
-# azure-arm Azure ARM Template library
-<sup>ARM Templates in .json and upcoming .bicep files.</sup> <br>
 
-This is a atomic-level repository of Azure ARM templates. All files install only a single resource. You can include the resources you need in an Azure DevOps or GitHub Actions pipeline to deploy directly to Azure.
+# Azure ARM Bicep Atomic Design Repository
 
-[Overview: What are Azure ARM Templates - docs.microsoft.com](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview)
+This repository implements an **atomic design** approach for Azure infrastructure-as-code using [Bicep](https://docs.microsoft.com/azure/azure-resource-manager/bicep/overview). It is organized into two main categories:
 
-[Tutorial: Deploy and Manage Azure Resources - azuredevopslabs.com](https://azuredevopslabs.com/labs/vsts/azureresource/)
+## Atoms (Modules)
+Located in the `bicep/modules/` directory, these are small, reusable Bicep modules representing individual Azure resources (e.g., storage accounts, key vaults, app services). Each module is designed to be composable and independently deployable.
 
-#### Contents
-Path | Item | Contents
---- | --- | ---
-arm-json | .json ARM Templates | Azure ARM Templates in json format. Use these directly with Azure DevOps and GitHub Actions pipelines.
-arm-bicep | .bicep ARM Templates | Azure ARM Templates in bicep format. Use these directly with Azure DevOps and GitHub Actions pipelines.
-arm-helpers | Cmd, ps1 and bash | Helper scripts for Azure resource management and investigation.
+## Organisms (Templates)
+Located in the `bicep/templates/` directory, these are higher-level Bicep templates that combine multiple modules (atoms) to define more complex Azure solutions or environments. Organisms orchestrate the deployment of multiple resources as a cohesive unit.
 
-# Contributing
+---
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
+## Key Features
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+- **Atomic Design**: Promotes reusability, maintainability, and clarity by separating infrastructure into atoms (modules) and organisms (templates).
+- **Validation**: Supports validation of deployments using Azure's deployment group what-if operation, allowing you to preview changes before applying them.
+- **Deployment**: Deploys resources using `az deployment group create` for robust, repeatable, and auditable infrastructure provisioning.
+
+---
+
+## Usage
+
+### 1. Validate a Deployment (What-If)
+
+Preview the impact of a deployment without making changes:
+
+```sh
+az deployment group what-if \
+	--resource-group <your-resource-group> \
+	--template-file <path-to-template.bicep> \
+	--parameters <parameters-file>
+```
+
+### 2. Deploy to a Resource Group
+
+Deploy a Bicep template (organism) to your Azure resource group:
+
+```sh
+az deployment group create \
+	--resource-group <your-resource-group> \
+	--template-file <path-to-template.bicep> \
+	--parameters <parameters-file>
+```
+
+---
+
+## Repository Structure
+
+- `bicep/modules/` — Atomic Bicep modules (atoms)
+- `bicep/templates/` — Composite Bicep templates (organisms)
+- `scripts/` — PowerShell and CLI scripts for automation
+- `variables/` — Parameter and variable files
+
+---
+
+## Contributing
+
+Contributions are welcome! Please ensure new modules and templates follow the atomic design principles and include documentation and sample parameters.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
