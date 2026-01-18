@@ -1,25 +1,32 @@
-
 targetScope = 'resourceGroup'
 
 param location string = resourceGroup().location
 param tags object
 param vnetName string
 param vnetCidr string
-param snetNameShared string
-param snetCidrShared string
 param snetNameManagement string
 param snetCidrManagement string
 
-
-var sharedSnetSecurityRules = [
+var platformManagementSecurityRules = [
   {
-    name: 'AllowVnetIn'
+    name: 'AllowPlatformHTTP'
     priority: 100
     direction: 'Inbound'
     access: 'Allow'
-    protocol: '*'
+    protocol: 'Tcp'
     sourcePortRange: '*'
-    destinationPortRange: '*'
+    destinationPortRange: '80'
+    sourceAddressPrefix: 'VirtualNetwork'
+    destinationAddressPrefix: '*'
+  }
+  {
+    name: 'AllowPlatformHTTPS'
+    priority: 110
+    direction: 'Inbound'
+    access: 'Allow'
+    protocol: 'Tcp'
+    sourcePortRange: '*'
+    destinationPortRange: '443'
     sourceAddressPrefix: 'VirtualNetwork'
     destinationAddressPrefix: '*'
   }
@@ -37,7 +44,7 @@ var sharedSnetSecurityRules = [
 ]
 
 module vnet '../modules/vnet-virtualnetwork.bicep' = {
-  name: vnetName
+  name: 'vnetName'
   params: {
     name: vnetName
     addressPrefix: vnetCidr
@@ -46,59 +53,21 @@ module vnet '../modules/vnet-virtualnetwork.bicep' = {
   }
 }
 
-module nsgShared '../modules/nsg-networksecuritygroup.bicep' = {
-  name: '${snetNameShared}-nsg'
+module nsgSnet '../modules/nsg-networksecuritygroup.bicep' = {
+  name: 'nsgNameManagement'
   params: {
-    name: '${snetNameShared}-nsg'
+    name: '${snetNameManagement}-nsg'
     tags: tags
-    securityRules: sharedSnetSecurityRules
+    securityRules: platformManagementSecurityRules
   }
 }
 
-module snetShared '../modules/snet-virtualnetworksubnet.bicep' = {
-  name: snetNameShared
-  params: {
-    vnetName: vnetName
-    snetName: snetNameShared
-    cidr: snetCidrShared
-    nsgId: nsgShared.outputs.id
-  }
-}
-
-module snetManagement '../modules/snet-virtualnetworksubnet.bicep' = {
-  name: snetNameManagement
+module snetHub '../modules/snet-virtualnetworksubnet.bicep' = {
+  name: 'snetNameManagement'
   params: {
     vnetName: vnetName
     snetName: snetNameManagement
     cidr: snetCidrManagement
-    // nsgId: <add if required>
+    nsgId: nsgSnet.outputs.id
   }
 }
-
-module sentModule '../modules/sent-loganalyticsworkspace.bicep' = {
-  name: sentName
-  params: {
-    name: sentName
-    location: location
-    tags: tags
-    sku: sentSku
-  }
-}
-
-module appiModule '../modules/appi-applicationinsights.bicep' = {
-  name: appiName
-  params: {
-    location: location
-    tags: tags
-    name: appiName
-    workResourceId: sentModule.outputs.id
-  }
-}
-
-// If DNS Private Zone is needed for the spoke, add the resource block below:
-// module dnsPrivateZone '../modules/dns-privatezone.bicep' = {
-//   name: 'dnsPrivateZoneName'
-//   params: {
-//     // ... DNS Private Zone configuration ...
-//   }
-// }

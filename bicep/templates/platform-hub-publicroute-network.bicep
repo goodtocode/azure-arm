@@ -8,8 +8,8 @@ param tags object
 param afdSku string = 'Standard_AzureFrontDoor' // Required for public front door
 param vnetName string
 param vnetCidr string
-param snetNameHubShared string
-param snetCidrHubShared string
+param snetNameManagement string
+param snetCidrManagement string
 param snetNameAzureBastion string
 param snetCidrAzureBastion string
 
@@ -43,8 +43,8 @@ var bastionSecurityRules = [
   }
 ]
 
-// Platform Shared Services subnet - allow internal platform traffic, block others
-var platformSharedSecurityRules = [
+// Platform Management Services subnet - allow internal platform traffic, block others
+var platformManagementSecurityRules = [
   {
     name: 'AllowPlatformHTTP'
     priority: 100
@@ -91,20 +91,20 @@ module vnet '../modules/vnet-virtualnetwork.bicep' = {
 }
 
 module nsgSnet '../modules/nsg-networksecuritygroup.bicep' = {
-  name: 'nsgNameHubShared'
+  name: 'nsgNameManagement'
   params: {
-    name: '${snetNameHubShared}-nsg'
+    name: '${snetNameManagement}-nsg'
     tags: tags
-    securityRules: platformSharedSecurityRules
+    securityRules: platformManagementSecurityRules
   }
 }
 
 module snetHub '../modules/snet-virtualnetworksubnet.bicep' = {
-  name: 'snetNameHubShared'
+  name: 'snetNameManagement'
   params: {
     vnetName: vnetName
-    snetName: snetNameHubShared
-    cidr: snetCidrHubShared
+    snetName: snetNameManagement
+    cidr: snetCidrManagement
     nsgId: nsgSnet.outputs.id
   }
 }

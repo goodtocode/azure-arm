@@ -1,4 +1,4 @@
-using '../templates/platform-spoke-publicroute.bicep'
+using '../templates/platform-spoke-publicroute-network.bicep'
 
 // =====================
 // Common
@@ -19,10 +19,7 @@ param tags = {
 // =====================
 // Networking
 // =====================
-param afdSku = 'Standard_AzureFrontDoor'
 param vnetName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-vnet'
 param vnetCidr = '10.10.0.0/16'
-param snetNameHubShared = '${productIac}-hub-shared-${instanceIac}-snet'
-param snetCidrHubShared = '10.10.1.0/24'
-param snetNameAzureBastion = '${productIac}-azure-bastion-${instanceIac}-snet'
-param snetCidrAzureBastion = '10.10.2.0/24'
+param snetNameManagement = '${productIac}-hub-management-${instanceIac}-snet'
+param snetCidrManagement = '10.10.1.0/24'
