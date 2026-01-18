@@ -12,8 +12,6 @@ param workName = 'work-shared-${environmentIac}-001'
 
 // Azure Monitor
 param appiName = 'appi-${productName}-${environmentIac}-001'
-param Flow_Type = 'Bluefield'
-param Application_Type = 'web'
 
 // Storage
 param stName = 'st${productName}${environmentIac}001'
