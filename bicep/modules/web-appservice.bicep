@@ -48,8 +48,9 @@ param kind string = 'app'
   'v7.0'
   'v8.0'
   'v9.0'
+  'v10.0'
 ])
-param dotnetVersion string = 'v8.0'
+param dotnetVersion string = 'v10.0'
 
 resource webAppResource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
