@@ -21,7 +21,7 @@ param tags = {
 // i.e. gtc-platmgmt-prod-wus2-001
 // =====================
 param mgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
-param mgmtResourceGroupName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-mgmt-rg'
+param mgmtResourceGroupName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg'
 param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
 
 // =====================

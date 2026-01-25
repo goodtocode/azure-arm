@@ -1,6 +1,6 @@
 using '../templates/landingzone-web-api-sql.bicep'
-// Common
 
+// Common
 var tenantIac = 'COMPANY'
 var productIac = 'PRODUCT'
 var environmentIac = 'dev'
