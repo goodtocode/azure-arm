@@ -1,8 +1,8 @@
 using '../templates/landingzone-function.bicep'
 // Common
 
-var tenantIac = 'myco'
-var productIac = 'product'
+var tenantIac = 'COMPANY'
+var productIac = 'PRODUCT'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
@@ -13,9 +13,8 @@ param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 // Workspace
-param tenantId = '00000000-0000-0000-0000-000000000000'
 param mgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
-param mgmtResourceGroupName = '${tenantIac}-${productIac}-${environmentIac}-${instanceIac}-rg'
+param mgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${instanceIac}-rg'
 param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-law'
 
 // Azure Monitor App Insights
@@ -30,7 +29,6 @@ param kvName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-kv'
 param kvSku = 'standard'
 param accessPolicies = [
   {
-    tenantId: tenantId
     objectId: 'PIPELINE_PRINCIPLE_OBJECT_ID'
     permissions: {
       secrets: ['Get', 'List']

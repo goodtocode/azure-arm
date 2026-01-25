@@ -5,7 +5,7 @@ param tenantId string = tenant().tenantId
 param location string = resourceGroup().location
 param tags object
 
-param mgmtSubscriptionId string
+param mgmtSubscriptionId string = subscription().subscriptionId
 param mgmtResourceGroupName string
 param workName string
 param appiName string

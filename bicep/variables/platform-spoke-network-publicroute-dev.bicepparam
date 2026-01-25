@@ -4,7 +4,7 @@ using '../templates/platform-spoke-network-publicroute.bicep'
 // Common
 // =====================
 var tenantIac = 'COMPANY'
-var productIac = 'SPOKE-PURPOSE-OR-PRODUCT'
+var productIac = 'spokenetwork'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'

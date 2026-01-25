@@ -4,7 +4,7 @@ using '../templates/platform-hub-network-publicroute.bicep'
 // Common
 // =====================
 var tenantIac = 'COMPANY'
-var productIac = 'platform'
+var productIac = 'platnetwork'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'
@@ -17,7 +17,8 @@ param tags = {
 }
 
 // =====================
-// Networking
+// Networking: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// rg: gtc-platnetwork-prod-wus2-001
 // =====================
 param afdSku = 'Standard_AzureFrontDoor'
 param vnetName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-vnet'

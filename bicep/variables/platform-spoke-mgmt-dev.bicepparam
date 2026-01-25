@@ -4,7 +4,7 @@ using '../templates/platform-spoke-mgmt.bicep'
 // Common
 // =====================
 var tenantIac = 'COMPANY'
-var productIac = 'SPOKE-PURPOSE-OR-PRODUCT'
+var productIac = 'spokemgmt'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'
@@ -17,14 +17,16 @@ param tags = {
 }
 
 // =====================
-// Hub
+// Platform Hub Management RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// i.e. gtc-platmgmt-prod-wus2-001
 // =====================
 param mgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
 param mgmtResourceGroupName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-mgmt-rg'
 param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
 
 // =====================
-// Management
+// Platform Spoke Management RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// i.e. gtc-spokemgmt-prod-wus2-001
 // =====================
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 param kvName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-kv'

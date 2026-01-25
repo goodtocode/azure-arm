@@ -1,8 +1,8 @@
 using '../templates/landingzone-api.bicep'
 // Common
 
-var tenantIac = 'myco'
-var productIac = 'product'
+var tenantIac = 'COMPANY'
+var productIac = 'PRODUCT'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
@@ -12,8 +12,8 @@ param environmentApp = 'Development'
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
-// Resource Group (shared)
-param mgmtResourceGroupName = '${tenantIac}-${productIac}-${environmentIac}-${instanceIac}-rg'
+// Mgmt Resource Group (spoke)
+param mgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${instanceIac}-rg'
 
 // Log Analytics Workspace
 param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-log'

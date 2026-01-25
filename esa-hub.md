@@ -258,7 +258,7 @@ Patterns
 
 Resource Groups
 <tenant>-<mg>-<purpose>-<region>-<###>-rg
-e.g., cannery-platform-network-wus3-001-rg
+e.g., cannery-platnetwork-wus3-001-rg
 
 Networking
 <purpose>-<region>-<###>-vnet
@@ -298,7 +298,7 @@ privatelink.azure-api.net.
 6. Resource Group Layout (Hub)
 Minimal, clean grouping that matches your patterns and cost posture.
 Network
-RG: cannery-platform-network-wus3-001-rg
+RG: cannery-platnetwork-wus3-001-rg
 Contents: VNet, subnets, Bastion, peering, UDRs
 Note: Firewall/DDoS not deployed now
 DNS
@@ -583,7 +583,7 @@ OIDC federated identity to access Key Vault (no PATs, no long‑lived secrets)
 18. Example Names (Dev / West US 3)
 RGs
 
-cannery-platform-network-wus3-001-rg
+cannery-platnetwork-wus3-001-rg
 cannery-platform-dns-wus3-001-rg
 cannery-platform-edge-wus3-001-rg
 cannery-platform-api-wus3-001-rg
