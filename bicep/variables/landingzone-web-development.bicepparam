@@ -1,4 +1,4 @@
-using '../templates/landingzone-blazor-api.bicep'
+using '../templates/landingzone-web.bicep'
 // Common
 
 var tenantIac = 'myco'
@@ -24,5 +24,4 @@ param stSku = 'Standard_LRS'
 
 // App Service
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
-param apiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
 param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
