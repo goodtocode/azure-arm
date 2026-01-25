@@ -1,10 +1,10 @@
-using '../templates/platform-hub-publicroute-network.bicep'
+using '../templates/platform-hub-network-publicroute.bicep'
 
 // =====================
 // Common
 // =====================
-var tenantIac = 'myco'
-var productIac = 'platformhub'
+var tenantIac = 'COMPANY'
+var productIac = 'platform'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'

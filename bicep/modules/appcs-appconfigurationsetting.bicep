@@ -13,6 +13,9 @@ param appcsValues array = [
   '1'
 ]
 
+@description('Specifies the label for the key-value resources. Optional; use for environment scoping (e.g., Development, Production).')
+param label string = ''
+
 @description('Specifies the content type of the key-value resources. For feature flag, the value should be application/vnd.microsoft.appconfig.ff+json;charset=utf-8. For Key Value reference, the value should be application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8. Otherwise, it\'s optional.')
 param contentType string = 'text/plain'
 

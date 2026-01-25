@@ -1,14 +1,13 @@
-using '../templates/platform-hub-publicroute-mgmt.bicep'
+using '../templates/platform-hub-mgmt.bicep'
 
 // =====================
 // Common
 // =====================
-var tenantIac = 'myco'
-var productIac = 'platformhub'
+var tenantIac = 'COMPANY'
+var productIac = 'platform'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'
-param tenantId = '00000000-0000-0000-0000-000000000000'
 param location = 'West US 2'
 param tags = {
   Environment: environmentIac

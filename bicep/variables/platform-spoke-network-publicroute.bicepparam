@@ -1,10 +1,10 @@
-using '../templates/platform-spoke-publicroute-network.bicep'
+using '../templates/platform-spoke-network-publicroute.bicep'
 
 // =====================
 // Common
 // =====================
-var tenantIac = 'myco'
-var productIac = 'platformhub'
+var tenantIac = 'COMPANY'
+var productIac = 'SPOKE-PURPOSE-OR-PRODUCT'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'
