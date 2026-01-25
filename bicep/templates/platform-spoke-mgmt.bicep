@@ -5,8 +5,8 @@ param tenantId string = tenant().tenantId
 param location string = resourceGroup().location
 param tags object
 
-param mgmtSubscriptionId string = subscription().subscriptionId
-param mgmtResourceGroupName string
+param hubMgmtSubscriptionId string = subscription().subscriptionId
+param hubMgmtResourceGroupName string
 param workName string
 param appiName string
 
@@ -18,7 +18,7 @@ param appcsSku string = 'free'
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: workName 
-  scope: resourceGroup(mgmtSubscriptionId, mgmtResourceGroupName)
+  scope: resourceGroup(hubMgmtSubscriptionId, hubMgmtResourceGroupName)
 }
 
 module appiModule '../modules/appi-applicationinsights.bicep' = {

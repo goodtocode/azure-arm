@@ -12,15 +12,15 @@ param environmentApp = 'Development'
 param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
+// Mgmt Resource Group (hub)
+param hubMgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
+param hubMgmtResourceGroupName = '${tenantIac}-platmgmt-${environmentIac}-${instanceIac}-rg'
+
 // Mgmt Resource Group (spoke)
-param mgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${instanceIac}-rg'
+param spokeMgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${instanceIac}-rg'
 
 // Azure Monitor App Insights
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
-
-// Storage
-param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
-param stSku = 'Standard_LRS'
 
 // App Service
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'

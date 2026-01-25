@@ -10,6 +10,8 @@ resource appiResource 'Microsoft.Insights/components@2020-02-02' = {
   tags: empty(tags) ? null : tags
   kind:'web'
   properties: {
+    Application_Type: 'web'
+    Flow_Type: 'Bluefield'
     WorkspaceResourceId: workResourceId
   }
 }
