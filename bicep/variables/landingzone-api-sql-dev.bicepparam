@@ -22,7 +22,7 @@ param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-lo
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // Storage
-param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}-st'
+param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
 param stSku = 'Standard_LRS'
 
 // Key Vault

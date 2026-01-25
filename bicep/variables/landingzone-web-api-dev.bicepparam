@@ -19,7 +19,7 @@ param mgmtResourceGroupName = '${tenantIac}-${productIac}-${environmentIac}-${in
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // Storage
-param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}-st'
+param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
 param stSku = 'Standard_LRS'
 
 // App Service
