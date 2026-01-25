@@ -19,8 +19,8 @@ param tags = {
 // =====================
 // Hub
 // =====================
-param sharedSubscriptionId = '00000000-0000-0000-0000-000000000000'
-param sharedResourceGroupName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-mgmt-rg'
+param mgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
+param mgmtResourceGroupName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-mgmt-rg'
 param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
 
 // =====================

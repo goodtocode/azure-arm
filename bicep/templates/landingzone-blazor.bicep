@@ -2,8 +2,8 @@ targetScope='resourceGroup'
 
 // Common
 param location string = resourceGroup().location
-param sharedSubscriptionId string = subscription().subscriptionId
-param sharedResourceGroupName string
+param mgmtSubscriptionId string = subscription().subscriptionId
+param mgmtResourceGroupName string
 param environmentApp string 
 param tags object
 // Azure Monitor
@@ -27,12 +27,12 @@ module stModule '../modules/st-storageaccount.bicep' = {
 
 resource appiResource 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appiName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+  scope: resourceGroup(mgmtSubscriptionId, mgmtResourceGroupName)
 }
 
 resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   name: planName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+  scope: resourceGroup(mgmtSubscriptionId, mgmtResourceGroupName)
 }
 
 module webModule '../modules/web-appservice.bicep' = {

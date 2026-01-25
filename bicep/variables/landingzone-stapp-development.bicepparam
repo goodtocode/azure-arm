@@ -11,7 +11,7 @@ param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 // Resource Group (shared)
-param sharedResourceGroupName = '${tenantIac}-${productIac}-${environmentIac}-${instanceIac}-rg'
+param mgmtResourceGroupName = '${tenantIac}-${productIac}-${environmentIac}-${instanceIac}-rg'
 param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-law'
 
 // Azure Monitor App Insights

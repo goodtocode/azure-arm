@@ -3,8 +3,8 @@ targetScope='resourceGroup'
 // Common
 param tenantId string = tenant().tenantId
 param location string = resourceGroup().location
-param sharedSubscriptionId string = subscription().subscriptionId
-param sharedResourceGroupName string
+param mgmtSubscriptionId string = subscription().subscriptionId
+param mgmtResourceGroupName string
 param tags object
 // Azure Monitor
 param appiName string 
@@ -23,7 +23,7 @@ param workName string
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: workName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+  scope: resourceGroup(mgmtSubscriptionId, mgmtResourceGroupName)
 }
 
 module appiModule '../modules/appi-applicationinsights.bicep' = {

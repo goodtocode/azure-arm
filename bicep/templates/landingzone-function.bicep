@@ -5,8 +5,8 @@ param tenantId string
 param location string 
 param tags object 
 param environmentApp string 
-param sharedSubscriptionId string
-param sharedResourceGroupName string
+param mgmtSubscriptionId string
+param mgmtResourceGroupName string
 // Azure Monitor
 param appiName string 
 // Key Vault
@@ -26,7 +26,7 @@ param alwaysOn bool = false
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: workName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+  scope: resourceGroup(mgmtSubscriptionId, mgmtResourceGroupName)
 }
 
 module appiModule '../modules/appi-applicationinsights.bicep' = {
@@ -63,7 +63,7 @@ module stModule '../modules/st-storageaccount.bicep' = {
 
 resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   name: planName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+  scope: resourceGroup(mgmtSubscriptionId, mgmtResourceGroupName)
 }
 
 module funcModule '../modules/func-functionsapp.bicep' = {

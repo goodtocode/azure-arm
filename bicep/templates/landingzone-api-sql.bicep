@@ -3,8 +3,8 @@ targetScope='resourceGroup'
 // Common
 param tenantId string = tenant().tenantId
 param location string = resourceGroup().location
-param sharedSubscriptionId string = subscription().subscriptionId
-param sharedResourceGroupName string
+param mgmtSubscriptionId string = subscription().subscriptionId
+param mgmtResourceGroupName string
 param environmentApp string 
 param tags object
 // Azure Monitor
@@ -31,7 +31,7 @@ param sqldbSku string
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: workName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+  scope: resourceGroup(mgmtSubscriptionId, mgmtResourceGroupName)
 }
 
 module appiModule '../modules/appi-applicationinsights.bicep' = {
@@ -67,7 +67,7 @@ module stModule '../modules/st-storageaccount.bicep' = {
 
 resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   name: planName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+  scope: resourceGroup(mgmtSubscriptionId, mgmtResourceGroupName)
 }
 
 module apiModule '../modules/api-appservice.bicep' = {
