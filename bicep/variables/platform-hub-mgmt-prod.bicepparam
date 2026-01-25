@@ -4,7 +4,7 @@ using '../templates/platform-hub-mgmt.bicep'
 // Common
 // =====================
 var tenantIac = 'COMPANY'
-var productIac = 'platmgmt'
+var productIac = 'hubmgmt'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'
@@ -18,7 +18,7 @@ param tags = {
 
 // =====================
 // Management: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// rg: gtc-platmgmt-prod-wus2-001
+// rg: gtc-hubmgmt-prod-wus2-001
 // =====================
 param sentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
 param sentSku = 'PerGB2018'
