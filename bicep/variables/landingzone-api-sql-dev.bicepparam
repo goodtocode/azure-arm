@@ -6,11 +6,10 @@ var productIac = 'PRODUCT'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
+param location = 'westus2'
 var planSku = 'F1'
-
-param environmentApp = 'Development'
-param location = 'West US 2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
+param environmentApp = 'Development'
 
 // Mgmt Resource Group (spoke)
 param spokeMgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${instanceIac}-rg'

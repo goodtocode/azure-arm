@@ -9,7 +9,7 @@ var instanceIac = '001'
 var planSku = 'F1'
 
 param environmentApp = 'Development'
-param location = 'West US 2'
+param location = 'westus2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 // Mgmt Resource Group (spoke)
