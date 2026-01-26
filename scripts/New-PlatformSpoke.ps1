@@ -2,11 +2,11 @@
 az login
 
 $mgmtRg = "can-hubmgmt-wus2-001-rg"
-$mgmtTemplate = "bicep/templates/platform-spoke-publicroute-mgmt.bicep"
-$mgmtParams = "bicep/variables/platform-spoke-publicroute-mgmt.bicepparam"
+$mgmtTemplate = "../bicep/templates/platform-spoke-mgmt-publicroute.bicep"
+$mgmtParams = "../bicep/variables/platform-spoke-mgmt-publicroute.bicepparam"
 $networkRg = "can-hubnetwork-wus2-001-rg"
-$networkTemplate = "bicep/templates/platform-spoke-publicroute-network.bicep"
-$networkParams = "bicep/variables/platform-spoke-publicroute-network.bicepparam"
+$networkTemplate = "../bicep/templates/platform-spoke-network-publicroute.bicep"
+$networkParams = "../bicep/variables/platform-spoke-network-publicroute.bicepparam"
 $spokeSubId = "<spokeSubID>"
 
 # Create resource groups if not exist
