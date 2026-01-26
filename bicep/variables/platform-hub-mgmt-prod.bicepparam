@@ -23,5 +23,5 @@ param tags = {
 param sentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
 param sentSku = 'PerGB2018'
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
-param kvName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-kv'
+param kvName = '${productIac}-${environmentIac}-${instanceIac}-kv'
 param kvSku = 'standard'

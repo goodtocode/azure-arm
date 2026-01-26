@@ -3,7 +3,7 @@ using '../templates/platform-spoke-mgmt.bicep'
 // =====================
 // Common
 // =====================
-var tenantIac = 'COMPANY'
+var tenantIac = 'can'
 var productIac = 'spokemgmt'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
@@ -27,10 +27,10 @@ param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-se
 
 // =====================
 // Platform Spoke Management RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// i.e. gtc-spokemgmt-prod-wus2-001
+// i.e. gtc-spokemgmt-dev-wus2-001
 // =====================
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
-param kvName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-kv'
+param kvName = '${productIac}-${environmentIac}-${instanceIac}-kv'
 param kvSku = 'standard'
 param appcsName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appcs'
 param appcsSku = 'free'

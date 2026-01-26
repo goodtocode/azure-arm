@@ -19,7 +19,7 @@ param spokeMgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${i
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // Storage
-param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
+param stName = '${productIac}${environmentIac}${instanceIac}st'
 param stSku = 'Standard_LRS'
 
 // Azure Functions

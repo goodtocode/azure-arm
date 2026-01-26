@@ -276,7 +276,7 @@ Edge & API
 
 
 Identity / Observability
-<resource>-<env>-<region>-<###>-kv      (Key Vault)
+<resource>-<env>-<###>-kv      (Key Vault)
 <resource>-<env>-<region>-<###>-log     (Log Analytics workspace)
 <resource>-<env>-<region>-<###>-appi    (Application Insights)
 

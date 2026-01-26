@@ -5,14 +5,35 @@ param tenantId string = tenant().tenantId
 param location string = resourceGroup().location
 param tags object
 
+@minLength(1)
+@maxLength(64)
+@description('Specifies the subscription ID for the hub management. Must not be empty.')
 param hubMgmtSubscriptionId string = subscription().subscriptionId
+
+@minLength(1)
+@maxLength(90)
+@description('Specifies the resource group name for hub management. Must not be empty. 1-90 characters, letters, numbers, -, _, (, ) and .')
 param hubMgmtResourceGroupName string
+
+@minLength(4)
+@maxLength(63)
+@description('Specifies the name of the Log Analytics workspace. 4-63 characters, letters, numbers, and -')
 param workName string
+
+@minLength(1)
+@maxLength(255)
+@description('Specifies the name of the Application Insights resource. 1-255 characters, letters, numbers, and -')
 param appiName string
 
+@minLength(3)
+@maxLength(24)
+@description('Specifies the name of the Key Vault. 3-24 characters, alphanumeric and -')
 param kvName string
 param kvSku string
 
+@minLength(5)
+@maxLength(50)
+@description('Specifies the name of the App Configuration store. 5-50 characters, only lowercase letters, numbers, and -')
 param appcsName string
 param appcsSku string = 'free'
 

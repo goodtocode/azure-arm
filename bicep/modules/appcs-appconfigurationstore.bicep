@@ -1,4 +1,6 @@
-@description('Specifies the name of the App Configuration store.')
+@description('Specifies the name of the App Configuration store. 5-50 chars, lowercase letters, numbers, and -')
+@minLength(5)
+@maxLength(50)
 param name string
 
 @description('Specifies the sku of the App Configuration store.')

@@ -1,6 +1,9 @@
 
 param location string 
 param tags object = {}
+@description('Specifies the name of the Application Insights resource. 1-255 characters, letters, numbers, and -')
+@minLength(1)
+@maxLength(255)
 param name string 
 param workResourceId string
 
