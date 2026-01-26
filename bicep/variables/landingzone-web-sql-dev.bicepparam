@@ -1,36 +1,29 @@
-using '../templates/landingzone-api-sql.bicep'
+using '../templates/landingzone-web-sql.bicep'
 // Common
 
-var tenantIac = 'myco'
-var productIac = 'product'
+var tenantIac = 'COMPANY'
+var productIac = 'PRODUCT'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
 var planSku = 'F1'
 
 param environmentApp = 'Development'
-param location = 'West US 2'
+param location = 'westus2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
-// Resource Group (shared)
-param sharedResourceGroupName = '${tenantIac}-${productIac}-${environmentIac}-${instanceIac}-rg'
+// Mgmt Resource Group (hub)
+param hubMgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
+param hubMgmtResourceGroupName = '${tenantIac}-hubmgmt-prod-${instanceIac}-rg'
 
-// Log Analytics Workspace
-param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-log'
+// Mgmt Resource Group (spoke)
+param spokeMgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${instanceIac}-rg'
 
 // Azure Monitor App Insights
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
-// Storage
-param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}-st'
-param stSku = 'Standard_LRS'
-
-// Key Vault
-param kvName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-kv'
-param kvSku = 'standard'
-
 // App Service
-param appName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
+param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
 param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 
 // SQL Server

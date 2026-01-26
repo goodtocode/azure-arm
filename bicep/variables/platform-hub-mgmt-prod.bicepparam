@@ -1,15 +1,14 @@
-using '../templates/platform-hub-publicroute-mgmt.bicep'
+using '../templates/platform-hub-mgmt.bicep'
 
 // =====================
 // Common
 // =====================
-var tenantIac = 'myco'
-var productIac = 'platformhub'
+var tenantIac = 'COMPANY'
+var productIac = 'hubmgmt'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'
-param tenantId = '00000000-0000-0000-0000-000000000000'
-param location = 'West US 2'
+param location = 'westus2'
 param tags = {
   Environment: environmentIac
   CostCenter: '0000'
@@ -18,10 +17,11 @@ param tags = {
 }
 
 // =====================
-// Management
+// Management: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// rg: gtc-hubmgmt-prod-wus2-001
 // =====================
 param sentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
 param sentSku = 'PerGB2018'
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
-param kvName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-kv'
+param kvName = '${productIac}-${environmentIac}-${instanceIac}-kv'
 param kvSku = 'standard'

@@ -13,7 +13,6 @@ param snetCidrManagement string
 param snetNameAzureBastion string
 param snetCidrAzureBastion string
 
-
 //
 // Networking
 //

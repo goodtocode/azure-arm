@@ -1,14 +1,14 @@
-using '../templates/platform-spoke-publicroute-network.bicep'
+using '../templates/platform-spoke-network-publicroute.bicep'
 
 // =====================
 // Common
 // =====================
-var tenantIac = 'myco'
-var productIac = 'platformhub'
-var environmentIac = 'prod'
+var tenantIac = 'COMPANY'
+var productIac = 'spokenetwork'
+var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
-param location = 'West US 2'
+param location = 'westus2'
 param tags = {
   Environment: environmentIac
   CostCenter: '0000'

@@ -1,26 +1,26 @@
-using '../templates/landingzone-blazor-api-sql.bicep'
-// Common
+using '../templates/landingzone-web-api-sql.bicep'
 
-var tenantIac = 'myco'
-var productIac = 'product'
+// Common
+var tenantIac = 'COMPANY'
+var productIac = 'PRODUCT'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
 var planSku = 'F1'
 
 param environmentApp = 'Development'
-param location = 'West US 2'
+param location = 'westus2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
-// Resource Group (shared)
-param sharedResourceGroupName = '${tenantIac}-${productIac}-${environmentIac}-${instanceIac}-rg'
+// Mgmt Resource Group (hub)
+param hubMgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
+param hubMgmtResourceGroupName = '${tenantIac}-hubmgmt-prod-${instanceIac}-rg'
+
+// Mgmt Resource Group (spoke)
+param spokeMgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${instanceIac}-rg'
 
 // Azure Monitor App Insights
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
-
-// Storage
-param stName = '${productIac}${environmentIac}${regionIac}${instanceIac}-st'
-param stSku = 'Standard_LRS'
 
 // App Service
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'

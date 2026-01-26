@@ -49,7 +49,7 @@ resource kvResource 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enabledForDiskEncryption: true
     enabledForTemplateDeployment: true
     tenantId: tenantId
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: 'Disabled'
     sku: {
       name: sku
       family: 'A'

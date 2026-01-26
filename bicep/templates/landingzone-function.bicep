@@ -1,54 +1,29 @@
 targetScope='resourceGroup'
 
 // Common
-param tenantId string 
-param location string 
+param location string = resourceGroup().location
 param tags object 
 param environmentApp string 
-param sharedSubscriptionId string
-param sharedResourceGroupName string
+param spokeMgmtSubscriptionId string = subscription().subscriptionId
+param spokeMgmtResourceGroupName string
 // Azure Monitor
 param appiName string 
-// Key Vault
-param kvName string 
-param kvSku string 
-param accessPolicies array 
 // Storage Account
 param stName string 
 param stSku string 
-// workspace
-param workName string
 // function
 param funcName string
 param planName string
 param alwaysOn bool = false
 
-
-resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
-  name: workName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+resource appiResource 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: appiName 
+  scope: resourceGroup(spokeMgmtSubscriptionId, spokeMgmtResourceGroupName)
 }
 
-module appiModule '../modules/appi-applicationinsights.bicep' = {
-  name: 'appiModuleName'
-  params:{
-    location: location
-    tags: tags
-    name: appiName
-    workResourceId: workResource.id
-  }
-}
-
-module kvModule '../modules/kv-keyvault.bicep'= {
-   name:'kvModuleName'
-   params:{
-    location: location
-    tags: tags
-    name: kvName
-    sku: kvSku
-    tenantId: tenantId
-    accessPolicies: accessPolicies
-   }
+resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
+  name: planName 
+  scope: resourceGroup(spokeMgmtSubscriptionId, spokeMgmtResourceGroupName)
 }
 
 module stModule '../modules/st-storageaccount.bicep' = {
@@ -61,11 +36,6 @@ module stModule '../modules/st-storageaccount.bicep' = {
   }
 }
 
-resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
-  name: planName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
-}
-
 module funcModule '../modules/func-functionsapp.bicep' = {
   name: 'funcModuleName'
   params:{
@@ -73,8 +43,8 @@ module funcModule '../modules/func-functionsapp.bicep' = {
     location: location    
     tags: tags
     environmentApp: environmentApp
-    appiKey:appiModule.outputs.InstrumentationKey
-    appiConnection:appiModule.outputs.Connectionstring
+    appiKey: appiResource.properties.InstrumentationKey
+    appiConnection: appiResource.properties.ConnectionString
     planId: planResource.id
     stName: stName
     alwaysOn: alwaysOn

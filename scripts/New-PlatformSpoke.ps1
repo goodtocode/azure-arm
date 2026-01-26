@@ -1,10 +1,10 @@
 # Login and set subscription variables
 az login
 
-$mgmtRg = "can-platform-mgmt-wus2-100-rg"
+$mgmtRg = "can-hubmgmt-wus2-001-rg"
 $mgmtTemplate = "bicep/templates/platform-spoke-publicroute-mgmt.bicep"
 $mgmtParams = "bicep/variables/platform-spoke-publicroute-mgmt.bicepparam"
-$networkRg = "can-platform-network-wus2-100-rg"
+$networkRg = "can-hubnetwork-wus2-001-rg"
 $networkTemplate = "bicep/templates/platform-spoke-publicroute-network.bicep"
 $networkParams = "bicep/variables/platform-spoke-publicroute-network.bicepparam"
 $spokeSubId = "<spokeSubID>"

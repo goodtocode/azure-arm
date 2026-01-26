@@ -1,26 +1,16 @@
 targetScope='resourceGroup'
 
 // Common
-param tenantId string = tenant().tenantId
 param location string = resourceGroup().location
-param sharedSubscriptionId string = subscription().subscriptionId
-param sharedResourceGroupName string
+param spokeMgmtSubscriptionId string = subscription().subscriptionId
+param spokeMgmtResourceGroupName string
 param environmentApp string 
 param tags object
 // Azure Monitor
 param appiName string 
-// Key Vault
-param kvName string 
-param kvSku string 
-// Storage Account
-param stName string 
-param stSku string 
 // App Service
 param planName string 
 param appName string 
-// workspace
-param workName string
-// Sql Server
 // Sql Server
 param sqlName string 
 param sqlAdminUser string
@@ -29,45 +19,15 @@ param sqlAdminPassword string
 param sqldbName string
 param sqldbSku string
 
-resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
-  name: workName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
-}
 
-module appiModule '../modules/appi-applicationinsights.bicep' = {
-  name: 'appiModuleName'
-  params:{
-    location: location
-    tags: tags
-    name: appiName
-    workResourceId: workResource.id
-  }
-}
-
-module kvModule '../modules/kv-keyvault.bicep'= {
-   name:'kvModuleName'
-   params:{
-    location: location
-    tags: tags
-    name: kvName
-    sku: kvSku
-    tenantId: tenantId
-   }
-}
-
-module stModule '../modules/st-storageaccount.bicep' = {
-  name:'stModuleName'
-  params:{
-    tags: tags
-    location: location
-    name: stName
-    sku: stSku
-  }
+resource appiResource 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: appiName 
+  scope: resourceGroup(spokeMgmtSubscriptionId, spokeMgmtResourceGroupName)
 }
 
 resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   name: planName 
-  scope: resourceGroup(sharedSubscriptionId, sharedResourceGroupName)
+  scope: resourceGroup(spokeMgmtSubscriptionId, spokeMgmtResourceGroupName)
 }
 
 module apiModule '../modules/api-appservice.bicep' = {
@@ -77,8 +37,8 @@ module apiModule '../modules/api-appservice.bicep' = {
     location: location    
     tags: tags
     environment: environmentApp
-    appiKey:appiModule.outputs.InstrumentationKey
-    appiConnection:appiModule.outputs.Connectionstring
+    appiKey: appiResource.properties.InstrumentationKey
+    appiConnection: appiResource.properties.ConnectionString
     planId: planResource.id  
   }
 }

@@ -1,18 +1,8 @@
 targetScope = 'resourceGroup'
 
 // Common
-param tenantId string = tenant().tenantId
 param location string = resourceGroup().location
 param tags object
-
-// Identity
-param kvName string
-param kvSku string
-
-// Management
-param sentName string
-param sentSku string
-param appiName string
 
 // Networking
 param afdSku string = 'Premium_AzureFrontDoor' // Required for private link routing
@@ -24,43 +14,6 @@ param snetNameHubShared string
 param snetCidrHubShared string
 param snetNameAzureBastion string
 param snetCidrAzureBastion string
-
-//
-// Identity 
-//
-module kvModule '../modules/kv-keyvault.bicep' = {
-  name: 'kvName'
-  params: {
-    location: location
-    tags: tags
-    name: kvName
-    sku: kvSku
-    tenantId: tenantId
-  }
-}
-
-//
-// Management
-//
-module sentModule '../modules/sent-loganalyticsworkspace.bicep' = {
-  name: 'sentName'
-  params: {
-    name: sentName
-    location: location
-    tags: tags
-    sku: sentSku
-  }
-}
-
-module appiModule '../modules/appi-applicationinsights.bicep' = {
-  name: 'appiName'
-  params:{
-    location: location
-    tags: tags
-    name: appiName
-    workResourceId: sentModule.outputs.id
-  }
-}
 
 //
 // Networking

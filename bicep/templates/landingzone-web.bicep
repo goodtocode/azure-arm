@@ -4,17 +4,19 @@ targetScope='resourceGroup'
 param location string = resourceGroup().location
 param spokeMgmtSubscriptionId string = subscription().subscriptionId
 param spokeMgmtResourceGroupName string
+param hubMgmtSubscriptionId string
+param hubMgmtResourceGroupName string
 param environmentApp string 
 param tags object
 // Azure Monitor
 param appiName string 
 // App Service
 param planName string 
-param appName string 
+param webName string 
 
 resource appiResource 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appiName 
-  scope: resourceGroup(spokeMgmtSubscriptionId, spokeMgmtResourceGroupName)
+  scope: resourceGroup(hubMgmtSubscriptionId, hubMgmtResourceGroupName)
 }
 
 resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
@@ -22,10 +24,10 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   scope: resourceGroup(spokeMgmtSubscriptionId, spokeMgmtResourceGroupName)
 }
 
-module apiModule '../modules/api-appservice.bicep' = {
-  name: 'apiModuleName'
+module webModule '../modules/web-appservice.bicep' = {
+  name: 'webModuleName'
   params:{
-    name: appName
+    name: webName
     location: location    
     tags: tags
     environment: environmentApp

@@ -1,14 +1,14 @@
-using '../templates/platform-hub-publicroute-network.bicep'
+using '../templates/platform-hub-network-publicroute.bicep'
 
 // =====================
 // Common
 // =====================
-var tenantIac = 'myco'
-var productIac = 'platformhub'
+var tenantIac = 'COMPANY'
+var productIac = 'hubnetwork'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'
-param location = 'West US 2'
+param location = 'westus2'
 param tags = {
   Environment: environmentIac
   CostCenter: '0000'
@@ -17,7 +17,8 @@ param tags = {
 }
 
 // =====================
-// Networking
+// Networking: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// rg: gtc-hubnetwork-prod-wus2-001
 // =====================
 param afdSku = 'Standard_AzureFrontDoor'
 param vnetName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-vnet'
