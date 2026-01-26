@@ -5,7 +5,7 @@ using '../templates/platform-hub-mgmt.bicep'
 // =====================
 var tenantIac = 'COMPANY'
 var productIac = 'hubmgmt'
-var environmentIac = 'prod'
+var environmentIac = 'plat'
 var regionIac = 'wus2'
 var instanceIac = '001'
 param location = 'westus2'
