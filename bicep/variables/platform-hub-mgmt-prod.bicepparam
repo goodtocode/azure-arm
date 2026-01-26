@@ -18,7 +18,7 @@ param tags = {
 
 // =====================
 // Management: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// rg: gtc-hubmgmt-prod-wus2-001
+// rg: gtc-hubmgmt-plat-wus2-001
 // =====================
 param sentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
 param sentSku = 'PerGB2018'

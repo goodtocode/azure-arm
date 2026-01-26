@@ -18,7 +18,7 @@ param tags = {
 
 // =====================
 // Networking: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// rg: gtc-hubnetwork-prod-wus2-001
+// rg: gtc-hubnetwork-plat-wus2-001
 // =====================
 param afdSku = 'Standard_AzureFrontDoor'
 param vnetName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-vnet'

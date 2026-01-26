@@ -5,10 +5,10 @@ az login
 az login
 
 # Variables for resource groups, templates, and parameters
-$mgmtRg = "can-hubmgmt-wus2-001-rg"
+$mgmtRg = "can-hubmgmt-plat-wus2-001-rg"
 $mgmtTemplate = "bicep/templates/platform-hub-publicroute-mgmt.bicep"
 $mgmtParams = "bicep/variables/platform-hub-publicroute-mgmt.bicepparam"
-$networkRg = "can-hubnetwork-wus2-001-rg"
+$networkRg = "can-hubnetwork-plat-wus2-001-rg"
 $networkTemplate = "bicep/templates/platform-hub-publicroute-network.bicep"
 $networkParams = "bicep/variables/platform-hub-publicroute-network.bicepparam"
 $hubSubId = "<HubSubID>"
