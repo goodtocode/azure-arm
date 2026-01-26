@@ -14,7 +14,7 @@ param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 // Mgmt Resource Group (hub)
 param hubMgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
-param hubMgmtResourceGroupName = '${tenantIac}-hubmgmt-${environmentIac}-${instanceIac}-rg'
+param hubMgmtResourceGroupName = '${tenantIac}-hubmgmt-prod-${instanceIac}-rg'
 
 // Mgmt Resource Group (spoke)
 param spokeMgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${instanceIac}-rg'

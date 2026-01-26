@@ -5,7 +5,7 @@ using '../templates/platform-spoke-network-publicroute.bicep'
 // =====================
 var tenantIac = 'COMPANY'
 var productIac = 'spokenetwork'
-var environmentIac = 'prod'
+var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
 param location = 'West US 2'

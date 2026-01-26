@@ -5,7 +5,7 @@ using '../templates/platform-spoke-mgmt.bicep'
 // =====================
 var tenantIac = 'COMPANY'
 var productIac = 'spokemgmt'
-var environmentIac = 'prod'
+var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
 param location = 'West US 2'
@@ -22,7 +22,7 @@ param tags = {
 // Note: Sentinel is the shared workspace log analytics
 // =====================
 param hubMgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
-param hubMgmtResourceGroupName = 'hubmgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
+param hubMgmtResourceGroupName = 'hubmgmt-prod-${instanceIac}-rg'
 param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
 
 // =====================
