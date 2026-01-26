@@ -21,7 +21,7 @@ param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-ap
 // Storage
 param stName = '${productIac}${environmentIac}${instanceIac}st'
 param stSku = 'Standard_LRS'
-`
+
 // Azure Functions
 param funcName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-func'
 param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
