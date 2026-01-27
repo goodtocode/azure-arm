@@ -30,7 +30,5 @@ param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-se
 // i.e. gtc-spokemgmt-dev-wus2-001
 // =====================
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
-param kvName = '${productIac}-${environmentIac}-${instanceIac}-kv'
-param kvSku = 'standard'
 param appcsName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appcs'
 param appcsSku = 'free'

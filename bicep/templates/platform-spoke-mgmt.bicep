@@ -25,17 +25,19 @@ param workName string
 @description('Specifies the name of the Application Insights resource. 1-255 characters, letters, numbers, and -')
 param appiName string
 
-@minLength(3)
-@maxLength(24)
-@description('Specifies the name of the Key Vault. 3-24 characters, alphanumeric and -')
-param kvName string
-param kvSku string
-
 @minLength(5)
 @maxLength(50)
 @description('Specifies the name of the App Configuration store. 5-50 characters, only lowercase letters, numbers, and -')
 param appcsName string
 param appcsSku string = 'free'
+
+// Generate a CAF-compliant, unique Key Vault name for the App Configuration Store
+// Format: <truncated-appcsName><rand>-appcs-kv (max 24 chars, Bicep-compatible)
+var kvNameBase = toLower(replace(appcsName, '-', ''))
+var kvNameTrunc = substring(kvNameBase, 0, min(8, length(kvNameBase))) // up to 8 chars from appcsName
+var kvNameRand = toLower(substring(uniqueString(appcsName, resourceGroup().id), 0, 4)) // 4-char random string
+var kvName = '${kvNameTrunc}${kvNameRand}-appcs-kv'
+var kvSku = 'standard'
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
   name: workName 
