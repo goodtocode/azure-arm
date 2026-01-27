@@ -34,7 +34,7 @@ param appcsSku string = 'free'
 // '-appcs-kv' is 9 chars, '001' is 3 chars, so truncate base to 12 chars max for 24-char total
 var kvNameBase = toLower(replace(appcsName, '-', ''))
 var kvNameTrunc = substring(kvNameBase, 0, min(12, length(kvNameBase)))
-var kvName = '${kvNameTrunc}-appcs-kv001'
+var kvName = '${kvNameTrunc}001-appcs-kv'
 var kvSku = 'standard'
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
