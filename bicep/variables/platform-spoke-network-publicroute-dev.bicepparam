@@ -17,7 +17,7 @@ param tags = {
 }
 
 // =====================
-// Networking
+// Networking RG
 // =====================
 param vnetName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-vnet'
 param vnetCidr = '10.10.0.0/16'
