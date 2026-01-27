@@ -31,12 +31,10 @@ param appiName string
 param appcsName string
 param appcsSku string = 'free'
 
-// Generate a CAF-compliant, unique Key Vault name for the App Configuration Store
-// Format: <truncated-appcsName><rand>-appcs-kv (max 24 chars, Bicep-compatible)
+// '-appcs-kv' is 9 chars, so truncate base to 15 chars max for 24-char total
 var kvNameBase = toLower(replace(appcsName, '-', ''))
-var kvNameTrunc = substring(kvNameBase, 0, min(8, length(kvNameBase))) // up to 8 chars from appcsName
-var kvNameRand = toLower(substring(uniqueString(appcsName, resourceGroup().id), 0, 4)) // 4-char random string
-var kvName = '${kvNameTrunc}${kvNameRand}-appcs-kv'
+var kvNameTrunc = substring(kvNameBase, 0, min(15, length(kvNameBase)))
+var kvName = '${kvNameTrunc}-appcs-kv'
 var kvSku = 'standard'
 
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
