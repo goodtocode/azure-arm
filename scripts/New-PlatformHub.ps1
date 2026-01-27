@@ -1,6 +1,11 @@
 # Login and set subscription variables
 az login
 
+# Sentinel requires registration
+az provider register --namespace Microsoft.OperationsManagement
+az provider register --namespace Microsoft.SecurityInsights
+
+
 $mgmtRg = "COMPANY-hubmgmt-wus2-001-rg"
 $mgmtTemplate = "../bicep/templates/platform-hub-mgmt.bicep"
 $mgmtParams = "../bicep/variables/platform-hub-mgmt.bicepparam"
