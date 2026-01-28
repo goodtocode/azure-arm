@@ -1,12 +1,17 @@
 # Login and set subscription variables
 az login
 
-$mgmtRg = "can-hubmgmt-wus2-001-rg"
-$mgmtTemplate = "bicep/templates/platform-hub-publicroute-mgmt.bicep"
-$mgmtParams = "bicep/variables/platform-hub-publicroute-mgmt.bicepparam"
-$networkRg = "can-hubnetwork-wus2-001-rg"
-$networkTemplate = "bicep/templates/platform-hub-publicroute-network.bicep"
-$networkParams = "bicep/variables/platform-hub-publicroute-network.bicepparam"
+# Sentinel requires registration
+az provider register --namespace Microsoft.OperationsManagement
+az provider register --namespace Microsoft.SecurityInsights
+
+
+$mgmtRg = "COMPANY-hubmgmt-wus2-001-rg"
+$mgmtTemplate = "../bicep/templates/platform-hub-mgmt.bicep"
+$mgmtParams = "../bicep/variables/platform-hub-mgmt.bicepparam"
+$networkRg = "COMPANY-hubnetwork-wus2-001-rg"
+$networkTemplate = "../bicep/templates/platform-hub-network-publicroute.bicep"
+$networkParams = "../bicep/variables/platform-hub-network-publicroute.bicepparam"
 $hubSubId = "<HubSubID>"
 
 # Create resource groups if not exist

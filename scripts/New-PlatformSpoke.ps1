@@ -1,12 +1,12 @@
 # Login and set subscription variables
 az login
 
-$mgmtRg = "can-hubmgmt-wus2-001-rg"
-$mgmtTemplate = "bicep/templates/platform-spoke-publicroute-mgmt.bicep"
-$mgmtParams = "bicep/variables/platform-spoke-publicroute-mgmt.bicepparam"
-$networkRg = "can-hubnetwork-wus2-001-rg"
-$networkTemplate = "bicep/templates/platform-spoke-publicroute-network.bicep"
-$networkParams = "bicep/variables/platform-spoke-publicroute-network.bicepparam"
+$mgmtRg = "COMPANY-hubmgmt-wus2-001-rg"
+$mgmtTemplate = "../bicep/templates/platform-spoke-mgmt.bicep"
+$mgmtParams = "../bicep/variables/platform-spoke-mgmt.bicepparam"
+$networkRg = "COMPANY-hubnetwork-wus2-001-rg"
+$networkTemplate = "../bicep/templates/platform-spoke-network.bicep"
+$networkParams = "../bicep/variables/platform-spoke-network.bicepparam"
 $spokeSubId = "<spokeSubID>"
 
 # Create resource groups if not exist

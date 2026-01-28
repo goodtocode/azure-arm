@@ -138,7 +138,7 @@ Posture: Zero Trust, Cost‑Optimized Startup Edition
 
   **Subscriptions:**
   - cannery-hub-dev-001 (Hub, now)
-  - cannery-hub-prod-001 (Hub, later)
+  - cannery-hub-plat-001 (Hub, later)
   - cannery-digital-dev-001 (Digital workloads)
   - cannery-cannery-dev-001 (AI/MCP/Cans)
   - Future spokes: one subscription per workload where practical, e.g., cannery-<workload>-dev-###
@@ -226,7 +226,7 @@ flowchart TB
   Cannery --> Production
   subgraph SUBS ["Subscriptions"]
     subHubDev["Sub: cannery-hub-dev-001"]
-    subHubProd["Sub: cannery-hub-prod-001"]
+    subHubProd["Sub: cannery-hub-plat-001"]
     subDigitalDev["Sub: cannery-digital-dev-001"]
     subCanneryDev["Sub: cannery-cannery-dev-001"]
   end
