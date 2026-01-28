@@ -31,6 +31,10 @@ param appiName string
 param appcsName string
 param appcsSku string = 'free'
 
+// App Service Plan parameters
+param planSku string = 'F1'
+param planName string
+
 // '-appcs-kv' is 9 chars, so truncate base to 15 chars max for 24-char total
 var kvNameBase = toLower(replace(appcsName, '-', ''))
 var kvNameTrunc = substring(kvNameBase, 0, min(15, length(kvNameBase)))
@@ -68,6 +72,15 @@ module appcsModule '../modules/appcs-appconfigurationstore.bicep' = {
   params: {
     name: appcsName
     sku: appcsSku
+    location: location
+  }
+}
+
+module planModule '../modules/plan-appserviceplan.bicep' = {
+  name: 'planModule'
+  params: {
+    name: planName
+    sku: planSku
     location: location
   }
 }
