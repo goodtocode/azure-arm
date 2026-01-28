@@ -18,9 +18,7 @@ param hubMgmtResourceGroupName = '${tenantIac}-hubmgmt-plat-${regionIac}-${insta
 
 // Mgmt Resource Group (spoke)
 param spokeMgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
-
-// Azure Monitor App Insights
-param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
+param appiName = 'spokemgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // App Service
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'

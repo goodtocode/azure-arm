@@ -13,9 +13,7 @@ param environmentApp = 'Development'
 
 // Mgmt Resource Group (spoke)
 param spokeMgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
-
-// Azure Monitor App Insights
-param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
+param appiName = 'spokemgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // App Service
 param appName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
