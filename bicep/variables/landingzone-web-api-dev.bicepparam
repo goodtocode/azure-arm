@@ -23,4 +23,4 @@ param appiName = 'spokemgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
 // App Service
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
 param apiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
-param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
+param planName = 'spokemgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'

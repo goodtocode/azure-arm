@@ -22,6 +22,6 @@ param stSku = 'Standard_LRS'
 
 // Azure Functions
 param funcName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-func'
-param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
+param planName = 'spokemgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 param alwaysOn = true
 

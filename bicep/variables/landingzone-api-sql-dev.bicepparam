@@ -17,7 +17,7 @@ param appiName = 'spokemgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // App Service
 param appName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
-param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
+param planName = 'spokemgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 
 // SQL Server
 param sqlName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sql'
