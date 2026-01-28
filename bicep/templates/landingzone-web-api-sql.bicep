@@ -4,8 +4,6 @@ targetScope='resourceGroup'
 param location string = resourceGroup().location
 param spokeMgmtSubscriptionId string = subscription().subscriptionId
 param spokeMgmtResourceGroupName string
-param hubMgmtSubscriptionId string
-param hubMgmtResourceGroupName string
 param environmentApp string 
 param tags object
 // Azure Monitor
@@ -24,7 +22,7 @@ param sqldbSku string
 
 resource appiResource 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appiName 
-  scope: resourceGroup(hubMgmtSubscriptionId, hubMgmtResourceGroupName)
+  scope: resourceGroup(spokeMgmtSubscriptionId, spokeMgmtResourceGroupName)
 }
 
 resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
