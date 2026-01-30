@@ -1,6 +1,14 @@
-# EEID App Registration and Secret Setup Script
-# Location: .azure/scripts/New-EeidAppRegistrations.ps1
-# Description: Idempotently installs prerequisites, creates/updates EEID app registrations, sets permissions, and configures dotnet user-secrets for Presentation.WebApi and Presentation.Blazor.
+# ============================================================================
+# Script Name:   New-EeidAppRegistrations.ps1
+# Description:   Creates new Entra External ID App Registrations.
+# -----------------------------------------------------------------------------
+# Example CLI Usage:
+#   pwsh -File ./scripts/entra-external-id/New-EeidAppRegistrations.ps1 -TenantId "<your-tenant-id>" -AppName "MyApp"
+# -----------------------------------------------------------------------------
+# Notes:
+#   - Requires Azure PowerShell modules (Az.Accounts, Az.Resources, etc.)
+#   - Ensure you are authenticated: Connect-AzAccount
+# ============================================================================
 param(
 	[string]$EeIdInstanceUrl,
 	[string]$TenantId,
