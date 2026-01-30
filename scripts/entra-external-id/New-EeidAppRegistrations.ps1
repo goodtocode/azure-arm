@@ -3,7 +3,7 @@
 # Description:   Creates new Entra External ID App Registrations.
 # -----------------------------------------------------------------------------
 # Example CLI Usage:
-#   pwsh -File ./scripts/entra-external-id/New-EeidAppRegistrations.ps1 -TenantId "<your-tenant-id>" -AppName "MyApp"
+#   pwsh -File ./New-EeidAppRegistrations.ps1 -EeIdInstanceUrl "<your-eeid-instance-url>" -TenantId "<your-tenant-id>" -SubscriptionId "<your-subscription-id>"
 # -----------------------------------------------------------------------------
 # Notes:
 #   - Requires Azure PowerShell modules (Az.Accounts, Az.Resources, etc.)
@@ -13,9 +13,9 @@ param(
 	[string]$EeIdInstanceUrl,
 	[string]$TenantId,
 	[string]$SubscriptionId,
-	[string]$WebAppRegistrationName = "web-semker-dev",
+	[string]$WebAppRegistrationName = "web-semker-deleteme",
 	[string]$WebProjectPath = "../../src/Presentation.Blazor",
-	[string]$ApiAppRegistrationName = "api-semker-dev",
+	[string]$ApiAppRegistrationName = "api-semker-deleteme",
 	[string]$ApiProjectPath = "../../src/Presentation.WebApi",
 	[string]$DotNetVersion = "10",
 	[string]$WebRedirectUri = "https://localhost:7175/signin-oidc",
@@ -123,14 +123,18 @@ if (-not $apiApp) {
 }
 
 # Step 4: Write API EEID values to $ApiProjectPath via dotnet user-secrets
-Write-Host "Setting EntraExternalId values for $ApiProjectPath"
-Push-Location $ApiProjectPath
-dotnet user-secrets init
-dotnet user-secrets set "EntraExternalId:Instance" $EeIdInstanceUrl
-dotnet user-secrets set "EntraExternalId:TenantId" $TenantId
-dotnet user-secrets set "EntraExternalId:ClientId" $apiApp.appId
-dotnet user-secrets set "EntraExternalId:ValidateAuthority" "true"
-Pop-Location
+if (Test-Path $ApiProjectPath) {
+	Write-Host "Setting EntraExternalId values for $ApiProjectPath"
+	Push-Location $ApiProjectPath
+	dotnet user-secrets init
+	dotnet user-secrets set "EntraExternalId:Instance" $EeIdInstanceUrl
+	dotnet user-secrets set "EntraExternalId:TenantId" $TenantId
+	dotnet user-secrets set "EntraExternalId:ClientId" $apiApp.appId
+	dotnet user-secrets set "EntraExternalId:ValidateAuthority" "true"
+	Pop-Location
+} else {
+	Write-Warning "*** CRITICAL: API project path '$ApiProjectPath' not found. Skipping dotnet user-secrets for API. App registrations will continue, but user-secrets are NOT set. ***"
+}
 
 # Step 5: Check for Web app registration by name; create if missing
 Write-Host "Checking for Web app registration: $WebAppRegistrationName..."
@@ -182,12 +186,16 @@ if (-not $webApp) {
 }
 
 # Step 6: Write Web EEID values to $WebProjectPath via dotnet user-secrets
-Write-Host "Setting EntraExternalId values for $WebProjectPath"
-Push-Location $WebProjectPath
-dotnet user-secrets init
-dotnet user-secrets set "EntraExternalId:Instance" $EeIdInstanceUrl
-dotnet user-secrets set "EntraExternalId:TenantId" $TenantId
-dotnet user-secrets set "EntraExternalId:ClientId" $webApp.appId
-dotnet user-secrets set "EntraExternalId:ValidateAuthority" "true"
-dotnet user-secrets set "EntraExternalId:ClientSecret" $webSecret
-Pop-Location
+if (Test-Path $WebProjectPath) {
+	Write-Host "Setting EntraExternalId values for $WebProjectPath"
+	Push-Location $WebProjectPath
+	dotnet user-secrets init
+	dotnet user-secrets set "EntraExternalId:Instance" $EeIdInstanceUrl
+	dotnet user-secrets set "EntraExternalId:TenantId" $TenantId
+	dotnet user-secrets set "EntraExternalId:ClientId" $webApp.appId
+	dotnet user-secrets set "EntraExternalId:ValidateAuthority" "true"
+	dotnet user-secrets set "EntraExternalId:ClientSecret" $webSecret
+	Pop-Location
+} else {
+	Write-Warning "*** CRITICAL: Web project path '$WebProjectPath' not found. Skipping dotnet user-secrets for Web. App registrations will continue, but user-secrets are NOT set. ***"
+}
