@@ -1,19 +1,62 @@
 targetScope='resourceGroup'
 
-// Common
-param location string = resourceGroup().location
-param tags object 
-param environmentApp string 
+@description('The Azure region where resources will be deployed. Only US regions are allowed.')
+@allowed([
+  'eastus'
+  'eastus2'
+  'centralus'
+  'northcentralus'
+  'southcentralus'
+  'westus'
+  'westus2'
+  'westus3'
+  'westcentralus'
+])
+param location string = 'eastus'
+
+@description('Resource tags to be applied to all resources.')
+param tags object
+
+@description('Environment name for the application.')
+@minLength(1)
+@maxLength(40)
+param environmentApp string
+
+@description('The subscription ID for the spoke management resource group.')
+@minLength(1)
+@maxLength(64)
 param spokeMgmtSubscriptionId string = subscription().subscriptionId
+
+@description('The resource group name for spoke management.')
+@minLength(1)
+@maxLength(90)
 param spokeMgmtResourceGroupName string
-// Azure Monitor
-param appiName string 
-// Storage Account
-param stName string 
-param stSku string 
-// function
+
+@description('Specifies the name of the Application Insights resource.')
+@minLength(1)
+@maxLength(60)
+param appiName string
+
+@description('Name of the Storage Account.')
+@minLength(3)
+@maxLength(24)
+param stName string
+
+@description('SKU for the Storage Account.')
+@allowed(['Standard_LRS', 'Standard_GRS', 'Standard_RAGRS', 'Standard_ZRS', 'Premium_LRS'])
+param stSku string = 'Standard_LRS'
+
+@description('Name of the Function App.')
+@minLength(1)
+@maxLength(60)
 param funcName string
+
+@description('Name of the App Service Plan.')
+@minLength(1)
+@maxLength(40)
 param planName string
+
+@description('Enable Always On for the Function App.')
 param alwaysOn bool = false
 
 resource appiResource 'Microsoft.Insights/components@2020-02-02' existing = {
