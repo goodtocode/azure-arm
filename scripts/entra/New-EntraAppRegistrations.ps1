@@ -46,18 +46,29 @@ foreach ($module in $modules) {
 }
 
 # Step 2: Login to Azure and set EEID tenant
-Write-Host "Logging into Azure..."
-Connect-AzAccount -Tenant $TenantId | Out-Null
-Write-Host "Logged in to Azure tenant $TenantId."
+Write-Host "Checking Azure authentication..."
+$azContext = Get-AzContext -ErrorAction SilentlyContinue
+if ($azContext -and $azContext.Tenant.Id -eq $TenantId) {
+	Write-Host "Already authenticated to Azure tenant $TenantId."
+} else {
+	Write-Host "Logging into Azure..."
+	Connect-AzAccount -Tenant $TenantId | Out-Null
+	Write-Host "Logged in to Azure tenant $TenantId."
+}
 
 # Ensure Microsoft Graph is authenticated
+$mgContext = $null
 try {
-	Get-MgUser -Top 1 -ErrorAction Stop | Out-Null
-} catch {
-	Write-Host "Connecting to Microsoft Graph..."
-	Connect-MgGraph -TenantId $TenantId -Scopes "Application.ReadWrite.All","Directory.ReadWrite.All" | Out-Null
+	$mgContext = Get-MgContext -ErrorAction Stop
+} catch {}
+if ($mgContext -and $mgContext.TenantId -eq $TenantId -and $mgContext.Account) {
+	Write-Host "Already authenticated to Microsoft Graph for tenant $TenantId."
+} else {
 	try {
-		Get-MgUser -Top 1 -ErrorAction Stop | Out-Null
+		Write-Host "Connecting to Microsoft Graph..."
+		Connect-MgGraph -TenantId $TenantId -Scopes "Application.ReadWrite.All","Directory.ReadWrite.All" | Out-Null
+		$mgContext = Get-MgContext -ErrorAction Stop
+		Write-Host "Connected to Microsoft Graph for tenant $TenantId."
 	} catch {
 		Write-Error "FATAL: Microsoft Graph authentication failed. Exiting script."
 		exit 1
@@ -120,7 +131,7 @@ if (-not $webApp) {
 	Write-Host "Created Web app registration with appId: $webAppId"
 	# Create client secret
 	try {
-		$webSecretObj = Add-MgApplicationPassword -ApplicationId $webApp.Id -DisplayName "$WebAppRegistrationName-$(Get-Date -Format yyyy)" -EndDateTime (Get-Date).AddYears(2)
+		$webSecretObj = Add-MgApplicationPassword -ApplicationId $webApp.Id -EndDateTime (Get-Date).AddYears(2)
 	} catch {
 		Write-Error "FATAL: Failed to create client secret for Web app registration. $_.Exception.Message"
 		exit 1
