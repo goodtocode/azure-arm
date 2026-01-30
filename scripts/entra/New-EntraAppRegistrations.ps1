@@ -131,7 +131,8 @@ if (-not $webApp) {
 	Write-Host "Created Web app registration with appId: $webAppId"
 	# Create client secret
 	try {
-		$webSecretObj = Add-MgApplicationPassword -ApplicationId $webApp.Id -EndDateTime (Get-Date).AddYears(2)
+		$passwordCredential = @{ EndDateTime = (Get-Date).AddYears(2) }
+		$webSecretObj = Add-MgApplicationPassword -ApplicationId $webApp.Id -PasswordCredential $passwordCredential
 	} catch {
 		Write-Error "FATAL: Failed to create client secret for Web app registration. $_.Exception.Message"
 		exit 1

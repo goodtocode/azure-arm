@@ -71,8 +71,11 @@ if (-not $app) {
 }
 
 # Create new client secret
+
+# Create password credential object for secret expiration
 $endDate = (Get-Date).AddMonths($SecretMonths)
-$secretObj = Add-MgApplicationPassword -ApplicationId $app.Id -EndDateTime $endDate
+$passwordCredential = @{ EndDateTime = $endDate }
+$secretObj = Add-MgApplicationPassword -ApplicationId $app.Id -PasswordCredential $passwordCredential
 if (-not $secretObj -or -not $secretObj.SecretText) {
     Write-Error "FATAL: Failed to create client secret."
     exit 1
