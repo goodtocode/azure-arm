@@ -1,4 +1,3 @@
-
 @description('The name of the App Service Web App. Must be 1-60 characters, using only alphanumeric characters and hyphens.')
 @minLength(1)
 @maxLength(60)
@@ -41,26 +40,36 @@ param planId string
 ])
 param kind string = 'app'
 
-@description('The .NET version for the Web App. Allowed values: v4.8, v6.0, v7.0, v8.0, v9.0. Default is v8.0.')
+@description('The .NET version for the Web App. Allowed values: v4.8 (for .NET Framework), 6.0, 7.0, 8.0, 9.0, 10.0 (for .NET). Default is 10.0.')
 @allowed([
   'v4.8'
-  'v6.0'
-  'v7.0'
-  'v8.0'
-  'v9.0'
-  'v10.0'
+  '6.0'
+  '7.0'
+  '8.0'
+  '9.0'
+  '10.0' 
 ])
-param dotnetVersion string = 'v10.0'
+param dotnetVersion string = '10.0'
+
+@description('Enable Always On for the App Service')
+param alwaysOn bool = false
+
+@description('Enable WebSockets for the App Service')
+param websockets bool = true
 
 resource webAppResource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
   location: location
-  kind: kind
-  tags: empty(tags) ? null : tags
-  properties: {
+  kind: kind  
+  tags: empty(tags) ? null : tags  
+  properties: {    
     serverFarmId: planId
+    httpsOnly: true
     siteConfig: {
       netFrameworkVersion: dotnetVersion
+      ftpsState: 'Disabled'
+      webSocketsEnabled: websockets
+      alwaysOn: alwaysOn
       appSettings: [
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
