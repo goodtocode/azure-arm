@@ -67,11 +67,17 @@ Write-Host "Checking for API app registration: $ApiAppRegistrationName..."
 $apiApp = az ad app list --display-name $ApiAppRegistrationName --query "[0]" -o json | ConvertFrom-Json
 if (-not $apiApp) {
 	Write-Host "API app registration not found. Creating..."
+	$requiredResourceAccess = @(
+		@{ 
+			resourceAppId = "00000003-0000-0000-c000-000000000000";
+			resourceAccess = @(@{ id = "e1fe6dd8-ba31-4d61-89e7-88639da4683d"; type = "Scope" })
+		}
+	) | ConvertTo-Json -Compress
 	$apiApp = az ad app create `
 		--display-name $ApiAppRegistrationName `
 		--sign-in-audience AzureADMyOrg `
 		--identifier-uris "api://$ApiAppRegistrationName" `
-		--required-resource-access '[{"resourceAppId":"00000003-0000-0000-c000-000000000000","resourceAccess":[{"id":"e1fe6dd8-ba31-4d61-89e7-88639da4683d","type":"Scope"}]}]' `
+		--required-resource-access $requiredResourceAccess `
 		--api-access-token-version 2 `
 		--query "appId" -o tsv
 	$apiAppId = $apiApp
@@ -153,11 +159,22 @@ if (-not $webApp) {
 	$webAppId = $webApp
 	Write-Host "Created Web app registration with appId: $webAppId"
 	# Add app role
-	az ad app update --id $webAppId --app-roles '[{"allowedMemberTypes":["User"],"description":"Admins have the ability to alter root setups that affect all tenants","displayName":"Multi-tenant Admins","isEnabled":true,"origin":"Application","value":"admin"}]'
+	$webAppRoles = @(
+		@{
+			allowedMemberTypes = @("User")
+			description = "Admins have the ability to alter root setups that affect all tenants"
+			displayName = "Multi-tenant Admins"
+			isEnabled = $true
+			origin = "Application"
+			value = "admin"
+		}
+	) | ConvertTo-Json -Compress
+	az ad app update --id $webAppId --app-roles $webAppRoles
 	# Add optional claims for idToken
 	$claims = @("ctry","email","upn","ipaddr","family_name","given_name","preferred_username")
 	foreach ($claim in $claims) {
-		az ad app update --id $webAppId --optional-claims-id-token "[{\"name\":\"$claim\",\"essential\":false}]"
+		$claimObj = @(@{ name = $claim; essential = $false }) | ConvertTo-Json -Compress
+		az ad app update --id $webAppId --optional-claims-id-token $claimObj
 	}
 	# Create client secret
 	$webSecret = az ad app credential reset --id $webAppId --display-name "$WebAppRegistrationName-$(Get-Date -Format yyyy)" --years 2 --query "secretText" -o tsv
