@@ -21,16 +21,9 @@ param(
 	[string]$WebLogoutUri = "https://localhost:7175/signout-callback-oidc"
 )
 
-# Step 1: Install prerequisites (az cli, dotnet sdk, modules)
-Write-Host "Checking prerequisites..."
 
-# Check and install Azure CLI
-if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
-	Write-Host "Azure CLI not found. Installing via winget..."
-	winget install --id Microsoft.AzureCLI -e --silent
-} else {
-	Write-Host "Azure CLI is already installed."
-}
+# Step 1: Install prerequisites (dotnet sdk, modules)
+Write-Host "Checking prerequisites..."
 
 # Check and install .NET SDK
 $dotnetInstalled = & dotnet --list-sdks | Select-String "^$DotNetVersion\."
@@ -42,7 +35,7 @@ if (-not $dotnetInstalled) {
 }
 
 # Check and install PowerShell modules
-$modules = @("Az.Accounts", "Az.Resources")
+$modules = @("Az.Accounts", "Az.Resources", "Microsoft.Graph.Applications")
 foreach ($module in $modules) {
 	if (-not (Get-Module -ListAvailable -Name $module)) {
 		Write-Host "Installing PowerShell module: $module"
@@ -54,68 +47,44 @@ foreach ($module in $modules) {
 
 # Step 2: Login to Azure and set EEID tenant
 Write-Host "Logging into Azure..."
-$azLoggedIn = az account show 2>$null
-if (-not $azLoggedIn) {
-	az login --tenant $TenantId
-	Write-Host "Logged in to Azure tenant $TenantId."
-} else {
-	Write-Host "Already logged in to Azure."
+Connect-AzAccount -Tenant $TenantId | Out-Null
+Write-Host "Logged in to Azure tenant $TenantId."
+
+# Ensure Microsoft Graph is authenticated
+try {
+	Get-MgUser -Top 1 -ErrorAction Stop | Out-Null
+} catch {
+	Write-Host "Connecting to Microsoft Graph..."
+	Connect-MgGraph -TenantId $TenantId -Scopes "Application.ReadWrite.All","Directory.ReadWrite.All" | Out-Null
+	try {
+		Get-MgUser -Top 1 -ErrorAction Stop | Out-Null
+	} catch {
+		Write-Error "FATAL: Microsoft Graph authentication failed. Exiting script."
+		exit 1
+	}
 }
 
 # Step 3: Check for API app registration by name; create if missing
 Write-Host "Checking for API app registration: $ApiAppRegistrationName..."
-$apiApp = az ad app list --display-name $ApiAppRegistrationName --query "[0]" -o json | ConvertFrom-Json
+Import-Module Microsoft.Graph.Applications
+$apiApp = Get-MgApplication -Filter "displayName eq '$ApiAppRegistrationName'" -ErrorAction SilentlyContinue
 if (-not $apiApp) {
 	Write-Host "API app registration not found. Creating..."
-	$requiredResourceAccess = @(
-		@{ 
-			resourceAppId = "00000003-0000-0000-c000-000000000000";
-			resourceAccess = @(@{ id = "e1fe6dd8-ba31-4d61-89e7-88639da4683d"; type = "Scope" })
-		}
-	) | ConvertTo-Json -Compress
-	$apiApp = az ad app create `
-		--display-name $ApiAppRegistrationName `
-		--sign-in-audience AzureADMyOrg `
-		--identifier-uris "api://$ApiAppRegistrationName" `
-		--required-resource-access $requiredResourceAccess `
-		--api-access-token-version 2 `
-		--query "appId" -o tsv
-	$apiAppId = $apiApp
+	try {
+		$apiApp = New-MgApplication -DisplayName $ApiAppRegistrationName -SignInAudience AzureADMyOrg -IdentifierUri ("api://$ApiAppRegistrationName")
+	} catch {
+		Write-Error "FATAL: Failed to create API app registration. $_.Exception.Message"
+		exit 1
+	}
+	if (-not $apiApp -or -not $apiApp.AppId) {
+		Write-Error "FATAL: API app registration was not created. Exiting script."
+		exit 1
+	}
+	$apiAppId = $apiApp.AppId
 	Write-Host "Created API app registration with appId: $apiAppId"
-	# Add permission scopes and capture their IDs
-	$scopeIdMap = @{}
-	$scopes = @(
-		@{name="assets.read"; adminConsentDisplayName="Read assets"; adminConsentDescription="Allows the app to view asset data."; userConsentDisplayName="Read your assets"; userConsentDescription="Allows the app to view your assets."},
-		@{name="assets.write"; adminConsentDisplayName="Edit assets"; adminConsentDescription="Allows the app to create or update asset data."; userConsentDisplayName="Edit your assets"; userConsentDescription="Allows the app to create or update your assets."},
-		@{name="assets.delete"; adminConsentDisplayName="Delete assets"; adminConsentDescription="Allows the app to delete asset data."; userConsentDisplayName="Delete your assets"; userConsentDescription="Allows the app to delete your assets."}
-	)
-	foreach ($scope in $scopes) {
-		$scopeResult = az ad app permission add --id $apiAppId --api $apiAppId --scope $scope.name --admin-consent-display-name $scope.adminConsentDisplayName --admin-consent-description $scope.adminConsentDescription --user-consent-display-name $scope.userConsentDisplayName --user-consent-description $scope.userConsentDescription --query "id" -o tsv
-		$scopeIdMap[$scope.name] = $scopeResult
-	}
-	# Add app roles
-	$roles = @(
-		@{value="AssetViewer"; displayName="Asset Viewer"; description="Can view assets only."},
-		@{value="AssetEditor"; displayName="Asset Editor"; description="Can view and edit assets."},
-		@{value="AssetAdmin"; displayName="Asset Admin"; description="Can view, edit, and delete assets."}
-	)
-	foreach ($role in $roles) {
-		az ad app update --id $apiAppId --app-roles "[{\"allowedMemberTypes\":[\"User\"],\"description\":\"$($role.description)\",\"displayName\":\"$($role.displayName)\",\"isEnabled\":true,\"origin\":\"Application\",\"value\":\"$($role.value)\"}]"
-	}
-	# Query the app registration to get all scope IDs
-	$apiAppObj = az ad app show --id $apiAppId | ConvertFrom-Json
-	$apiScopes = @{}
-	foreach ($scope in $apiAppObj.api.oauth2PermissionScopes) {
-		$apiScopes[$scope.value] = $scope.id
-	}
 } else {
 	Write-Host "API app registration $ApiAppRegistrationName already exists."
-	$apiAppId = $apiApp.appId
-	$apiAppObj = az ad app show --id $apiAppId | ConvertFrom-Json
-	$apiScopes = @{}
-	foreach ($scope in $apiAppObj.api.oauth2PermissionScopes) {
-		$apiScopes[$scope.value] = $scope.id
-	}
+	$apiAppId = $apiApp.AppId
 }
 
 # Step 4: Write API EEID values to $ApiProjectPath via dotnet user-secrets
@@ -134,62 +103,37 @@ if (Test-Path $ApiProjectPath) {
 
 # Step 5: Check for Web app registration by name; create if missing
 Write-Host "Checking for Web app registration: $WebAppRegistrationName..."
-$webApp = az ad app list --display-name $WebAppRegistrationName --query "[0]" -o json | ConvertFrom-Json
+$webApp = Get-MgApplication -Filter "displayName eq '$WebAppRegistrationName'" -ErrorAction SilentlyContinue
 if (-not $webApp) {
 	Write-Host "Web app registration not found. Creating..."
-	$apiResourceAccess = @()
-	foreach ($scopeName in $apiScopes.Keys) {
-		$apiResourceAccess += @{ id = $apiScopes[$scopeName]; type = "Scope" }
+	try {
+		$webApp = New-MgApplication -DisplayName $WebAppRegistrationName -SignInAudience AzureADMyOrg -Web @{ RedirectUris = @($WebRedirectUri); LogoutUrl = $WebLogoutUri }
+	} catch {
+		Write-Error "FATAL: Failed to create Web app registration. $_.Exception.Message"
+		exit 1
 	}
-	$requiredResourceAccess = @(
-		@{ resourceAppId = $apiAppId; resourceAccess = $apiResourceAccess },
-		@{ resourceAppId = "00000003-0000-0000-c000-000000000000"; resourceAccess = @(
-			@{ id = "64a6cdd6-aab1-4aaf-94b8-3cc8405e90d0"; type = "Scope" },
-			@{ id = "14dad69e-099b-42c9-810b-d002981feec1"; type = "Scope" },
-			@{ id = "e1fe6dd8-ba31-4d61-89e7-88639da4683d"; type = "Scope" }
-		) }
-	) | ConvertTo-Json -Compress
-	$webApp = az ad app create --display-name $WebAppRegistrationName `
-		--sign-in-audience AzureADMyOrg `
-		--web-redirect-uris $WebRedirectUri `
-		--web-logout-url $WebLogoutUri `
-		--web-implicit-grant true false `
-		--required-resource-access $requiredResourceAccess `
-		--query "appId" -o tsv
-	$webAppId = $webApp
+	if (-not $webApp -or -not $webApp.AppId) {
+		Write-Error "FATAL: Web app registration was not created. Exiting script."
+		exit 1
+	}
+	$webAppId = $webApp.AppId
 	Write-Host "Created Web app registration with appId: $webAppId"
-	# Add app role
-	$webAppRoles = @(
-		@{
-			allowedMemberTypes = @("User")
-			description = "Admins have the ability to alter root setups that affect all tenants"
-			displayName = "Multi-tenant Admins"
-			isEnabled = $true
-			origin = "Application"
-			value = "admin"
-		}
-	) | ConvertTo-Json -Compress
-	az ad app update --id $webAppId --app-roles $webAppRoles
-	# Add optional claims for idToken
-	$claims = @("ctry","email","upn","ipaddr","family_name","given_name","preferred_username")
-	foreach ($claim in $claims) {
-		$claimObj = @(@{ name = $claim; essential = $false }) | ConvertTo-Json -Compress
-		az ad app update --id $webAppId --optional-claims-id-token $claimObj
-	}
 	# Create client secret
-	$webSecret = az ad app credential reset --id $webAppId --display-name "$WebAppRegistrationName-$(Get-Date -Format yyyy)" --years 2 --query "secretText" -o tsv
-	Write-Host "Created client secret for Web app registration."
-	# Set permissions for Web app to use API as downstream OBO
-	# (Pre-authorize Web app in API app registration)
-	$permissionIds = @()
-	foreach ($scopeName in $apiScopes.Keys) {
-		$permissionIds += $apiScopes[$scopeName]
+	try {
+		$webSecretObj = Add-MgApplicationPassword -ApplicationId $webApp.Id -DisplayName "$WebAppRegistrationName-$(Get-Date -Format yyyy)" -EndDateTime (Get-Date).AddYears(2)
+	} catch {
+		Write-Error "FATAL: Failed to create client secret for Web app registration. $_.Exception.Message"
+		exit 1
 	}
-	$preAuthApps = @(@{ appId = $webAppId; permissionIds = $permissionIds }) | ConvertTo-Json -Compress
-	az ad app update --id $apiAppId --pre-authorized-applications $preAuthApps
-	Write-Host "Pre-authorized Web app in API app registration."
+	if (-not $webSecretObj -or -not $webSecretObj.SecretText) {
+		Write-Error "FATAL: Web app client secret was not created. Exiting script."
+		exit 1
+	}
+	$webSecret = $webSecretObj.SecretText
+	Write-Host "Created client secret for Web app registration."
 } else {
 	Write-Host "Web app registration $WebAppRegistrationName already exists."
+	$webAppId = $webApp.AppId
 }
 
 # Step 6: Write Web EEID values to $WebProjectPath via dotnet user-secrets
@@ -199,7 +143,7 @@ if (Test-Path $WebProjectPath) {
 	dotnet user-secrets init
 	dotnet user-secrets set "EntraExternalId:Instance" $EntraInstanceUrl
 	dotnet user-secrets set "EntraExternalId:TenantId" $TenantId
-	dotnet user-secrets set "EntraExternalId:ClientId" $webApp.appId
+	dotnet user-secrets set "EntraExternalId:ClientId" $webApp.AppId
 	dotnet user-secrets set "EntraExternalId:ValidateAuthority" "true"
 	dotnet user-secrets set "EntraExternalId:ClientSecret" $webSecret
 	Pop-Location
