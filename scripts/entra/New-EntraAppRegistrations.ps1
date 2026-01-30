@@ -3,16 +3,15 @@
 # Description:   Creates new Entra External ID App Registrations.
 # -----------------------------------------------------------------------------
 # Example CLI Usage:
-#   pwsh -File ./New-EeidAppRegistrations.ps1 -EeIdInstanceUrl "<your-eeid-instance-url>" -TenantId "<your-tenant-id>" -SubscriptionId "<your-subscription-id>"
+#   pwsh -File ./New-EntraAppRegistrations.ps1 -EntraInstanceUrl "<your-eeid-instance-url>" -TenantId "<your-tenant-id>"
 # -----------------------------------------------------------------------------
 # Notes:
 #   - Requires Azure PowerShell modules (Az.Accounts, Az.Resources, etc.)
 #   - Ensure you are authenticated: Connect-AzAccount
 # ============================================================================
 param(
-	[string]$EeIdInstanceUrl,
+	[string]$EntraInstanceUrl,
 	[string]$TenantId,
-	[string]$SubscriptionId,
 	[string]$WebAppRegistrationName = "web-semker-deleteme",
 	[string]$WebProjectPath = "../../src/Presentation.Blazor",
 	[string]$ApiAppRegistrationName = "api-semker-deleteme",
@@ -53,7 +52,7 @@ foreach ($module in $modules) {
 	}
 }
 
-# Step 2: Login to Azure and set EEID tenant/subscription
+# Step 2: Login to Azure and set EEID tenant
 Write-Host "Logging into Azure..."
 $azLoggedIn = az account show 2>$null
 if (-not $azLoggedIn) {
@@ -61,15 +60,6 @@ if (-not $azLoggedIn) {
 	Write-Host "Logged in to Azure tenant $TenantId."
 } else {
 	Write-Host "Already logged in to Azure."
-}
-
-Write-Host "Setting Azure subscription..."
-$currentSub = az account show --query id -o tsv
-if ($currentSub -ne $SubscriptionId) {
-	az account set --subscription $SubscriptionId
-	Write-Host "Azure subscription set to $SubscriptionId."
-} else {
-	Write-Host "Azure subscription already set to $SubscriptionId."
 }
 
 # Step 3: Check for API app registration by name; create if missing
@@ -127,7 +117,7 @@ if (Test-Path $ApiProjectPath) {
 	Write-Host "Setting EntraExternalId values for $ApiProjectPath"
 	Push-Location $ApiProjectPath
 	dotnet user-secrets init
-	dotnet user-secrets set "EntraExternalId:Instance" $EeIdInstanceUrl
+	dotnet user-secrets set "EntraExternalId:Instance" $EntraInstanceUrl
 	dotnet user-secrets set "EntraExternalId:TenantId" $TenantId
 	dotnet user-secrets set "EntraExternalId:ClientId" $apiApp.appId
 	dotnet user-secrets set "EntraExternalId:ValidateAuthority" "true"
@@ -190,7 +180,7 @@ if (Test-Path $WebProjectPath) {
 	Write-Host "Setting EntraExternalId values for $WebProjectPath"
 	Push-Location $WebProjectPath
 	dotnet user-secrets init
-	dotnet user-secrets set "EntraExternalId:Instance" $EeIdInstanceUrl
+	dotnet user-secrets set "EntraExternalId:Instance" $EntraInstanceUrl
 	dotnet user-secrets set "EntraExternalId:TenantId" $TenantId
 	dotnet user-secrets set "EntraExternalId:ClientId" $webApp.appId
 	dotnet user-secrets set "EntraExternalId:ValidateAuthority" "true"
