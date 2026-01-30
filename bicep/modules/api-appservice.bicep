@@ -52,6 +52,9 @@ param kind string = 'app'
 ])
 param dotnetVersion string = '10.0'
 
+@description('Enable Always On for the App Service')
+param alwaysOn bool = false
+
 resource apiAppResource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
   location: location
@@ -63,6 +66,7 @@ resource apiAppResource 'Microsoft.Web/sites@2023-12-01' = {
     siteConfig: {
       netFrameworkVersion: dotnetVersion
       ftpsState: 'Disabled'
+      alwaysOn: alwaysOn
       appSettings: [
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'

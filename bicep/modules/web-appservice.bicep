@@ -1,4 +1,3 @@
-
 @description('The name of the App Service Web App. Must be 1-60 characters, using only alphanumeric characters and hyphens.')
 @minLength(1)
 @maxLength(60)
@@ -52,17 +51,25 @@ param kind string = 'app'
 ])
 param dotnetVersion string = '10.0'
 
+@description('Enable Always On for the App Service')
+param alwaysOn bool = false
+
+@description('Enable WebSockets for the App Service')
+param websockets bool = true
+
 resource webAppResource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
   location: location
-  kind: kind
-  tags: empty(tags) ? null : tags
-  properties: {
+  kind: kind  
+  tags: empty(tags) ? null : tags  
+  properties: {    
     serverFarmId: planId
     httpsOnly: true
     siteConfig: {
       netFrameworkVersion: dotnetVersion
       ftpsState: 'Disabled'
+      webSocketsEnabled: websockets
+      alwaysOn: alwaysOn
       appSettings: [
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
