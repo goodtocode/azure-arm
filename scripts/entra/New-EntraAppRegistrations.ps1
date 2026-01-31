@@ -87,8 +87,21 @@ function New-ApiRegistration {
     # Ensure we have the latest application object (for ObjectId)
     $apiApp = Get-MgApplication -ApplicationId $apiApp.AppId
 
-    # Get the service principal for completeness
-    $apiSp = Get-MgServicePrincipal -Filter "appId eq '$($apiApp.AppId)'" | Select-Object -First 1
+	# Grant admin consent for Microsoft Graph User.Read to the API app registration
+	$apiSp = Get-MgServicePrincipal -Filter "appId eq '$($apiApp.AppId)'" | Select-Object -First 1
+	if ($apiSp) {
+		$userReadPerm = $msGraphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq "User.Read" }
+		if ($userReadPerm) {
+			try {
+				# Grant admin consent for the permission
+				New-MgServicePrincipalOauth2PermissionGrant -ClientId $apiSp.Id -ConsentType AllPrincipals -ResourceId $msGraphSp.Id -Scope "User.Read"
+				Write-Host "Admin consent granted for User.Read to API app registration."
+			}
+			catch {
+				Write-Error "Failed to grant admin consent: $_"
+			}
+		}
+	}
 
     return [PSCustomObject]@{
         App      = $apiApp
