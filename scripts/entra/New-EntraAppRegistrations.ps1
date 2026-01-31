@@ -21,32 +21,6 @@ param(
 	[string]$WebLogoutUri = "https://localhost:7175/signout-callback-oidc"
 )
 
-function Wait-ForApplicationPropagation {
-	param(
-		[string]$AppId,
-		[string]$ObjectId = $null,
-		[int]$MaxRetries = 10,
-		[int]$DelaySeconds = 2
-	)
-	$retryCount = 0
-	$app = $null
-	do {
-		Start-Sleep -Seconds $DelaySeconds
-		if ($ObjectId) {
-			$app = Get-MgApplication -ApplicationId $ObjectId -ErrorAction SilentlyContinue
-		}
-		if (-not $app -and $AppId) {
-			$app = Get-MgApplication -Filter "appId eq '$AppId'" -ErrorAction SilentlyContinue
-		}
-		$retryCount++
-	} while (-not $app -and $retryCount -lt $MaxRetries)
-	if (-not $app) {
-		Write-Error "FATAL: Application $AppId was not found after creation and waiting. Exiting script."
-		exit 1
-	}
-	return $app
-}
-
 function New-ApiRegistration {
 	param(
 		[string]$ApiAppRegistrationName,
@@ -120,11 +94,13 @@ function New-ApiRegistration {
 		Start-Sleep -Seconds 5
 	}
 	if ($apiSp) {
-		$userReadPerm = $msGraphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq "User.Read" }
-		if ($userReadPerm) {
-			Write-Host "To grant admin consent for API app registration, run:"
-			Write-Host "az ad app permission admin-consent --id $($apiApp.AppId)"
-		}
+		$portalConsentUrl = "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Permissions/appId/$($apiApp.AppId)/isMSAApp~/false"
+		Write-Host ""
+		Write-Host "ACTION REQUIRED: Grant admin consent for API app permissions in the Azure Portal:" -ForegroundColor Yellow
+		Write-Host "Open the following URL in your browser:" -ForegroundColor Yellow
+		Write-Host $portalConsentUrl -ForegroundColor Cyan
+		Write-Host "Then click 'Grant admin consent for ...' in the API permissions blade." -ForegroundColor Yellow
+		Write-Host ""
 	}
 
 	return [PSCustomObject]@{
@@ -248,8 +224,13 @@ function New-WebRegistration {
 		Start-Sleep -Seconds 5
 	}
 	if ($webSp) {
-		Write-Host "To grant admin consent for Web app registration, run:"
-		Write-Host "az ad app permission admin-consent --id $($webApp.AppId)"
+		$portalConsentUrl = "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Permissions/appId/$($webApp.AppId)/isMSAApp~/false"
+		Write-Host ""
+		Write-Host "ACTION REQUIRED: Grant admin consent for Web app permissions in the Azure Portal:" -ForegroundColor Yellow
+		Write-Host "Open the following URL in your browser:" -ForegroundColor Yellow
+		Write-Host $portalConsentUrl -ForegroundColor Cyan
+		Write-Host "Then click 'Grant admin consent for ...' in the API permissions blade." -ForegroundColor Yellow
+		Write-Host ""
 	}
 
 	$optionalClaims = @{
@@ -368,6 +349,32 @@ function Set-ProjectUserSecrets {
 	else {
 		Write-Warning "*** CRITICAL: Project path '$ProjectPath' not found. Skipping dotnet user-secrets. App registrations will continue, but user-secrets are NOT set. ***"
 	}
+}
+
+function Wait-ForApplicationPropagation {
+	param(
+		[string]$AppId,
+		[string]$ObjectId = $null,
+		[int]$MaxRetries = 10,
+		[int]$DelaySeconds = 2
+	)
+	$retryCount = 0
+	$app = $null
+	do {
+		Start-Sleep -Seconds $DelaySeconds
+		if ($ObjectId) {
+			$app = Get-MgApplication -ApplicationId $ObjectId -ErrorAction SilentlyContinue
+		}
+		if (-not $app -and $AppId) {
+			$app = Get-MgApplication -Filter "appId eq '$AppId'" -ErrorAction SilentlyContinue
+		}
+		$retryCount++
+	} while (-not $app -and $retryCount -lt $MaxRetries)
+	if (-not $app) {
+		Write-Error "FATAL: Application $AppId was not found after creation and waiting. Exiting script."
+		exit 1
+	}
+	return $app
 }
 
 function Write-OutputSummary {
