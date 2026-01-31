@@ -143,8 +143,10 @@ function New-WebRegistration {
 			Write-Error "FATAL: Web app registration was not created. Exiting script."
 			exit 1
 		}
-		$webAppId = $webApp.AppId
-		Write-Host "Created Web app registration with appId: $webAppId"
+		Write-Host "Created Web app registration with appId: $($webApp.AppId)"
+
+		Update-MgApplication -ApplicationId $webApp.Id -Web @{ ImplicitGrantSettings = @{ EnableIdTokenIssuance = $false; EnableAccessTokenIssuance = $true } }
+		Write-Host "Enabled access token issuance for implicit/hybrid flows in Web app registration."
 
 		$webAppRoles = @(
 			@{
