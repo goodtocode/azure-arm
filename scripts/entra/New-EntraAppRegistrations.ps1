@@ -173,6 +173,17 @@ function New-WebRegistration {
         }
         $permScopes += @{ Id = $scope.Id; Type = "Scope" }
     }
+    $webSp = Get-MgServicePrincipal -Filter "appId eq '$($webApp.AppId)'" | Select-Object -First 1
+    if ($webSp) {
+        $scopesToGrant = $delegatedPerms -join " "
+        try {
+            New-MgServicePrincipalOauth2PermissionGrant -ClientId $webSp.Id -ConsentType AllPrincipals -ResourceId $msGraphSp.Id -Scope $scopesToGrant
+            Write-Host "Admin consent granted for $scopesToGrant to Web app registration."
+        }
+        catch {
+            Write-Error "Failed to grant admin consent to Web app: $_"
+        }
+    }
     $webAppReqPerms = @{
         ResourceAppId  = $msGraphSp.AppId
         ResourceAccess = $permScopes
