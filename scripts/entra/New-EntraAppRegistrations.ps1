@@ -12,14 +12,34 @@
 param(
 	[string]$EntraInstanceUrl,
 	[string]$TenantId,
-	[string]$WebAppRegistrationName = "semker-deleteme2-web",
+	[string]$WebAppRegistrationName = "semker-deleteme3-web",
 	[string]$WebProjectPath = "../../src/Presentation.Blazor",
-	[string]$ApiAppRegistrationName = "semker-deleteme2-api",
+	[string]$ApiAppRegistrationName = "semker-deleteme3-api",
 	[string]$ApiProjectPath = "../../src/Presentation.WebApi",
 	[string]$DotNetVersion = "10",
 	[string]$WebRedirectUri = "https://localhost:7175/signin-oidc",
 	[string]$WebLogoutUri = "https://localhost:7175/signout-callback-oidc"
 )
+
+function Wait-ForApplicationPropagation {
+    param(
+        [string]$AppId,
+        [int]$MaxRetries = 10,
+        [int]$DelaySeconds = 2
+    )
+    $retryCount = 0
+    $app = $null
+    do {
+        Start-Sleep -Seconds $DelaySeconds
+        $app = Get-MgApplication -ApplicationId $AppId -ErrorAction SilentlyContinue
+        $retryCount++
+    } while (-not $app -and $retryCount -lt $MaxRetries)
+    if (-not $app) {
+        Write-Error "FATAL: Application $AppId was not found after creation and waiting. Exiting script."
+        exit 1
+    }
+    return $app
+}
 
 function New-ApiRegistration {
     param(
@@ -62,6 +82,8 @@ function New-ApiRegistration {
         )
         Update-MgApplication -ApplicationId $apiApp.Id -AppRoles $appRoles
         Write-Host "Added app roles to API app registration."
+        # Wait for propagation
+        $apiApp = Wait-ForApplicationPropagation -AppId $apiApp.AppId
     }
     else {
         Write-Host "API app registration $ApiAppRegistrationName already exists."
@@ -85,23 +107,23 @@ function New-ApiRegistration {
     Write-Host "Added Microsoft Graph User.Read delegated permission to API app registration."
 
     # Ensure we have the latest application object (for ObjectId)
-    $apiApp = Get-MgApplication -ApplicationId $apiApp.AppId
+    $apiApp = Wait-ForApplicationPropagation -AppId $apiApp.AppId
 
-	# Grant admin consent for Microsoft Graph User.Read to the API app registration
-	$apiSp = Get-MgServicePrincipal -Filter "appId eq '$($apiApp.AppId)'" | Select-Object -First 1
-	if ($apiSp) {
-		$userReadPerm = $msGraphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq "User.Read" }
-		if ($userReadPerm) {
-			try {
-				# Grant admin consent for the permission
-				New-MgServicePrincipalOauth2PermissionGrant -ClientId $apiSp.Id -ConsentType AllPrincipals -ResourceId $msGraphSp.Id -Scope "User.Read"
-				Write-Host "Admin consent granted for User.Read to API app registration."
-			}
-			catch {
-				Write-Error "Failed to grant admin consent: $_"
-			}
-		}
-	}
+    # Grant admin consent for Microsoft Graph User.Read to the API app registration
+    $apiSp = Get-MgServicePrincipal -All | Where-Object { $_.AppId -eq $apiApp.AppId } | Select-Object -First 1
+    if ($apiSp) {
+        $userReadPerm = $msGraphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq "User.Read" }
+        if ($userReadPerm) {
+            try {
+                # Grant admin consent for the permission
+                New-MgServicePrincipalOauth2PermissionGrant -ClientId $apiSp.Id -ConsentType AllPrincipals -ResourceId $msGraphSp.Id -Scope "User.Read"
+                Write-Host "Admin consent granted for User.Read to API app registration."
+            }
+            catch {
+                Write-Error "Failed to grant admin consent: $_"
+            }
+        }
+    }
 
     return [PSCustomObject]@{
         App      = $apiApp
@@ -153,6 +175,8 @@ function New-WebRegistration {
         }
         $webSecret = $webSecretObj.SecretText
         Write-Host "Created client secret for Web app registration."
+        # Wait for propagation
+        $webApp = Wait-ForApplicationPropagation -AppId $webApp.AppId
     }
     else {
         Write-Host "Web app registration $WebAppRegistrationName already exists."
@@ -173,7 +197,8 @@ function New-WebRegistration {
         }
         $permScopes += @{ Id = $scope.Id; Type = "Scope" }
     }
-    $webAppReqPerms = @{
+    $webAppReqPerms = @()
+    $webAppReqPerms += @{
         ResourceAppId  = $msGraphSp.AppId
         ResourceAccess = $permScopes
     }
@@ -196,10 +221,13 @@ function New-WebRegistration {
         ResourceAppId  = $apiApp.AppId
         ResourceAccess = $apiScopes
     }
-    Update-MgApplication -ApplicationId $webApp.Id -RequiredResourceAccess @($webAppReqPerms)
+    Update-MgApplication -ApplicationId $webApp.Id -RequiredResourceAccess $webAppReqPerms
     Write-Host "Added Microsoft Graph User.Read, email, profile delegated permissions to Web app registration."
 
-	$webSp = Get-MgServicePrincipal -Filter "appId eq '$($webApp.AppId)'" | Select-Object -First 1
+    # Wait for propagation before querying again
+    $webApp = Wait-ForApplicationPropagation -AppId $webApp.AppId
+
+    $webSp = Get-MgServicePrincipal -All | Where-Object { $_.AppId -eq $webApp.AppId } | Select-Object -First 1
     if ($webSp) {
         $scopesToGrant = $delegatedPerms -join " "
         try {
@@ -225,8 +253,8 @@ function New-WebRegistration {
     Update-MgApplication -ApplicationId $webApp.Id -OptionalClaims $optionalClaims
     Write-Host "Added optional claims (ctry, email, family_name, given_name, ipaddr, preferred_username, upn) to Web app registration."
 
-    $webApp = Get-MgApplication -ApplicationId $webApp.AppId
-    $webSp = Get-MgServicePrincipal -Filter "appId eq '$($webApp.AppId)'" | Select-Object -First 1
+    $webApp = Wait-ForApplicationPropagation -AppId $webApp.AppId
+    $webSp = Get-MgServicePrincipal -All | Where-Object { $_.AppId -eq $webApp.AppId } | Select-Object -First 1
     return [PSCustomObject]@{
         App      = $webApp
         AppId    = $webApp.AppId
