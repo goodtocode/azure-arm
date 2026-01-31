@@ -1,7 +1,7 @@
 param(
     [string]$TenantId,
     [string]$WebAppRegistrationName,
-    [string]$WebProjectPath = "../../src/Presentation.Blazor"
+    [string]$WebProjectPath
 )
 
 function Install-Prerequisites {

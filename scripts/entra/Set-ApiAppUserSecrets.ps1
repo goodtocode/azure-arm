@@ -1,7 +1,7 @@
 param(
     [string]$TenantId,
     [string]$ApiAppRegistrationName,
-    [string]$ApiProjectPath = "../../src/Presentation.WebApi"
+    [string]$ApiProjectPath
 )
 
 function Install-Prerequisites {

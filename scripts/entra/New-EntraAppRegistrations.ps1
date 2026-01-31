@@ -3,7 +3,13 @@
 # Description:   Creates new Entra External ID App Registrations.
 # -----------------------------------------------------------------------------
 # Example CLI Usage:
-#   pwsh -File ./New-EntraAppRegistrations.ps1 -EntraInstanceUrl "<your-eeid-instance-url>" -TenantId "<your-tenant-id>"
+#   pwsh -File ./New-EntraAppRegistrations.ps1 `
+#       -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" `
+#       -TenantId "<your-tenant-id>" `
+#       -WebAppRegistrationName "myproduct-web-dev-001" `
+#       -ApiAppRegistrationName "myproduct-api-dev-001" `
+#       -WebProjectPath "../../src/Presentation.Blazor" `
+#       -ApiProjectPath "../../src/Presentation.WebApi"
 # -----------------------------------------------------------------------------
 # Notes:
 #   - Requires Azure PowerShell modules (Az.Accounts, Az.Resources, etc.)
@@ -14,8 +20,8 @@ param(
 	[string]$TenantId,
 	[string]$WebAppRegistrationName,
 	[string]$ApiAppRegistrationName,
-	[string]$WebProjectPath = "../../src/Presentation.Blazor",	
-	[string]$ApiProjectPath = "../../src/Presentation.WebApi",
+	[string]$WebProjectPath,
+	[string]$ApiProjectPath,
 	[string]$DotNetVersion = "10",
 	[string]$WebRedirectUri = "https://localhost:7175/signin-oidc",
 	[string]$WebLogoutUri = "https://localhost:7175/signout-callback-oidc"
