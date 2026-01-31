@@ -30,7 +30,8 @@ $dotnetInstalled = & dotnet --list-sdks | Select-String "^$DotNetVersion\."
 if (-not $dotnetInstalled) {
 	Write-Host ".NET SDK $DotNetVersion not found. Installing via winget..."
 	winget install --id Microsoft.DotNet.SDK.$DotNetVersion -e --silent
-} else {
+}
+else {
 	Write-Host ".NET SDK $DotNetVersion is already installed."
 }
 
@@ -40,7 +41,8 @@ foreach ($module in $modules) {
 	if (-not (Get-Module -ListAvailable -Name $module)) {
 		Write-Host "Installing PowerShell module: $module"
 		Install-Module $module -Scope CurrentUser -Force
-	} else {
+	}
+ else {
 		Write-Host "PowerShell module $module is already installed."
 	}
 }
@@ -50,26 +52,29 @@ Write-Host "Checking Azure authentication..."
 $azContext = Get-AzContext -ErrorAction SilentlyContinue
 if ($azContext -and $azContext.Tenant.Id -eq $TenantId) {
 	Write-Host "Already authenticated to Azure tenant $TenantId."
-} else {
+}
+else {
 	Write-Host "Logging into Azure..."
 	Connect-AzAccount -Tenant $TenantId | Out-Null
 	Write-Host "Logged in to Azure tenant $TenantId."
 }
-
 # Ensure Microsoft Graph is authenticated
 $mgContext = $null
 try {
 	$mgContext = Get-MgContext -ErrorAction Stop
-} catch {}
+}
+catch {}
 if ($mgContext -and $mgContext.TenantId -eq $TenantId -and $mgContext.Account) {
 	Write-Host "Already authenticated to Microsoft Graph for tenant $TenantId."
-} else {
+}
+else {
 	try {
 		Write-Host "Connecting to Microsoft Graph..."
-		Connect-MgGraph -TenantId $TenantId -Scopes "Application.ReadWrite.All","Directory.ReadWrite.All" | Out-Null
+		Connect-MgGraph -TenantId $TenantId -Scopes "Application.ReadWrite.All", "Directory.ReadWrite.All" | Out-Null
 		$mgContext = Get-MgContext -ErrorAction Stop
 		Write-Host "Connected to Microsoft Graph for tenant $TenantId."
-	} catch {
+	}
+ catch {
 		Write-Error "FATAL: Microsoft Graph authentication failed. Exiting script."
 		exit 1
 	}
@@ -82,8 +87,9 @@ $apiApp = Get-MgApplication -Filter "displayName eq '$ApiAppRegistrationName'" -
 if (-not $apiApp) {
 	Write-Host "API app registration not found. Creating..."
 	try {
-		$apiApp = New-MgApplication -DisplayName $ApiAppRegistrationName -SignInAudience AzureADMyOrg -IdentifierUri ("api://$ApiAppRegistrationName")
-	} catch {
+		$apiApp = New-MgApplication -DisplayName $ApiAppRegistrationName -SignInAudience AzureADMyOrg
+	}
+	catch {
 		Write-Error "FATAL: Failed to create API app registration. $_.Exception.Message"
 		exit 1
 	}
@@ -93,34 +99,104 @@ if (-not $apiApp) {
 	}
 	$apiAppId = $apiApp.AppId
 	Write-Host "Created API app registration with appId: $apiAppId"
-} else {
+	# Set IdentifierUri to api://<AppId>
+	$identifierUri = "api://$apiAppId"
+	Update-MgApplication -ApplicationId $apiApp.Id -IdentifierUris @($identifierUri)
+	Write-Host "Set IdentifierUri to $identifierUri"
+	# Add custom scopes
+	$customScopes = @(
+		@{
+			Id                      = [guid]::NewGuid()
+			AdminConsentDisplayName = "Read assets"
+			AdminConsentDescription = "Allows the app to view asset data."
+			UserConsentDisplayName  = "Read your assets"
+			UserConsentDescription  = "Allows the app to view your assets."
+			IsEnabled               = $true
+			Type                    = "User"
+			Value                   = "assets.read"
+		},
+		@{
+			Id                      = [guid]::NewGuid()
+			AdminConsentDisplayName = "Edit assets"
+			AdminConsentDescription = "Allows the app to create or update asset data."
+			UserConsentDisplayName  = "Edit your assets"
+			UserConsentDescription  = "Allows the app to create or update your assets."
+			IsEnabled               = $true
+			Type                    = "User"
+			Value                   = "assets.write"
+		},
+		@{
+			Id                      = [guid]::NewGuid()
+			AdminConsentDisplayName = "Delete assets"
+			AdminConsentDescription = "Allows the app to delete asset data."
+			UserConsentDisplayName  = "Delete your assets"
+			UserConsentDescription  = "Allows the app to delete your assets."
+			IsEnabled               = $true
+			Type                    = "User"
+			Value                   = "assets.delete"
+		}
+	)
+	Update-MgApplication -ApplicationId $apiApp.Id -Api @{ OAuth2PermissionScopes = $customScopes }
+	Write-Host "Added custom OAuth2 permission scopes to API app registration."
+	# Add app roles
+	$appRoles = @(
+		@{
+			Id                 = [guid]::NewGuid()
+			AllowedMemberTypes = @("User")
+			Description        = "Can view assets only."
+			DisplayName        = "Asset Viewer"
+			IsEnabled          = $true
+			Origin             = "Application"
+			Value              = "AssetViewer"
+		},
+		@{
+			Id                 = [guid]::NewGuid()
+			AllowedMemberTypes = @("User")
+			Description        = "Can view and edit assets."
+			DisplayName        = "Asset Editor"
+			IsEnabled          = $true
+			Origin             = "Application"
+			Value              = "AssetEditor"
+		},
+		@{
+			Id                 = [guid]::NewGuid()
+			AllowedMemberTypes = @("User")
+			Description        = "Can view, edit, and delete assets."
+			DisplayName        = "Asset Admin"
+			IsEnabled          = $true
+			Origin             = "Application"
+			Value              = "AssetAdmin"
+		}
+	)
+	Update-MgApplication -ApplicationId $apiApp.Id -AppRoles $appRoles
+	Write-Host "Added app roles to API app registration."
+}
+else {
 	Write-Host "API app registration $ApiAppRegistrationName already exists."
 	$apiAppId = $apiApp.AppId
-	# Add Microsoft Graph User.Read permission (Delegated)
-	Write-Host "Adding Microsoft Graph User.Read permission to API app registration..."
-	# Get Microsoft Graph service principal
-	$msGraphSp = Get-MgServicePrincipal -Filter "displayName eq 'Microsoft Graph'" -ErrorAction Stop
-	if (-not $msGraphSp) {
-		Write-Error "FATAL: Microsoft Graph service principal not found. Exiting script."
-		exit 1
-	}
-	# Find User.Read delegated permission id
-	$userReadPerm = $msGraphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq "User.Read" }
-	if (-not $userReadPerm) {
-		Write-Error "FATAL: Microsoft Graph User.Read permission not found. Exiting script."
-		exit 1
-	}
-	# Add permission to app registration
-	$apiAppReqPerms = @{
-		ResourceAppId = $msGraphSp.AppId
-		ResourceAccess = @(@{
-			Id = $userReadPerm.Id
+}
+
+# Always add Microsoft Graph User.Read delegated permission to API app registration
+Write-Host "Adding Microsoft Graph User.Read permission to API app registration..."
+$msGraphSp = Get-MgServicePrincipal -Filter "displayName eq 'Microsoft Graph'" -ErrorAction Stop
+if (-not $msGraphSp) {
+	Write-Error "FATAL: Microsoft Graph service principal not found. Exiting script."
+	exit 1
+}
+$userReadPerm = $msGraphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq "User.Read" }
+if (-not $userReadPerm) {
+	Write-Error "FATAL: Microsoft Graph User.Read permission not found. Exiting script."
+	exit 1
+}
+$apiAppReqPerms = @{
+	ResourceAppId  = $msGraphSp.AppId
+	ResourceAccess = @(@{
+			Id   = $userReadPerm.Id
 			Type = "Scope"
 		})
-	}
-	Update-MgApplication -ApplicationId $apiApp.Id -RequiredResourceAccess @($apiAppReqPerms)
-	Write-Host "Added Microsoft Graph User.Read delegated permission to API app registration."
 }
+Update-MgApplication -ApplicationId $apiApp.Id -RequiredResourceAccess @($apiAppReqPerms)
+Write-Host "Added Microsoft Graph User.Read delegated permission to API app registration."
 
 # Step 4: Write API EEID values to $ApiProjectPath via dotnet user-secrets
 if (Test-Path $ApiProjectPath) {
@@ -132,7 +208,8 @@ if (Test-Path $ApiProjectPath) {
 	dotnet user-secrets set "EntraExternalId:ClientId" $apiApp.appId
 	dotnet user-secrets set "EntraExternalId:ValidateAuthority" "true"
 	Pop-Location
-} else {
+}
+else {
 	Write-Warning "*** CRITICAL: API project path '$ApiProjectPath' not found. Skipping dotnet user-secrets for API. App registrations will continue, but user-secrets are NOT set. ***"
 }
 
@@ -143,7 +220,8 @@ if (-not $webApp) {
 	Write-Host "Web app registration not found. Creating..."
 	try {
 		$webApp = New-MgApplication -DisplayName $WebAppRegistrationName -SignInAudience AzureADMyOrg -Web @{ RedirectUris = @($WebRedirectUri); LogoutUrl = $WebLogoutUri }
-	} catch {
+	}
+ catch {
 		Write-Error "FATAL: Failed to create Web app registration. $_.Exception.Message"
 		exit 1
 	}
@@ -157,7 +235,8 @@ if (-not $webApp) {
 	try {
 		$passwordCredential = @{ EndDateTime = (Get-Date).AddYears(2) }
 		$webSecretObj = Add-MgApplicationPassword -ApplicationId $webApp.Id -PasswordCredential $passwordCredential
-	} catch {
+	}
+ catch {
 		Write-Error "FATAL: Failed to create client secret for Web app registration. $_.Exception.Message"
 		exit 1
 	}
@@ -185,12 +264,13 @@ if (-not $webApp) {
 		$permScopes += @{ Id = $scope.Id; Type = "Scope" }
 	}
 	$webAppReqPerms = @{
-		ResourceAppId = $msGraphSp.AppId
+		ResourceAppId  = $msGraphSp.AppId
 		ResourceAccess = $permScopes
 	}
 	Update-MgApplication -ApplicationId $webApp.Id -RequiredResourceAccess @($webAppReqPerms)
 	Write-Host "Added Microsoft Graph User.Read, email, profile delegated permissions to Web app registration."
-} else {
+}
+else {
 	Write-Host "Web app registration $WebAppRegistrationName already exists."
 	$webAppId = $webApp.AppId
 	# Add Microsoft Graph delegated permissions: User.Read, email, profile
@@ -211,7 +291,7 @@ if (-not $webApp) {
 		$permScopes += @{ Id = $scope.Id; Type = "Scope" }
 	}
 	$webAppReqPerms = @{
-		ResourceAppId = $msGraphSp.AppId
+		ResourceAppId  = $msGraphSp.AppId
 		ResourceAccess = $permScopes
 	}
 	Update-MgApplication -ApplicationId $webApp.Id -RequiredResourceAccess @($webAppReqPerms)
@@ -229,6 +309,7 @@ if (Test-Path $WebProjectPath) {
 	dotnet user-secrets set "EntraExternalId:ValidateAuthority" "true"
 	dotnet user-secrets set "EntraExternalId:ClientSecret" $webSecret
 	Pop-Location
-} else {
+}
+else {
 	Write-Warning "*** CRITICAL: Web project path '$WebProjectPath' not found. Skipping dotnet user-secrets for Web. App registrations will continue, but user-secrets are NOT set. ***"
 }
