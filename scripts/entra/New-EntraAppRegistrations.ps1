@@ -179,13 +179,22 @@ function New-WebRegistration {
     }
     Update-MgApplication -ApplicationId $webApp.Id -RequiredResourceAccess @($webAppReqPerms)
     Write-Host "Added Microsoft Graph User.Read, email, profile delegated permissions to Web app registration."
+    $optionalClaims = @{
+        idToken = @(
+            @{ name = "ctry" },
+            @{ name = "email" },
+            @{ name = "family_name" },
+            @{ name = "given_name" },
+            @{ name = "ipaddr" },
+            @{ name = "preferred_username" },
+            @{ name = "upn" }
+        )
+    }
+    Update-MgApplication -ApplicationId $webApp.Id -OptionalClaims $optionalClaims
+    Write-Host "Added optional claims (ctry, email, family_name, given_name, ipaddr, preferred_username, upn) to Web app registration."
 
-    # Ensure we have the latest application object (for ObjectId)
     $webApp = Get-MgApplication -ApplicationId $webApp.AppId
-
-    # Get the service principal for completeness
     $webSp = Get-MgServicePrincipal -Filter "appId eq '$($webApp.AppId)'" | Select-Object -First 1
-
     return [PSCustomObject]@{
         App      = $webApp
         AppId    = $webApp.AppId
