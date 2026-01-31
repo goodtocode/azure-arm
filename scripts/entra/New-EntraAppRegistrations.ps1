@@ -117,6 +117,12 @@ function New-ApiRegistration {
 
     # Grant admin consent for Microsoft Graph User.Read to the API app registration
     $apiSp = Get-MgServicePrincipal -All | Where-Object { $_.AppId -eq $apiApp.AppId } | Select-Object -First 1
+    if (-not $apiSp) {
+        Write-Host "API service principal not found. Creating service principal for API app..."
+        $apiSp = New-MgServicePrincipal -AppId $apiApp.AppId
+        # Wait for propagation
+        Start-Sleep -Seconds 5
+    }
     if ($apiSp) {
         $userReadPerm = $msGraphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq "User.Read" }
         if ($userReadPerm) {
@@ -234,6 +240,12 @@ function New-WebRegistration {
     $webApp = Wait-ForApplicationPropagation -AppId $webApp.AppId -ObjectId $webApp.Id
 
     $webSp = Get-MgServicePrincipal -All | Where-Object { $_.AppId -eq $webApp.AppId } | Select-Object -First 1
+    if (-not $webSp) {
+        Write-Host "Web service principal not found. Creating service principal for Web app..."
+        $webSp = New-MgServicePrincipal -AppId $webApp.AppId
+        # Wait for propagation
+        Start-Sleep -Seconds 5
+    }
     if ($webSp) {
         $scopesToGrant = $delegatedPerms -join " "
         try {
