@@ -177,6 +177,25 @@ function New-WebRegistration {
         ResourceAppId  = $msGraphSp.AppId
         ResourceAccess = $permScopes
     }
+    $apiApp = Get-MgApplication -Filter "displayName eq '$ApiAppRegistrationName'" -ErrorAction Stop
+    if (-not $apiApp) {
+        Write-Error "FATAL: API app registration $ApiAppRegistrationName not found. Exiting script."
+        exit 1
+    }
+    $customScopes = @("assets.read", "assets.write", "assets.delete")
+    $apiScopes = @()
+    foreach ($scope in $customScopes) {
+        $apiScope = $apiApp.Api.Oauth2PermissionScopes | Where-Object { $_.Value -eq $scope }
+        if (-not $apiScope) {
+            Write-Error "FATAL: API scope $scope not found in API app registration. Exiting script."
+            exit 1
+        }
+        $apiScopes += @{ Id = $apiScope.Id; Type = "Scope" }
+    }
+    $webAppReqPerms += @{
+        ResourceAppId  = $apiApp.AppId
+        ResourceAccess = $apiScopes
+    }
     Update-MgApplication -ApplicationId $webApp.Id -RequiredResourceAccess @($webAppReqPerms)
     Write-Host "Added Microsoft Graph User.Read, email, profile delegated permissions to Web app registration."
 
@@ -191,7 +210,6 @@ function New-WebRegistration {
             Write-Error "Failed to grant admin consent to Web app: $_"
         }
     }
-
 
     $optionalClaims = @{
         idToken = @(
