@@ -12,9 +12,9 @@
 param(
 	[string]$EntraInstanceUrl,
 	[string]$TenantId,
-	[string]$WebAppRegistrationName = "semker-deleteme7-web",
-	[string]$WebProjectPath = "../../src/Presentation.Blazor",
-	[string]$ApiAppRegistrationName = "semker-deleteme7-api",
+	[string]$WebAppRegistrationName,
+	[string]$ApiAppRegistrationName,
+	[string]$WebProjectPath = "../../src/Presentation.Blazor",	
 	[string]$ApiProjectPath = "../../src/Presentation.WebApi",
 	[string]$DotNetVersion = "10",
 	[string]$WebRedirectUri = "https://localhost:7175/signin-oidc",
