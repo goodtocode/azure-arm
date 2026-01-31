@@ -96,6 +96,30 @@ if (-not $apiApp) {
 } else {
 	Write-Host "API app registration $ApiAppRegistrationName already exists."
 	$apiAppId = $apiApp.AppId
+	# Add Microsoft Graph User.Read permission (Delegated)
+	Write-Host "Adding Microsoft Graph User.Read permission to API app registration..."
+	# Get Microsoft Graph service principal
+	$msGraphSp = Get-MgServicePrincipal -Filter "displayName eq 'Microsoft Graph'" -ErrorAction Stop
+	if (-not $msGraphSp) {
+		Write-Error "FATAL: Microsoft Graph service principal not found. Exiting script."
+		exit 1
+	}
+	# Find User.Read delegated permission id
+	$userReadPerm = $msGraphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq "User.Read" }
+	if (-not $userReadPerm) {
+		Write-Error "FATAL: Microsoft Graph User.Read permission not found. Exiting script."
+		exit 1
+	}
+	# Add permission to app registration
+	$apiAppReqPerms = @{
+		ResourceAppId = $msGraphSp.AppId
+		ResourceAccess = @(@{
+			Id = $userReadPerm.Id
+			Type = "Scope"
+		})
+	}
+	Update-MgApplication -ApplicationId $apiApp.Id -RequiredResourceAccess @($apiAppReqPerms)
+	Write-Host "Added Microsoft Graph User.Read delegated permission to API app registration."
 }
 
 # Step 4: Write API EEID values to $ApiProjectPath via dotnet user-secrets
@@ -143,9 +167,55 @@ if (-not $webApp) {
 	}
 	$webSecret = $webSecretObj.SecretText
 	Write-Host "Created client secret for Web app registration."
+	# Add Microsoft Graph delegated permissions: User.Read, email, profile
+	Write-Host "Adding Microsoft Graph User.Read, email, profile delegated permissions to Web app registration..."
+	$msGraphSp = Get-MgServicePrincipal -Filter "displayName eq 'Microsoft Graph'" -ErrorAction Stop
+	if (-not $msGraphSp) {
+		Write-Error "FATAL: Microsoft Graph service principal not found. Exiting script."
+		exit 1
+	}
+	$delegatedPerms = @("User.Read", "email", "profile")
+	$permScopes = @()
+	foreach ($perm in $delegatedPerms) {
+		$scope = $msGraphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq $perm }
+		if (-not $scope) {
+			Write-Error "FATAL: Microsoft Graph permission $perm not found. Exiting script."
+			exit 1
+		}
+		$permScopes += @{ Id = $scope.Id; Type = "Scope" }
+	}
+	$webAppReqPerms = @{
+		ResourceAppId = $msGraphSp.AppId
+		ResourceAccess = $permScopes
+	}
+	Update-MgApplication -ApplicationId $webApp.Id -RequiredResourceAccess @($webAppReqPerms)
+	Write-Host "Added Microsoft Graph User.Read, email, profile delegated permissions to Web app registration."
 } else {
 	Write-Host "Web app registration $WebAppRegistrationName already exists."
 	$webAppId = $webApp.AppId
+	# Add Microsoft Graph delegated permissions: User.Read, email, profile
+	Write-Host "Adding Microsoft Graph User.Read, email, profile delegated permissions to Web app registration..."
+	$msGraphSp = Get-MgServicePrincipal -Filter "displayName eq 'Microsoft Graph'" -ErrorAction Stop
+	if (-not $msGraphSp) {
+		Write-Error "FATAL: Microsoft Graph service principal not found. Exiting script."
+		exit 1
+	}
+	$delegatedPerms = @("User.Read", "email", "profile")
+	$permScopes = @()
+	foreach ($perm in $delegatedPerms) {
+		$scope = $msGraphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq $perm }
+		if (-not $scope) {
+			Write-Error "FATAL: Microsoft Graph permission $perm not found. Exiting script."
+			exit 1
+		}
+		$permScopes += @{ Id = $scope.Id; Type = "Scope" }
+	}
+	$webAppReqPerms = @{
+		ResourceAppId = $msGraphSp.AppId
+		ResourceAccess = $permScopes
+	}
+	Update-MgApplication -ApplicationId $webApp.Id -RequiredResourceAccess @($webAppReqPerms)
+	Write-Host "Added Microsoft Graph User.Read, email, profile delegated permissions to Web app registration."
 }
 
 # Step 6: Write Web EEID values to $WebProjectPath via dotnet user-secrets
