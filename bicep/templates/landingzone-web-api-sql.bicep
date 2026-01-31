@@ -1,24 +1,81 @@
 targetScope='resourceGroup'
 
-// Common
-param location string = resourceGroup().location
+@description('The Azure region where resources will be deployed. Only US regions are allowed.')
+@allowed([
+  'eastus'
+  'eastus2'
+  'centralus'
+  'northcentralus'
+  'southcentralus'
+  'westus'
+  'westus2'
+  'westus3'
+  'westcentralus'
+])
+param location string = 'eastus'
+
+@description('The subscription ID for the spoke management resource group.')
+@minLength(1)
+@maxLength(64)
 param spokeMgmtSubscriptionId string = subscription().subscriptionId
+
+@description('The resource group name for spoke management.')
+@minLength(1)
+@maxLength(90)
 param spokeMgmtResourceGroupName string
-param environmentApp string 
+
+@description('Environment name for the application.')
+@minLength(1)
+@maxLength(40)
+param environmentApp string
+
+@description('Resource tags to be applied to all resources.')
 param tags object
-// Azure Monitor
-param appiName string 
-// App Service
-param planName string 
-param webName string 
-param apiName string 
-// Sql Server
-param sqlName string 
+
+@description('Specifies the name of the Application Insights resource.')
+@minLength(1)
+@maxLength(255)
+param appiName string
+
+@description('Name of the App Service Plan.')
+@minLength(1)
+@maxLength(40)
+param planName string
+
+@description('Name of the Web App.')
+@minLength(1)
+@maxLength(60)
+param webName string
+
+@description('Name of the API App.')
+@minLength(1)
+@maxLength(60)
+param apiName string
+
+@description('Name of the SQL Server.')
+@minLength(1)
+@maxLength(60)
+param sqlName string
+
+@description('SQL Server admin username.')
+@minLength(1)
+@maxLength(60)
 param sqlAdminUser string
+
 @secure()
+@description('SQL Server admin password.')
+@minLength(8)
+@maxLength(60)
 param sqlAdminPassword string
+
+@description('Name of the SQL Database.')
+@minLength(1)
+@maxLength(60)
 param sqldbName string
-param sqldbSku string
+
+@description('SKU for the SQL Database.')
+@allowed(['Basic', 'Premium', 'Standard'])
+param sqldbSku string = 'Basic'
 
 resource appiResource 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appiName 

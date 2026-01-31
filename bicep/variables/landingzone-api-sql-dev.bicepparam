@@ -21,7 +21,7 @@ param planName = 'spokemgmt-${environmentIac}-${regionIac}-${planSku}-${instance
 
 // SQL Server
 param sqlName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sql'
-param sqlAdminUser = ''
-param sqlAdminPassword = ''
+param sqlAdminUser = 'LocalAdmin'
+param sqlAdminPassword = 'PASS_FROM_CLI_PARAMETERS'
 param sqldbName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sqldb'
 param sqldbSku = 'Basic'
