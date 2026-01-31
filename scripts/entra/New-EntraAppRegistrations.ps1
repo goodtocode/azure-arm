@@ -21,7 +21,10 @@ param(
 	[string]$WebLogoutUri = "https://localhost:7175/signout-callback-oidc"
 )
 
-New-Prerequisites -DotNetVersion $DotNetVersion
+# Step 1: Install prerequisites
+Install-Prerequisites -DotNetVersion $DotNetVersion
+
+# Step 2: Authenticate to Azure and Microsoft Graph
 New-Auth -TenantId $TenantId
 
 # Step 3: Create or get API app registration using function
@@ -52,7 +55,7 @@ $webSecrets = @{
 }
 Set-ProjectUserSecrets -ProjectPath $WebProjectPath -Secrets $webSecrets
 
-# Output summary
+# Step 7: Output summary of created app registrations
 Write-OutputSummary -TenantId $TenantId -EntraInstanceUrl $EntraInstanceUrl -ApiApp $apiApp -WebApp $webApp -WebRedirectUri $WebRedirectUri -WebLogoutUri $WebLogoutUri
 
 
@@ -83,7 +86,6 @@ function New-WebRegistration {
 		}
 		$webAppId = $webApp.AppId
 		Write-Host "Created Web app registration with appId: $webAppId"
-		# Create client secret
 		try {
 			$passwordCredential = @{ EndDateTime = (Get-Date).AddYears(2) }
 			$webSecretObj = Add-MgApplicationPassword -ApplicationId $webApp.Id -PasswordCredential $passwordCredential
@@ -102,7 +104,6 @@ function New-WebRegistration {
  else {
 		Write-Host "Web app registration $WebAppRegistrationName already exists."
 	}
-	# Add Microsoft Graph delegated permissions: User.Read, email, profile
 	Write-Host "Adding Microsoft Graph User.Read, email, profile delegated permissions to Web app registration..."
 	$msGraphSp = Get-MgServicePrincipal -Filter "displayName eq 'Microsoft Graph'" -ErrorAction Stop
 	if (-not $msGraphSp) {
@@ -134,33 +135,6 @@ function New-WebRegistration {
 	}
 }
 
-function New-Prerequisites {
-	param(
-		[string]$DotNetVersion
-	)
-	Write-Host "Checking prerequisites..."
-	# Check and install .NET SDK
-	$dotnetInstalled = & dotnet --list-sdks | Select-String "^$DotNetVersion\."
-	if (-not $dotnetInstalled) {
-		Write-Host ".NET SDK $DotNetVersion not found. Installing via winget..."
-		winget install --id Microsoft.DotNet.SDK.$DotNetVersion -e --silent
-	}
-	else {
-		Write-Host ".NET SDK $DotNetVersion is already installed."
-	}
-	# Check and install PowerShell modules
-	$modules = @("Az.Accounts", "Az.Resources", "Microsoft.Graph.Applications")
-	foreach ($module in $modules) {
-		if (-not (Get-Module -ListAvailable -Name $module)) {
-			Write-Host "Installing PowerShell module: $module"
-			Install-Module $module -Scope CurrentUser -Force
-		}
-		else {
-			Write-Host "PowerShell module $module is already installed."
-		}
-	}
-}
-
 function New-ApiRegistration {
 	param(
 		[string]$ApiAppRegistrationName,
@@ -186,11 +160,9 @@ function New-ApiRegistration {
 		}
 		$apiAppId = $apiApp.AppId
 		Write-Host "Created API app registration with appId: $apiAppId"
-		# Set IdentifierUri to api://<AppId>
 		$identifierUri = "api://$apiAppId"
 		Update-MgApplication -ApplicationId $apiApp.Id -IdentifierUris @($identifierUri)
 		Write-Host "Set IdentifierUri to $identifierUri"
-		# Add custom scopes
 		$customScopes = @(
 			@{ Id = [guid]::NewGuid(); AdminConsentDisplayName = "Read assets"; AdminConsentDescription = "Allows the app to view asset data."; UserConsentDisplayName = "Read your assets"; UserConsentDescription = "Allows the app to view your assets."; IsEnabled = $true; Type = "User"; Value = "assets.read" },
 			@{ Id = [guid]::NewGuid(); AdminConsentDisplayName = "Edit assets"; AdminConsentDescription = "Allows the app to create or update asset data."; UserConsentDisplayName = "Edit your assets"; UserConsentDescription = "Allows the app to create or update your assets."; IsEnabled = $true; Type = "User"; Value = "assets.write" },
@@ -198,7 +170,6 @@ function New-ApiRegistration {
 		)
 		Update-MgApplication -ApplicationId $apiApp.Id -Api @{ OAuth2PermissionScopes = $customScopes }
 		Write-Host "Added custom OAuth2 permission scopes to API app registration."
-		# Add app roles
 		$appRoles = @(
 			@{ Id = [guid]::NewGuid(); AllowedMemberTypes = @("User"); Description = "Can view assets only."; DisplayName = "Asset Viewer"; IsEnabled = $true; Origin = "Application"; Value = "AssetViewer" },
 			@{ Id = [guid]::NewGuid(); AllowedMemberTypes = @("User"); Description = "Can view and edit assets."; DisplayName = "Asset Editor"; IsEnabled = $true; Origin = "Application"; Value = "AssetEditor" },
@@ -210,7 +181,6 @@ function New-ApiRegistration {
  else {
 		Write-Host "API app registration $ApiAppRegistrationName already exists."
 	}
-	# Always add Microsoft Graph User.Read delegated permission to API app registration
 	Write-Host "Adding Microsoft Graph User.Read permission to API app registration..."
 	$msGraphSp = Get-MgServicePrincipal -Filter "displayName eq 'Microsoft Graph'" -ErrorAction Stop
 	if (-not $msGraphSp) {
@@ -278,6 +248,31 @@ function New-Auth {
 	}
 	New-AzLogin -TenantId $TenantId
 	New-MgLogin -TenantId $TenantId
+}
+
+function Install-Prerequisites {
+	param(
+		[string]$DotNetVersion
+	)
+	Write-Host "Checking prerequisites..."
+	$dotnetInstalled = & dotnet --list-sdks | Select-String "^$DotNetVersion\."
+	if (-not $dotnetInstalled) {
+		Write-Host ".NET SDK $DotNetVersion not found. Installing via winget..."
+		winget install --id Microsoft.DotNet.SDK.$DotNetVersion -e --silent
+	}
+	else {
+		Write-Host ".NET SDK $DotNetVersion is already installed."
+	}
+	$modules = @("Az.Accounts", "Az.Resources", "Microsoft.Graph.Applications")
+	foreach ($module in $modules) {
+		if (-not (Get-Module -ListAvailable -Name $module)) {
+			Write-Host "Installing PowerShell module: $module"
+			Install-Module $module -Scope CurrentUser -Force
+		}
+		else {
+			Write-Host "PowerShell module $module is already installed."
+		}
+	}
 }
 
 function Write-OutputSummary {
