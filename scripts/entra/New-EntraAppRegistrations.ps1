@@ -173,7 +173,14 @@ function New-WebRegistration {
         }
         $permScopes += @{ Id = $scope.Id; Type = "Scope" }
     }
-    $webSp = Get-MgServicePrincipal -Filter "appId eq '$($webApp.AppId)'" | Select-Object -First 1
+    $webAppReqPerms = @{
+        ResourceAppId  = $msGraphSp.AppId
+        ResourceAccess = $permScopes
+    }
+    Update-MgApplication -ApplicationId $webApp.Id -RequiredResourceAccess @($webAppReqPerms)
+    Write-Host "Added Microsoft Graph User.Read, email, profile delegated permissions to Web app registration."
+
+	$webSp = Get-MgServicePrincipal -Filter "appId eq '$($webApp.AppId)'" | Select-Object -First 1
     if ($webSp) {
         $scopesToGrant = $delegatedPerms -join " "
         try {
@@ -184,12 +191,8 @@ function New-WebRegistration {
             Write-Error "Failed to grant admin consent to Web app: $_"
         }
     }
-    $webAppReqPerms = @{
-        ResourceAppId  = $msGraphSp.AppId
-        ResourceAccess = $permScopes
-    }
-    Update-MgApplication -ApplicationId $webApp.Id -RequiredResourceAccess @($webAppReqPerms)
-    Write-Host "Added Microsoft Graph User.Read, email, profile delegated permissions to Web app registration."
+
+
     $optionalClaims = @{
         idToken = @(
             @{ name = "ctry" },
