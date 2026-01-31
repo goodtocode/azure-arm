@@ -18,11 +18,17 @@ param(
 	[string]$ApiProjectPath = "../../src/Presentation.WebApi",
 	[string]$DotNetVersion = "10",
 	[string]$WebRedirectUri = "https://localhost:7175/signin-oidc",
-	[string]$WebLogoutUri = "https://localhost:7175/signout-callback-oidc"
+	[string]$WebLogoutUri = "https://localhost:7175/signout-callback-oidc",
+	[switch]$SkipInstall
 )
 
 
 # Step 1: Install prerequisites (dotnet sdk, modules)
+function Ensure-Prerequisites {
+    param([switch]$SkipInstall)
+    # Checks .NET SDK and required modules, installs if needed (unless -SkipInstall)
+}
+
 Write-Host "Checking prerequisites..."
 
 # Check and install .NET SDK
@@ -48,6 +54,10 @@ foreach ($module in $modules) {
 }
 
 # Step 2: Login to Azure and set EEID tenant
+function Ensure-Auth {
+    # Ensures Az and Microsoft Graph authentication
+}
+
 Write-Host "Checking Azure authentication..."
 $azContext = Get-AzContext -ErrorAction SilentlyContinue
 if ($azContext -and $azContext.Tenant.Id -eq $TenantId) {
@@ -81,6 +91,11 @@ else {
 }
 
 # Step 3: Check for API app registration by name; create if missing
+function Ensure-ApiRegistration {
+    # Ensures API app registration, identifierUri, scopes, roles, permissions
+    # Returns [PSCustomObject] with app details
+}
+
 Write-Host "Checking for API app registration: $ApiAppRegistrationName..."
 Import-Module Microsoft.Graph.Applications
 $apiApp = Get-MgApplication -Filter "displayName eq '$ApiAppRegistrationName'" -ErrorAction SilentlyContinue
@@ -101,6 +116,10 @@ if (-not $apiApp) {
 	Write-Host "Created API app registration with appId: $apiAppId"
 	# Set IdentifierUri to api://<AppId>
 	$identifierUri = "api://$apiAppId"
+	if (-not $identifierUri) {
+		Write-Error "FATAL: IdentifierUri could not be generated. Exiting script."
+		exit 1
+	}
 	Update-MgApplication -ApplicationId $apiApp.Id -IdentifierUris @($identifierUri)
 	Write-Host "Set IdentifierUri to $identifierUri"
 	# Add custom scopes
@@ -136,6 +155,10 @@ if (-not $apiApp) {
 			Value                   = "assets.delete"
 		}
 	)
+	if (-not $customScopes) {
+		Write-Error "FATAL: Custom scopes could not be generated. Exiting script."
+		exit 1
+	}
 	Update-MgApplication -ApplicationId $apiApp.Id -Api @{ OAuth2PermissionScopes = $customScopes }
 	Write-Host "Added custom OAuth2 permission scopes to API app registration."
 	# Add app roles
@@ -168,6 +191,10 @@ if (-not $apiApp) {
 			Value              = "AssetAdmin"
 		}
 	)
+	if (-not $appRoles) {
+		Write-Error "FATAL: App roles could not be generated. Exiting script."
+		exit 1
+	}
 	Update-MgApplication -ApplicationId $apiApp.Id -AppRoles $appRoles
 	Write-Host "Added app roles to API app registration."
 }
@@ -199,6 +226,10 @@ Update-MgApplication -ApplicationId $apiApp.Id -RequiredResourceAccess @($apiApp
 Write-Host "Added Microsoft Graph User.Read delegated permission to API app registration."
 
 # Step 4: Write API EEID values to $ApiProjectPath via dotnet user-secrets
+if (-not $apiApp.AppId -or -not $EntraInstanceUrl -or -not $TenantId) {
+	Write-Error "FATAL: One or more required values for API user-secrets are missing. Exiting script."
+	exit 1
+}
 if (Test-Path $ApiProjectPath) {
 	Write-Host "Setting EntraExternalId values for $ApiProjectPath"
 	Push-Location $ApiProjectPath
@@ -210,7 +241,8 @@ if (Test-Path $ApiProjectPath) {
 	Pop-Location
 }
 else {
-	Write-Warning "*** CRITICAL: API project path '$ApiProjectPath' not found. Skipping dotnet user-secrets for API. App registrations will continue, but user-secrets are NOT set. ***"
+	Write-Error "FATAL: API project path '$ApiProjectPath' not found. Exiting script."
+	exit 1
 }
 
 # Step 5: Check for Web app registration by name; create if missing
@@ -299,6 +331,10 @@ else {
 }
 
 # Step 6: Write Web EEID values to $WebProjectPath via dotnet user-secrets
+if (-not $webApp.AppId -or -not $EntraInstanceUrl -or -not $TenantId -or -not $webSecret) {
+	Write-Error "FATAL: One or more required values for Web user-secrets are missing. Exiting script."
+	exit 1
+}
 if (Test-Path $WebProjectPath) {
 	Write-Host "Setting EntraExternalId values for $WebProjectPath"
 	Push-Location $WebProjectPath
@@ -311,5 +347,18 @@ if (Test-Path $WebProjectPath) {
 	Pop-Location
 }
 else {
-	Write-Warning "*** CRITICAL: Web project path '$WebProjectPath' not found. Skipping dotnet user-secrets for Web. App registrations will continue, but user-secrets are NOT set. ***"
+	Write-Error "FATAL: Web project path '$WebProjectPath' not found. Exiting script."
+	exit 1
 }
+
+function Write-OutputSummary {
+    param(
+        [PSCustomObject]$ApiApp,
+        [PSCustomObject]$WebApp,
+        [string]$TenantId,
+        [string]$EntraInstanceUrl
+    )
+    # Prints summary of key outputs
+}
+
+Write-OutputSummary -ApiApp $apiApp -WebApp $webApp -TenantId $TenantId -EntraInstanceUrl $EntraInstanceUrl
