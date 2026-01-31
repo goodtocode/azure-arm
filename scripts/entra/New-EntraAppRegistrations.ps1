@@ -12,9 +12,9 @@
 param(
 	[string]$EntraInstanceUrl,
 	[string]$TenantId,
-	[string]$WebAppRegistrationName = "semker-deleteme3-web",
+	[string]$WebAppRegistrationName = "semker-deleteme4-web",
 	[string]$WebProjectPath = "../../src/Presentation.Blazor",
-	[string]$ApiAppRegistrationName = "semker-deleteme3-api",
+	[string]$ApiAppRegistrationName = "semker-deleteme4-api",
 	[string]$ApiProjectPath = "../../src/Presentation.WebApi",
 	[string]$DotNetVersion = "10",
 	[string]$WebRedirectUri = "https://localhost:7175/signin-oidc",
@@ -24,6 +24,7 @@ param(
 function Wait-ForApplicationPropagation {
     param(
         [string]$AppId,
+        [string]$ObjectId = $null,
         [int]$MaxRetries = 10,
         [int]$DelaySeconds = 2
     )
@@ -31,7 +32,12 @@ function Wait-ForApplicationPropagation {
     $app = $null
     do {
         Start-Sleep -Seconds $DelaySeconds
-        $app = Get-MgApplication -ApplicationId $AppId -ErrorAction SilentlyContinue
+        if ($ObjectId) {
+            $app = Get-MgApplication -ApplicationId $ObjectId -ErrorAction SilentlyContinue
+        }
+        if (-not $app -and $AppId) {
+            $app = Get-MgApplication -Filter "appId eq '$AppId'" -ErrorAction SilentlyContinue
+        }
         $retryCount++
     } while (-not $app -and $retryCount -lt $MaxRetries)
     if (-not $app) {
@@ -83,7 +89,7 @@ function New-ApiRegistration {
         Update-MgApplication -ApplicationId $apiApp.Id -AppRoles $appRoles
         Write-Host "Added app roles to API app registration."
         # Wait for propagation
-        $apiApp = Wait-ForApplicationPropagation -AppId $apiApp.AppId
+        $apiApp = Wait-ForApplicationPropagation -AppId $apiApp.AppId -ObjectId $apiApp.Id
     }
     else {
         Write-Host "API app registration $ApiAppRegistrationName already exists."
@@ -176,7 +182,7 @@ function New-WebRegistration {
         $webSecret = $webSecretObj.SecretText
         Write-Host "Created client secret for Web app registration."
         # Wait for propagation
-        $webApp = Wait-ForApplicationPropagation -AppId $webApp.AppId
+        $webApp = Wait-ForApplicationPropagation -AppId $webApp.AppId -ObjectId $webApp.Id
     }
     else {
         Write-Host "Web app registration $WebAppRegistrationName already exists."
@@ -225,7 +231,7 @@ function New-WebRegistration {
     Write-Host "Added Microsoft Graph User.Read, email, profile delegated permissions to Web app registration."
 
     # Wait for propagation before querying again
-    $webApp = Wait-ForApplicationPropagation -AppId $webApp.AppId
+    $webApp = Wait-ForApplicationPropagation -AppId $webApp.AppId -ObjectId $webApp.Id
 
     $webSp = Get-MgServicePrincipal -All | Where-Object { $_.AppId -eq $webApp.AppId } | Select-Object -First 1
     if ($webSp) {
