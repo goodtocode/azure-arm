@@ -5,7 +5,7 @@
 param name string
 
 
-@description('The SKU (pricing tier) for the Bot Service. Allowed values: F0 (Free), S1 (Standard). Default is S1.')
+@description('The SKU for the Bot Service. Allowed values: F0 Free, S1 Standard. Default is S1.')
 @allowed([
   'F0'
   'S1'
@@ -23,6 +23,11 @@ param msAppValue string
 @description('The display name for the Bot Service. Optional, defaults to the resource name if not provided.')
 @maxLength(64)
 param displayName string = ''
+
+
+@description('The endpoint URL for the Bot Service. Example: https://your-bot-endpoint/api/messages')
+@minLength(1)
+param endpoint string
 
 @description('Tags to apply to the Bot Service resource.')
 param tags object = {}
@@ -71,6 +76,6 @@ resource name_resource 'Microsoft.BotService/botServices@2022-09-15' = {
     msaAppId: msAppId
     openWithHint: 'bfcomposer://'
     appPasswordHint: appPasswordSecretId
-    endpoint: 'https://REPLACE-WITH-YOUR-BOT-ENDPOINT/api/messages'
+    endpoint: endpoint
   }
 }
