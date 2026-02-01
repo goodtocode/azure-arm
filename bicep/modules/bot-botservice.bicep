@@ -36,8 +36,8 @@ var location = resourceGroup().location
 var uniqueSuffix = toLower(substring(uniqueString(resourceGroup().id, 'Microsoft.BotService/bots', name), 0, 6))
 var botDisplayName = empty(displayName) ? name : displayName
 var kvName = 'kv-${name}'
-var appPasswordSecret = 'bot-${replace(name, '_', '-')}-pwd-${uniqueSuffix}'
-var appPasswordSecretId = empty(msAppValue) ? '' : keyVaultName_appPasswordSecret.id
+var appCredentialName = 'bot-${replace(name, '_', '-')}-cred-${uniqueSuffix}'
+var appCredentialId = empty(msAppValue) ? '' : keyVaultName_appCredential.id
 
 resource keyVaultName 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: kvName
@@ -54,9 +54,9 @@ resource keyVaultName 'Microsoft.KeyVault/vaults@2023-07-01' = {
 }
 
 
-resource keyVaultName_appPasswordSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = if (!empty(msAppValue)) {
+resource keyVaultName_appCredential 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = if (!empty(msAppValue)) {
   parent: keyVaultName
-  name: appPasswordSecret
+  name: appCredentialName
   properties: {
     value: msAppValue
   }
@@ -75,7 +75,7 @@ resource name_resource 'Microsoft.BotService/botServices@2022-09-15' = {
     displayName: botDisplayName
     msaAppId: msAppId
     openWithHint: 'bfcomposer://'
-    appPasswordHint: appPasswordSecretId
+    appPasswordHint: appCredentialId
     endpoint: endpoint
   }
 }
