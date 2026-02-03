@@ -13,13 +13,13 @@ param location = 'westus2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 // Mgmt Resource Group (spoke)
-param spokeMgmtResourceGroupName = '${tenantIac}-spokemgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
-param appiName = 'spokemgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
+param spokeMgmtResourceGroupName = '${tenantIac}-spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
+param appiName = 'spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // App Service
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
 param apiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
-param planName = 'spokemgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
+param planName = 'spoke-mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 
 // SQL Server
 param sqlName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sql'

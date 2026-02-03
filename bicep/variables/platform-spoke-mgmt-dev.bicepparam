@@ -4,7 +4,7 @@ using '../templates/platform-spoke-mgmt.bicep'
 // Common
 // =====================
 var tenantIac = 'COMPANY'
-var productIac = 'spokemgmt'
+var productIac = 'spoke-mgmt'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
@@ -18,16 +18,16 @@ param tags = {
 
 // =====================
 // Platform Hub Management RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// i.e. gtc-hubmgmt-plat-wus2-001
+// i.e. gtc-hub-mgmt-plat-wus2-001
 // Note: Sentinel is the shared workspace log analytics
 // =====================
 param hubMgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
-param hubMgmtResourceGroupName = 'hubmgmt-plat-${regionIac}-${instanceIac}-rg'
-param workName = 'hubmgmt-plat-${regionIac}-${instanceIac}-sent'
+param hubMgmtResourceGroupName = 'hub-mgmt-plat-${regionIac}-${instanceIac}-rg'
+param workName = 'hub-mgmt-plat-${regionIac}-${instanceIac}-sent'
 
 // =====================
 // Platform Spoke Management RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// i.e. gtc-spokemgmt-dev-wus2-001
+// i.e. gtc-spoke-mgmt-dev-wus2-001
 // =====================
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 param appcsName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appcs'
