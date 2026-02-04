@@ -3,10 +3,10 @@
 
 ## 1. Management Groups (CAF-aligned)
 - **Root**
-	- `myco-company` (CAN - Company)
-		- `myco-platform` (CAN - Platform/Hub)
-		- `myco-dev` (CAN - Dev)
-		- `myco-prod` (CAN - Prod)
+	- `myco-company` (GTC - Company)
+		- `myco-platform` (GTC - Platform/Hub)
+		- `myco-dev` (GTC - Dev)
+		- `myco-prod` (GTC - Prod)
 
 ## 2. Identity Groups & Service Principals
 - `MYCO-ADM-Global` — Administer Global Administrator role

@@ -84,5 +84,3 @@ module planModule '../modules/plan-appserviceplan.bicep' = {
     location: location
   }
 }
-
-

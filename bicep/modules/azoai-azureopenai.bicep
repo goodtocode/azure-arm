@@ -9,11 +9,11 @@ param location string
 @description('Tags to apply to the Azure OpenAI resource.')
 param tags object = {}
 
-@description('SKU for Azure OpenAI. Allowed values: Standard, Default is Standard.')
+@description('SKU for Azure OpenAI. Allowed values: S0, Default is S0.')
 @allowed([
-  'Standard'
+  'S0'
 ])
-param sku string = 'Standard'
+param sku string = 'S0'
 
 resource azoaiResource 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   name: name
@@ -24,7 +24,7 @@ resource azoaiResource 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
     name: sku
   }
   properties: {
-    apiProperties: {
+    apiProperties: {  
       enableDynamicThrottling: true
     }
     networkAcls: {
