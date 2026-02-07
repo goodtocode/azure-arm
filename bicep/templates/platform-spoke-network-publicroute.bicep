@@ -2,9 +2,25 @@ targetScope = 'resourceGroup'
 
 param location string = resourceGroup().location
 param tags object
+
+@minLength(2)
+@maxLength(64)
+@description('Specifies the name of the Virtual Network. 2-64 characters, letters, numbers, and -')
 param vnetName string
+
+@minLength(9)
+@maxLength(18)
+@description('Specifies the address prefix (CIDR block) for the Virtual Network. Example: 10.0.0.0/16')
 param vnetCidr string
+
+@minLength(1)
+@maxLength(80)
+@description('Specifies the name of the management subnet. 1-80 characters, letters, numbers, and -')
 param snetNameManagement string
+
+@minLength(9)
+@maxLength(18)
+@description('Specifies the address prefix (CIDR block) for the management subnet. Example: 10.0.1.0/24')
 param snetCidrManagement string
 
 var platformManagementSecurityRules = [
