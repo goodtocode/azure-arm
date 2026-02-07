@@ -32,5 +32,7 @@ param workName = 'hub-mgmt-plat-${regionIac}-${instanceIac}-sent'
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 param appcsName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appcs'
 param appcsSku = 'free'
+param kvName = '${productIac}-${environmentIac}-appcs-kv'
 param planSku = 'F1'
 param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
+
