@@ -5,14 +5,50 @@ param location string = resourceGroup().location
 param tags object
 
 // Networking
+@description('Specifies the SKU for Azure Front Door. Allowed values: Standard_AzureFrontDoor, Premium_AzureFrontDoor. Default is Premium_AzureFrontDoor.')
+@allowed([
+  'Standard_AzureFrontDoor'
+  'Premium_AzureFrontDoor'
+])
 param afdSku string = 'Premium_AzureFrontDoor' // Required for private link routing
+
+@minLength(1)
+@description('Specifies the API Management publisher name. Must not be empty.')
 param apimPublisherName string
+
+@minLength(5)
+@maxLength(100)
+@description('Specifies the API Management publisher email address. 5-100 characters.')
 param apimPublisherEmail string
+
+@minLength(2)
+@maxLength(64)
+@description('Specifies the name of the Virtual Network. 2-64 characters, letters, numbers, and -')
 param vnetName string
+
+@minLength(9)
+@maxLength(18)
+@description('Specifies the address prefix (CIDR block) for the Virtual Network. Example: 10.0.0.0/16')
 param vnetCidr string
+
+@minLength(1)
+@maxLength(80)
+@description('Specifies the name of the hub shared subnet. 1-80 characters, letters, numbers, and -')
 param snetNameHubShared string
+
+@minLength(9)
+@maxLength(18)
+@description('Specifies the address prefix (CIDR block) for the hub shared subnet. Example: 10.0.1.0/24')
 param snetCidrHubShared string
+
+@minLength(1)
+@maxLength(80)
+@description('Specifies the name of the Azure Bastion subnet. 1-80 characters, letters, numbers, and -')
 param snetNameAzureBastion string
+
+@minLength(9)
+@maxLength(18)
+@description('Specifies the address prefix (CIDR block) for the Azure Bastion subnet. Example: 10.0.2.0/27')
 param snetCidrAzureBastion string
 
 //

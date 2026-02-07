@@ -91,8 +91,8 @@ resource Microsoft_Web_sites_name 'Microsoft.Web/sites@2023-12-01' = {
   ]
 }
 
-resource name_appiName 'Microsoft.Web/sites/microsoft.insights/components@2015-05-01' = {
-  name: '${name}/${appiName}'
+resource name_appiName 'Microsoft.Insights/components@2015-05-01' = {
+  name: appiName
   kind: 'web'
   location: location2
   tags: {
