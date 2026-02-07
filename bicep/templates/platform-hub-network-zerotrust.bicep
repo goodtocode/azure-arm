@@ -168,7 +168,7 @@ module snetBastion '../modules/snet-virtualnetworksubnet.bicep' = {
 module afd '../modules/afd-azurefrontdoor.bicep' = {
   name: 'afdName'
   params: {
-    name: '${vnetName}-afd'
+    name: '${take(vnetName, 59)}-afd'
     location: 'global'
     tags: tags
     sku: afdSku
@@ -178,7 +178,7 @@ module afd '../modules/afd-azurefrontdoor.bicep' = {
 module apim '../modules/apim-apimanagement.bicep' = {
   name: 'apimName'
   params: {
-    name: '${vnetName}-apim'
+    name: '${take(vnetName, 45)}-apim'
     tags: tags
     publisherName: apimPublisherName
     publisherEmail: apimPublisherEmail

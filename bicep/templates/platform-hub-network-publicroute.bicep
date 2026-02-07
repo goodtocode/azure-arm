@@ -159,7 +159,7 @@ module snetBastion '../modules/snet-virtualnetworksubnet.bicep' = {
 module afd '../modules/afd-azurefrontdoor.bicep' = {
   name: 'afdName'
   params: {
-    name: '${vnetName}-afd'
+    name: '${take(vnetName, 59)}-afd'
     location: 'global'
     tags: tags
     sku: afdSku
