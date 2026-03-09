@@ -20,8 +20,8 @@ param(
 	[string]$TenantId,
 	[string]$WebAppRegistrationName,
 	[string]$ApiAppRegistrationName,
-	[string]$WebProjectPath,
-	[string]$ApiProjectPath,
+	[string]$WebProjectPath = "../../src/Presentation.Blazor",
+	[string]$ApiProjectPath = "../../src/Presentation.WebApi",
 	[string]$DotNetVersion = "10",
 	[string]$WebRedirectUri = "https://localhost:7175/signin-oidc",
 	[string]$WebLogoutUri = "https://localhost:7175/signout-callback-oidc"
