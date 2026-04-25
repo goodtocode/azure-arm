@@ -55,8 +55,9 @@ function New-ApiRegistration {
 		Update-MgApplication -ApplicationId $apiApp.Id -IdentifierUris @($identifierUri)
 		Write-Host "Set IdentifierUri to $identifierUri"
 		$customScopes = @(
+			@{ Id = [guid]::NewGuid(); AdminConsentDisplayName = "Access as user"; AdminConsentDescription = "Allows the app to act on behalf of the signed-in user (OBO flow)."; UserConsentDisplayName = "Access as you"; UserConsentDescription = "Allows the app to act on your behalf."; IsEnabled = $true; Type = "User"; Value = "access_as_user" },
 			@{ Id = [guid]::NewGuid(); AdminConsentDisplayName = "Read assets"; AdminConsentDescription = "Allows the app to view asset data."; UserConsentDisplayName = "Read your assets"; UserConsentDescription = "Allows the app to view your assets."; IsEnabled = $true; Type = "User"; Value = "assets.read" },
-			@{ Id = [guid]::NewGuid(); AdminConsentDisplayName = "Edit assets"; AdminConsentDescription = "Allows the app to create or update asset data."; UserConsentDisplayName = "Edit your assets"; UserConsentDescription = "Allows the app to create or update your assets."; IsEnabled = $true; Type = "User"; Value = "assets.write" },
+			@{ Id = [guid]::NewGuid(); AdminConsentDisplayName = "Edit assets"; AdminConsentDescription = "Allows the app to create or update asset data."; UserConsentDisplayName = "Edit your assets"; UserConsentDescription = "Allows the app to create or update your assets."; IsEnabled = $true; Type = "User"; Value = "assets.edit" },
 			@{ Id = [guid]::NewGuid(); AdminConsentDisplayName = "Delete assets"; AdminConsentDescription = "Allows the app to delete asset data."; UserConsentDisplayName = "Delete your assets"; UserConsentDescription = "Allows the app to delete your assets."; IsEnabled = $true; Type = "User"; Value = "assets.delete" }
 		)
 		Update-MgApplication -ApplicationId $apiApp.Id -Api @{ OAuth2PermissionScopes = $customScopes }
@@ -207,7 +208,7 @@ function New-WebRegistration {
 		Write-Error "FATAL: API app registration $ApiAppRegistrationName not found. Exiting script."
 		exit 1
 	}
-	$customScopes = @("assets.read", "assets.write", "assets.delete")
+	$customScopes = @("access_as_user", "assets.read", "assets.edit", "assets.delete")
 	$apiScopes = @()
 	foreach ($scope in $customScopes) {
 		$apiScope = $apiApp.Api.Oauth2PermissionScopes | Where-Object { $_.Value -eq $scope }
