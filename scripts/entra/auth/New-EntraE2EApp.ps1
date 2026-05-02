@@ -234,10 +234,12 @@ if ($GenerateSecrets -and ($created -or $RotateSecret)) {
     $secretAction = if ($created) { "initial" } else { "rotation" }
     Write-Host "Generating client secret for E2E app ($secretAction, expires in 1 year)..."
     try {
+        $secretDisplayName = "appregistration-$(Get-Date -Format 'yyyyMMdd-HHmm')"
         $secretObj = Add-MgApplicationPassword `
             -ApplicationId      $e2eApp.Id `
-            -PasswordCredential @{ EndDateTime = (Get-Date).AddYears(1) }
+            -PasswordCredential @{ DisplayName = $secretDisplayName; EndDateTime = (Get-Date).AddYears(1) }
         $e2eSecret = $secretObj.SecretText
+        Write-Host "Client secret label: $secretDisplayName"
         Write-Host ""
         Write-Host "E2E CLIENT SECRET (copy now — shown once):" -ForegroundColor Yellow
         Write-Host $e2eSecret -ForegroundColor Cyan
