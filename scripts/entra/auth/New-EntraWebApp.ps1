@@ -251,7 +251,7 @@ if ($GenerateSecrets -and ($created -or $RotateSecret)) {
     $secretAction = if ($created) { "initial" } else { "rotation" }
     Write-Host "Generating client secret for Web app ($secretAction, expires in 2 years)..."
     try {
-        $secretDisplayName = "appregistration-$(Get-Date -Format 'yyyyMMdd-HHmm')"
+        $secretDisplayName = "$AppRegistrationName-$(Get-Date -Format 'yyyyMMdd-HHmm')"
         $secretObj = Add-MgApplicationPassword `
             -ApplicationId      $webApp.Id `
             -PasswordCredential @{ DisplayName = $secretDisplayName; EndDateTime = (Get-Date).AddYears(2) }
