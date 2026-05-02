@@ -14,7 +14,7 @@
 #       -EntraInstanceUrl "https://your-tenant.ciamlogin.com" `
 #       -TenantId "<tenant-id>" `
 #       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -ApiProjectPath "../../src/Presentation.WebApi"
+#       -ApiProjectPath "../../../src/Presentation.WebApi"
 #
 # Example — API + Web (standard):
 #   pwsh -File ./New-EntraSolution.ps1 `
@@ -22,8 +22,8 @@
 #       -TenantId "<tenant-id>" `
 #       -ApiAppRegistrationName "myproduct-api-dev-001" `
 #       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -ApiProjectPath "../../src/Presentation.WebApi" `
-#       -WebProjectPath "../../src/Presentation.Blazor" `
+#       -ApiProjectPath "../../../src/Presentation.WebApi" `
+#       -WebProjectPath "../../../src/Presentation.Blazor" `
 #       -GenerateSecrets
 #
 # Example — rerun idempotently after interruption (no secret duplication):
@@ -51,9 +51,9 @@
 #       -ApiAppRegistrationName "myproduct-api-dev-001" `
 #       -WebAppRegistrationName "myproduct-web-dev-001" `
 #       -E2EAppRegistrationName "myproduct-e2e-dev-001" `
-#       -ApiProjectPath "../../src/Presentation.Api" `
-#       -WebProjectPath "../../src/Presentation.Web" `
-#       -E2EProjectPath "../../src/Tests.Endtoend" `
+#       -ApiProjectPath "../../../src/Presentation.Api" `
+#       -WebProjectPath "../../../src/Presentation.Web" `
+#       -E2EProjectPath "../../../src/Tests.Endtoend" `
 #       -WebRedirectUri "https://localhost:7175/signin-oidc" `
 #       -WebLogoutUri "https://localhost:7175/signout-callback-oidc" `
 #       -IncludeE2E -GenerateSecrets -RotateSecrets -AutoConsent
@@ -126,16 +126,31 @@ if ($IncludeE2E -and [string]::IsNullOrWhiteSpace($E2EAppRegistrationName)) {
 # ── Derive child script paths ─────────────────────────────────────────────────
 $authDir = Join-Path $PSScriptRoot "auth"
 
+# Run child scripts from the orchestrator folder so relative paths like ../../src/*
+# resolve consistently, even when child scripts are under ./auth.
+function Invoke-FromOrchestratorDirectory {
+    param([scriptblock]$ScriptBlock)
+    Push-Location $PSScriptRoot
+    try {
+        & $ScriptBlock
+    }
+    finally {
+        Pop-Location
+    }
+}
+
 # ── Step 1: API app (resource server) ─────────────────────────────────────────
 Write-Host ""
 Write-Host "──────────────────────────────────────────────────"
 Write-Host " Step 1: API App Registration (resource server)"
 Write-Host "──────────────────────────────────────────────────"
-$api = & "$authDir\New-EntraApiApp.ps1" `
-    -EntraInstanceUrl    $EntraInstanceUrl `
-    -TenantId            $TenantId `
-    -AppRegistrationName $ApiAppRegistrationName `
-    -ProjectPath         $ApiProjectPath
+$api = Invoke-FromOrchestratorDirectory {
+    & "$authDir\New-EntraApiApp.ps1" `
+        -EntraInstanceUrl    $EntraInstanceUrl `
+        -TenantId            $TenantId `
+        -AppRegistrationName $ApiAppRegistrationName `
+        -ProjectPath         $ApiProjectPath
+}
 
 if (-not $api -or -not $api.AppId) {
     Write-Error "FATAL: API app registration failed."
@@ -150,16 +165,18 @@ if (-not [string]::IsNullOrWhiteSpace($WebAppRegistrationName)) {
     Write-Host "──────────────────────────────────────────────────"
     Write-Host " Step 2: Web App Registration (Auth Code + PKCE)"
     Write-Host "──────────────────────────────────────────────────"
-    $web = & "$authDir\New-EntraWebApp.ps1" `
-        -EntraInstanceUrl    $EntraInstanceUrl `
-        -TenantId            $TenantId `
-        -AppRegistrationName $WebAppRegistrationName `
-        -ApiAppId            $api.AppId `
-        -ProjectPath         $WebProjectPath `
-        -RedirectUri         $WebRedirectUri `
-        -LogoutUri           $WebLogoutUri `
-        -GenerateSecrets:$GenerateSecrets `
-        -RotateSecret:$RotateSecrets
+    $web = Invoke-FromOrchestratorDirectory {
+        & "$authDir\New-EntraWebApp.ps1" `
+            -EntraInstanceUrl    $EntraInstanceUrl `
+            -TenantId            $TenantId `
+            -AppRegistrationName $WebAppRegistrationName `
+            -ApiAppId            $api.AppId `
+            -ProjectPath         $WebProjectPath `
+            -RedirectUri         $WebRedirectUri `
+            -LogoutUri           $WebLogoutUri `
+            -GenerateSecrets:$GenerateSecrets `
+            -RotateSecret:$RotateSecrets
+    }
 
     if (-not $web -or -not $web.AppId) {
         Write-Error "FATAL: Web app registration failed."
@@ -179,13 +196,15 @@ if ($IncludeE2E) {
     Write-Host "──────────────────────────────────────────────────"
     Write-Host " Step 3: E2E App Registration (Client Credentials)"
     Write-Host "──────────────────────────────────────────────────"
-    $e2e = & "$authDir\New-EntraE2EApp.ps1" `
-        -TenantId            $TenantId `
-        -AppRegistrationName $E2EAppRegistrationName `
-        -ApiAppId            $api.AppId `
-        -ProjectPath         $E2EProjectPath `
-        -GenerateSecrets:$GenerateSecrets `
-        -RotateSecret:$RotateSecrets
+    $e2e = Invoke-FromOrchestratorDirectory {
+        & "$authDir\New-EntraE2EApp.ps1" `
+            -TenantId            $TenantId `
+            -AppRegistrationName $E2EAppRegistrationName `
+            -ApiAppId            $api.AppId `
+            -ProjectPath         $E2EProjectPath `
+            -GenerateSecrets:$GenerateSecrets `
+            -RotateSecret:$RotateSecrets
+    }
 
     if (-not $e2e -or -not $e2e.AppId) {
         Write-Error "FATAL: E2E app registration failed."
@@ -212,7 +231,9 @@ if ($web) {
         AutoConsent = $AutoConsent
     }
     if ($e2e) { $consentParams["E2EAppId"] = $e2e.AppId }
-    & "$authDir\Grant-EntraConsent.ps1" @consentParams
+    Invoke-FromOrchestratorDirectory {
+        & "$authDir\Grant-EntraConsent.ps1" @consentParams
+    }
 }
 else {
     Write-Host ""
