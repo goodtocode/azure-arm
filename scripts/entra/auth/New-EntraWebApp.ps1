@@ -140,18 +140,32 @@ function Wait-ForApplicationPropagation {
 function Set-ProjectUserSecrets {
     param([string]$ProjectPath, [hashtable]$Secrets)
     if ([string]::IsNullOrWhiteSpace($ProjectPath)) { return }
-    if (Test-Path $ProjectPath) {
-        Write-Host "Setting .NET user-secrets for: $ProjectPath"
-        Push-Location $ProjectPath
-        dotnet user-secrets init | Out-Null
-        foreach ($key in $Secrets.Keys) {
-            dotnet user-secrets set $key $Secrets[$key] | Out-Null
-            Write-Host "  Set: $key"
-        }
-        Pop-Location
-    }
-    else {
+    $resolvedPath = Resolve-Path -Path $ProjectPath -ErrorAction SilentlyContinue
+    if (-not $resolvedPath) {
         Write-Warning "*** Project path '$ProjectPath' not found. Skipping dotnet user-secrets. ***"
+        return
+    }
+
+    $targetPath = $resolvedPath.Path
+    $projectFile = $null
+    if ((Test-Path $targetPath -PathType Leaf) -and $targetPath.EndsWith('.csproj', [System.StringComparison]::OrdinalIgnoreCase)) {
+        $projectFile = $targetPath
+    }
+    elseif (Test-Path $targetPath -PathType Container) {
+        $project = Get-ChildItem -Path $targetPath -Filter "*.csproj" -File | Select-Object -First 1
+        if ($project) { $projectFile = $project.FullName }
+    }
+
+    if (-not $projectFile) {
+        Write-Warning "*** No .csproj found at '$targetPath'. Skipping dotnet user-secrets. ***"
+        return
+    }
+
+    Write-Host "Setting .NET user-secrets for project: $projectFile"
+    dotnet user-secrets init --project "$projectFile" | Out-Null
+    foreach ($key in $Secrets.Keys) {
+        dotnet user-secrets set "$key" "$($Secrets[$key])" --project "$projectFile" | Out-Null
+        Write-Host "  Set: $key"
     }
 }
 

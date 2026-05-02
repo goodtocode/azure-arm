@@ -56,7 +56,7 @@
 #       -E2EProjectPath "../../src/Tests.Endtoend" `
 #       -WebRedirectUri "https://localhost:7175/signin-oidc" `
 #       -WebLogoutUri "https://localhost:7175/signout-callback-oidc" `
-#       -IncludeE2E -GenerateSecrets -AutoConsent
+#       -IncludeE2E -GenerateSecrets -RotateSecrets -AutoConsent
 # -----------------------------------------------------------------------------
 # Notes:
 #   - Requires Az.Accounts, Az.Resources, Microsoft.Graph.Applications
