@@ -43,8 +43,8 @@ param(
     [Parameter(Mandatory)][string]$AppRegistrationName,
     [Parameter(Mandatory)][string]$ApiAppId,
     [string]$ProjectPath  = "",
-    [string]$RedirectUri  = "https://localhost:7175/signin-oidc",
-    [string]$LogoutUri    = "https://localhost:7175/signout-callback-oidc",
+    [string]$RedirectUri,
+    [string]$LogoutUri,
     [switch]$GenerateSecrets,
     [switch]$RotateSecret
 )
