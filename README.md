@@ -49,8 +49,68 @@ az deployment group create \
 
 - `bicep/modules/` — Atomic Bicep modules (atoms)
 - `bicep/templates/` — Composite Bicep templates (organisms)
+- `bicep/variables/` — Environment-specific `.bicepparam` files for templates
 - `scripts/` — PowerShell and CLI scripts for automation
 - `variables/` — Parameter and variable files
+
+---
+
+## Azure AI Foundry (Standalone)
+
+This repository includes a standalone Azure AI Foundry deployment path that avoids private networking and enterprise landing-zone dependencies.
+
+### New Assets
+
+- Module: `bicep/modules/aif-foundry.bicep`
+- Template: `bicep/templates/landingzone-standalone-ai-foundry.bicep`
+- Variables: `bicep/variables/landingzone-standalone-ai-foundry-dev.bicepparam`
+
+### Scope
+
+- Deploys Azure AI Foundry hub (`Microsoft.CognitiveServices/accounts`, kind `AIServices`).
+- Deploys Azure AI Foundry project resource.
+- Deploys a configurable model deployment.
+- Outputs endpoint and deployment identifiers for provider integration.
+
+### Validate
+
+```sh
+az deployment group what-if \
+	--resource-group <your-resource-group> \
+	--template-file bicep/templates/landingzone-standalone-ai-foundry.bicep \
+	--parameters bicep/variables/landingzone-standalone-ai-foundry-dev.bicepparam
+```
+
+### Deploy
+
+```sh
+az deployment group create \
+	--resource-group <your-resource-group> \
+	--template-file bicep/templates/landingzone-standalone-ai-foundry.bicep \
+	--parameters bicep/variables/landingzone-standalone-ai-foundry-dev.bicepparam
+```
+
+### Provider Configuration Example
+
+Use deployment outputs with your provider abstraction:
+
+```json
+{
+	"AgentProvider": {
+		"Provider": "Foundry",
+		"Endpoint": "<foundry-endpoint>",
+		"Deployment": "default"
+	}
+}
+```
+
+### Local vs Cloud Provider Selection
+
+- Local/self-hosted option: Ollama
+- Managed cloud option: Azure AI Foundry
+- Existing managed option: Azure OpenAI
+
+Switching providers should remain configuration-driven through your `AgentProviderOptions` pattern.
 
 ---
 
