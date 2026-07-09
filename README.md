@@ -114,6 +114,72 @@ Switching providers should remain configuration-driven through your `AgentProvid
 
 ---
 
+## Azure Ollama (Standalone)
+
+This repository includes a standalone Ollama deployment path using Azure Container Apps with internal ingress and persistent model storage.
+
+### New Assets
+
+- Module: `bicep/modules/aca-ollama.bicep`
+- Template: `bicep/templates/platform-standalone-ai-ollama.bicep`
+- Variables: `bicep/variables/platform-standalone-ai-ollama-dev.bicepparam`
+
+### Scope
+
+- Deploys Azure Container Apps managed environment.
+- Deploys Azure Container App running `ollama/ollama`.
+- Configures internal-only ingress (`external: false`).
+- Pulls configured model at startup.
+- Persists downloaded models to Azure Files mounted into the container.
+
+### Validate
+
+```sh
+az deployment group what-if \
+	--resource-group <your-resource-group> \
+	--template-file bicep/templates/platform-standalone-ai-ollama.bicep \
+	--parameters bicep/variables/platform-standalone-ai-ollama-dev.bicepparam
+```
+
+### Deploy
+
+```sh
+az deployment group create \
+	--resource-group <your-resource-group> \
+	--template-file bicep/templates/platform-standalone-ai-ollama.bicep \
+	--parameters bicep/variables/platform-standalone-ai-ollama-dev.bicepparam
+```
+
+### Provider Configuration Mapping
+
+Azure-hosted Ollama:
+
+```json
+{
+	"AgentProvider": {
+		"Provider": "Ollama",
+		"Endpoint": "http://<ollama-internal-fqdn>",
+		"Model": "phi4"
+	}
+}
+```
+
+Local development:
+
+```json
+{
+	"AgentProvider": {
+		"Provider": "Ollama",
+		"Endpoint": "http://localhost:11434",
+		"Model": "phi4"
+	}
+}
+```
+
+Both use the same provider shape and differ only by environment-specific configuration values.
+
+---
+
 ## Contributing
 
 Contributions are welcome! Please ensure new modules and templates follow the atomic design principles and include documentation and sample parameters.
