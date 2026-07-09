@@ -1,4 +1,4 @@
-using '../templates/platform-spoke-ai.bicep'
+using '../templates/platform-standalone-ai-openai.bicep'
 
 // =====================
 // Common
