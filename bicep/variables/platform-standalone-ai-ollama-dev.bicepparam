@@ -8,6 +8,7 @@ var productIac = 'crucible'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
+var storageAccountProductIac = take(replace(productIac, '-', ''), 24 - length(environmentIac) - length(regionIac) - length(instanceIac) - 3)
 param location = 'westus2'
 param tags = {
   Environment: environmentIac
@@ -17,12 +18,11 @@ param tags = {
 }
 
 // =====================
-// Standalone Ollama RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// i.e. company-crucible-dev-wus2-001-rg
+// Spoke AI in SPOKE_MGMT_RG_NAME
 // =====================
 param environmentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-acaenv'
 param containerAppName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-ollama'
-param storageAccountName = 'cru${environmentIac}${regionIac}${instanceIac}oll'
+param storageAccountName = '${storageAccountProductIac}${environmentIac}${regionIac}${instanceIac}oll'
 param storageShareName = 'ollama-models'
 
 param modelName = 'phi4'
