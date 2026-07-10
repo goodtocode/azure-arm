@@ -108,11 +108,7 @@ resource managedEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: environmentName
   location: location
   tags: empty(tags) ? null : tags
-  properties: {
-    appLogsConfiguration: {
-      destination: 'none'
-    }
-  }
+  properties: {}
 }
 
 resource environmentStorage 'Microsoft.App/managedEnvironments/storages@2024-03-01' = {
