@@ -4,7 +4,7 @@ using '../templates/platform-standalone-ai-ollama.bicep'
 // Common
 // =====================
 var tenantIac = 'COMPANY'
-var productIac = 'platform'
+var productIac = 'spoke-ai'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
