@@ -1,4 +1,4 @@
-using '../templates/platform-standalone-ai-ollama.bicep'
+using '../templates/platform-spoke-ai-ollama.bicep'
 
 // =====================
 // Common
@@ -32,7 +32,4 @@ param memoryGiB = '4Gi'
 param minReplicas = 1
 param maxReplicas = 1
 param storageSku = 'Standard_LRS'
-param ingressExternal = true
-param ingressAllowedCidrs = [
-  '203.0.113.10/32'
-]
+param infrastructureSubnetResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/hub-network-dev-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/hub-dev-wus2-001-vnet/subnets/aca-infra-snet'

@@ -71,17 +71,20 @@ param maxReplicas int = 1
 ])
 param storageSku string = 'Standard_LRS'
 
-@description('Set to true to expose Ollama publicly through external ingress.')
-param ingressExternal bool = true
-
-@description('Optional CIDR allow list for public ingress. Example: 203.0.113.10/32')
-param ingressAllowedCidrs array = []
+@description('Resource ID of the delegated subnet used by the Azure Container Apps managed environment infrastructure.')
+@minLength(20)
+param infrastructureSubnetResourceId string
 
 resource managedEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: environmentName
   location: location
   tags: empty(tags) ? null : tags
-  properties: {}
+  properties: {
+    vnetConfiguration: {
+      infrastructureSubnetId: infrastructureSubnetResourceId
+      internal: true
+    }
+  }
 }
 
 module ollamaModule '../modules/aca-ollama.bicep' = {
@@ -103,8 +106,8 @@ module ollamaModule '../modules/aca-ollama.bicep' = {
     minReplicas: minReplicas
     maxReplicas: maxReplicas
     storageSku: storageSku
-    ingressExternal: ingressExternal
-    ingressAllowedCidrs: ingressAllowedCidrs
+    ingressExternal: false
+    ingressAllowedCidrs: []
   }
 }
 
