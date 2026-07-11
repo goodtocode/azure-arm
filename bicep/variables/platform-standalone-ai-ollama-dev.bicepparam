@@ -33,6 +33,7 @@ param minReplicas = 1
 param maxReplicas = 1
 param storageSku = 'Standard_LRS'
 param ingressExternal = true
+// RFC5737 TEST-NET-3 placeholder; replace with real caller egress CIDRs before deployment.
 param ingressAllowedCidrs = [
-  '203.0.113.10/32'
+  '203.0.113.0/24'
 ]
