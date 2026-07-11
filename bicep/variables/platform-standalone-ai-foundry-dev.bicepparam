@@ -4,7 +4,7 @@ using '../templates/platform-standalone-ai-foundry.bicep'
 // Common
 // =====================
 var tenantIac = 'COMPANY'
-var productIac = 'crucible'
+var productIac = 'spoke-ai'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'

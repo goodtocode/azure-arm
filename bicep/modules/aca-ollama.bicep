@@ -6,8 +6,8 @@ param tags object = {}
 
 @minLength(3)
 @maxLength(63)
-@description('Name of the Azure Container Apps managed environment.')
-param environmentName string
+@description('Name of the existing Azure Container Apps managed environment hosting Ollama.')
+param managedEnvironmentName string
 
 @minLength(2)
 @maxLength(63)
@@ -68,6 +68,12 @@ param maxReplicas int = 1
 ])
 param targetPort int = 11434
 
+@description('Set to true to expose Ollama publicly through external ingress. Set to false for internal-only ingress.')
+param ingressExternal bool
+
+@description('Optional list of CIDR ranges allowed to call the public endpoint when ingressExternal is true. Example: 203.0.113.10/32')
+param ingressAllowedCidrs array = []
+
 @description('Storage SKU for the persistent storage account.')
 @allowed([
   'Standard_LRS'
@@ -104,12 +110,16 @@ resource storageShare 'Microsoft.Storage/storageAccounts/fileServices/shares@202
   }
 }
 
-resource managedEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
-  name: environmentName
-  location: location
-  tags: empty(tags) ? null : tags
-  properties: {}
+resource managedEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' existing = {
+  name: managedEnvironmentName
 }
+
+var ingressIpSecurityRestrictions = [for (cidr, index) in ingressAllowedCidrs: {
+  name: 'allow-${index + 1}'
+  action: 'Allow'
+  ipAddressRange: cidr
+  description: 'Allowed CIDR ${cidr}'
+}]
 
 resource environmentStorage 'Microsoft.App/managedEnvironments/storages@2024-03-01' = {
   parent: managedEnvironment
@@ -132,10 +142,11 @@ resource ollamaApp 'Microsoft.App/containerApps@2024-03-01' = {
     managedEnvironmentId: managedEnvironment.id
     configuration: {
       ingress: {
-        external: false
+        external: ingressExternal
         targetPort: targetPort
         transport: 'auto'
         allowInsecure: false
+        ipSecurityRestrictions: ingressExternal && !empty(ingressAllowedCidrs) ? ingressIpSecurityRestrictions : null
       }
       activeRevisionsMode: 'Single'
     }
@@ -188,7 +199,9 @@ resource ollamaApp 'Microsoft.App/containerApps@2024-03-01' = {
   }
 }
 
-output ollamaEndpoint string = 'http://${ollamaApp.properties.configuration.ingress.fqdn}'
+var endpointScheme = ingressExternal ? 'https' : 'http'
+
+output ollamaEndpoint string = '${endpointScheme}://${ollamaApp.properties.configuration.ingress.fqdn}'
 output deployedModel string = modelName
 output containerAppId string = ollamaApp.id
 output environmentId string = managedEnvironment.id
