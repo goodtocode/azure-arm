@@ -68,7 +68,7 @@ param modelDeploymentSkuName string = 'Standard'
 @minValue(1)
 param modelDeploymentSkuCapacity int = 1
 
-module azoaiModule '../modules/azoai-azureopenai.bicep' = {
+module azoaiModule '../modules/aoai-azureopenai.bicep' = {
   name: 'azoaiModule'
   params: {
     name: azoaiName
