@@ -1,0 +1,373 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.38.33.27573",
+      "templateHash": "3389507779911600415"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region for resource deployment. Defaults to the resource group location."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "metadata": {
+        "description": "Tags to apply to resources. Must be an object."
+      }
+    },
+    "azoaiName": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 63,
+      "metadata": {
+        "description": "Name of the Azure OpenAI instance. Must be globally unique, 3-63 characters, using only lowercase letters, numbers, and hyphens, starting and ending with a letter or number."
+      }
+    },
+    "azoaiSku": {
+      "type": "string",
+      "defaultValue": "S0",
+      "allowedValues": [
+        "S0"
+      ],
+      "metadata": {
+        "description": "SKU for Azure OpenAI. Allowed value: S0. Defaults to S0."
+      }
+    },
+    "deployModel": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "When true, deploys a model deployment into the Azure OpenAI account."
+      }
+    },
+    "modelDeploymentName": {
+      "type": "string",
+      "defaultValue": "default",
+      "minLength": 1,
+      "maxLength": 64,
+      "metadata": {
+        "description": "Deployment name clients use at runtime for Azure OpenAI calls."
+      }
+    },
+    "modelName": {
+      "type": "string",
+      "defaultValue": "gpt-4.1-mini",
+      "allowedValues": [
+        "gpt-4.1",
+        "gpt-4.1-mini",
+        "gpt-4o",
+        "gpt-4o-mini",
+        "text-embedding-3-large",
+        "text-embedding-3-small"
+      ],
+      "metadata": {
+        "description": "Model name to deploy when deployModel is true."
+      }
+    },
+    "modelFormat": {
+      "type": "string",
+      "defaultValue": "OpenAI",
+      "allowedValues": [
+        "OpenAI"
+      ],
+      "metadata": {
+        "description": "Model format required by Azure OpenAI deployment."
+      }
+    },
+    "modelVersion": {
+      "type": "string",
+      "defaultValue": "2025-04-14",
+      "metadata": {
+        "description": "Model version. Keep configurable because availability varies by region and subscription."
+      }
+    },
+    "modelDeploymentSkuName": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "allowedValues": [
+        "Standard",
+        "GlobalStandard"
+      ],
+      "metadata": {
+        "description": "Model deployment SKU name."
+      }
+    },
+    "modelDeploymentSkuCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "metadata": {
+        "description": "Model deployment SKU capacity."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "azoaiModule",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[parameters('azoaiName')]"
+          },
+          "sku": {
+            "value": "[parameters('azoaiSku')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          },
+          "deployModel": {
+            "value": "[parameters('deployModel')]"
+          },
+          "deploymentName": {
+            "value": "[parameters('modelDeploymentName')]"
+          },
+          "modelName": {
+            "value": "[parameters('modelName')]"
+          },
+          "modelFormat": {
+            "value": "[parameters('modelFormat')]"
+          },
+          "modelVersion": {
+            "value": "[parameters('modelVersion')]"
+          },
+          "deploymentSkuName": {
+            "value": "[parameters('modelDeploymentSkuName')]"
+          },
+          "deploymentSkuCapacity": {
+            "value": "[parameters('modelDeploymentSkuCapacity')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.38.33.27573",
+              "templateHash": "13969482876113378514"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 63,
+              "metadata": {
+                "description": "Name of the Azure OpenAI instance. Must be globally unique and 3-63 characters, using only lowercase letters, numbers, and hyphens, starting and ending with a letter or number."
+              }
+            },
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Location for the Azure OpenAI resource."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {},
+              "metadata": {
+                "description": "Tags to apply to the Azure OpenAI resource."
+              }
+            },
+            "sku": {
+              "type": "string",
+              "defaultValue": "S0",
+              "allowedValues": [
+                "S0"
+              ],
+              "metadata": {
+                "description": "SKU for Azure OpenAI. Allowed values: S0, Default is S0."
+              }
+            },
+            "deployModel": {
+              "type": "bool",
+              "defaultValue": true,
+              "metadata": {
+                "description": "When true, deploys a model deployment into the Azure OpenAI account."
+              }
+            },
+            "deploymentName": {
+              "type": "string",
+              "defaultValue": "default",
+              "minLength": 1,
+              "maxLength": 64,
+              "metadata": {
+                "description": "Deployment name clients use at runtime. This is the value used as model/deployment identifier by most Azure OpenAI SDK calls."
+              }
+            },
+            "modelName": {
+              "type": "string",
+              "defaultValue": "gpt-4.1-mini",
+              "allowedValues": [
+                "gpt-4.1",
+                "gpt-4.1-mini",
+                "gpt-4o",
+                "gpt-4o-mini",
+                "text-embedding-3-large",
+                "text-embedding-3-small"
+              ],
+              "metadata": {
+                "description": "Model name to deploy when deployModel is true."
+              }
+            },
+            "modelFormat": {
+              "type": "string",
+              "defaultValue": "OpenAI",
+              "allowedValues": [
+                "OpenAI"
+              ],
+              "metadata": {
+                "description": "Model format required by Azure OpenAI deployment."
+              }
+            },
+            "modelVersion": {
+              "type": "string",
+              "defaultValue": "2025-04-14",
+              "metadata": {
+                "description": "Model version. Keep configurable because availability varies by region and subscription."
+              }
+            },
+            "deploymentSkuName": {
+              "type": "string",
+              "defaultValue": "Standard",
+              "allowedValues": [
+                "Standard",
+                "GlobalStandard"
+              ],
+              "metadata": {
+                "description": "Model deployment SKU name."
+              }
+            },
+            "deploymentSkuCapacity": {
+              "type": "int",
+              "defaultValue": 1,
+              "minValue": 1,
+              "metadata": {
+                "description": "Model deployment SKU capacity."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.CognitiveServices/accounts",
+              "apiVersion": "2024-10-01",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "kind": "OpenAI",
+              "sku": {
+                "name": "[parameters('sku')]"
+              },
+              "properties": {
+                "apiProperties": {
+                  "enableDynamicThrottling": true
+                },
+                "networkAcls": {
+                  "defaultAction": "Allow"
+                }
+              }
+            },
+            {
+              "condition": "[parameters('deployModel')]",
+              "type": "Microsoft.CognitiveServices/accounts/deployments",
+              "apiVersion": "2024-10-01",
+              "name": "[format('{0}/{1}', parameters('name'), parameters('deploymentName'))]",
+              "sku": {
+                "name": "[parameters('deploymentSkuName')]",
+                "capacity": "[parameters('deploymentSkuCapacity')]"
+              },
+              "properties": {
+                "model": {
+                  "format": "[parameters('modelFormat')]",
+                  "name": "[parameters('modelName')]",
+                  "version": "[parameters('modelVersion')]"
+                },
+                "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
+                "raiPolicyName": "Microsoft.Default"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('name'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "id": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.CognitiveServices/accounts', parameters('name'))]"
+            },
+            "endpoint": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('name')), '2024-10-01').endpoint]"
+            },
+            "primaryAccessKey": {
+              "type": "string",
+              "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('name')), '2024-10-01').key1]"
+            },
+            "secondaryAccessKey": {
+              "type": "string",
+              "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('name')), '2024-10-01').key2]"
+            },
+            "deployedModelName": {
+              "type": "string",
+              "value": "[if(parameters('deployModel'), parameters('modelName'), '')]"
+            },
+            "deployedModelVersion": {
+              "type": "string",
+              "value": "[if(parameters('deployModel'), parameters('modelVersion'), '')]"
+            },
+            "deployedModelDeploymentName": {
+              "type": "string",
+              "value": "[if(parameters('deployModel'), parameters('deploymentName'), '')]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "azoaiResourceId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'azoaiModule'), '2025-04-01').outputs.id.value]"
+    },
+    "endpoint": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'azoaiModule'), '2025-04-01').outputs.endpoint.value]"
+    },
+    "primaryAccessKey": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'azoaiModule'), '2025-04-01').outputs.primaryAccessKey.value]"
+    },
+    "secondaryAccessKey": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'azoaiModule'), '2025-04-01').outputs.secondaryAccessKey.value]"
+    },
+    "deployedModelName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'azoaiModule'), '2025-04-01').outputs.deployedModelName.value]"
+    },
+    "deployedModelVersion": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'azoaiModule'), '2025-04-01').outputs.deployedModelVersion.value]"
+    },
+    "deployedModelDeploymentName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'azoaiModule'), '2025-04-01').outputs.deployedModelDeploymentName.value]"
+    }
+  }
+}

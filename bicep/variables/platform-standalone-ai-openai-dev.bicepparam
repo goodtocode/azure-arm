@@ -22,3 +22,10 @@ param tags = {
 // =====================
 param azoaiSku = 'S0'
 param azoaiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-azoai'
+param deployModel = true
+param modelDeploymentName = 'default'
+param modelName = 'gpt-4.1-mini'
+param modelFormat = 'OpenAI'
+param modelVersion = '2025-04-14'
+param modelDeploymentSkuName = 'Standard'
+param modelDeploymentSkuCapacity = 1
