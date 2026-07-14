@@ -1,4 +1,4 @@
-using '../templates/platform-standalone-ai-openai.bicep'
+using '../templates/platform-standalone-ai-aoai.bicep'
 
 // =====================
 // Common
@@ -22,3 +22,10 @@ param tags = {
 // =====================
 param azoaiSku = 'S0'
 param azoaiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-azoai'
+param deployModel = true
+param modelDeploymentName = 'default'
+param modelName = 'gpt-5.5'
+param modelFormat = 'OpenAI'
+param modelVersion = '2026-04-24'
+param modelDeploymentSkuName = 'Standard'
+param modelDeploymentSkuCapacity = 1
