@@ -30,7 +30,7 @@ param modelName string = 'gpt-4.1-mini'
 
 @minLength(1)
 @maxLength(64)
-@description('Deployment name exposed to Crucible provider configuration.')
+@description('Deployment name exposed to provider configuration.')
 param deploymentName string = 'default'
 
 @description('SKU for model deployment.')

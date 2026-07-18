@@ -18,7 +18,7 @@ param tags = {
 
 // =====================
 // Standalone Foundry RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// i.e. company-crucible-dev-wus2-001-rg
+// i.e. gtc-agentframework-dev-wus2-001-rg
 // =====================
 param foundryName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif'
 param projectName = '${productIac}-${environmentIac}'
