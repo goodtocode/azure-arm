@@ -13,8 +13,7 @@ param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 // Common Services
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
-param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
-
+param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-work'
 
 // App Service
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
