@@ -1240,7 +1240,7 @@ export-modulemember -function Update-LineByContains
 # Update-ContentsByTag [-Path [<String>]]
 # [-Open [<String[]>] [-Close [<String[]>]]
 #
-# Example: .\Update-ContentsByTag -Path $Path -Include *.sln -Open "GlobalSection(TeamFoundationVersionControl) = preSolution" -Close "EndGlobalSection"
+# Example: .\Update-ContentsByTag -Path $Path -Include *.slnx -Open "GlobalSection(TeamFoundationVersionControl) = preSolution" -Close "EndGlobalSection"
 #-----------------------------------------------------------------------
 function Update-ContentsByTag
 {

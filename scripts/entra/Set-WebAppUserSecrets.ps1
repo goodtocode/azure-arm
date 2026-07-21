@@ -6,7 +6,9 @@
 #   pwsh -File ./Set-WebAppUserSecrets.ps1 `
 #       -TenantId "<your-tenant-id>" `
 #       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -WebProjectPath "../../src/Presentation.Blazor"
+#       -ApiClientId "<api-app-client-id>" `
+#       -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" `
+#       -WebProjectPath "../../src/Presentation.Web"
 # -----------------------------------------------------------------------------
 # Notes:
 #   - Requires Azure PowerShell modules (Az.Accounts, Microsoft.Graph.Applications)
@@ -17,6 +19,8 @@
 param(
     [string]$TenantId,
     [string]$WebAppRegistrationName,
+    [string]$ApiClientId,
+    [string]$EntraInstanceUrl = "https://login.microsoftonline.com",
     [string]$WebProjectPath
 )
 
@@ -73,10 +77,13 @@ $secrets = Get-MgApplicationPassword -ApplicationId $webApp.Id
 $clientSecret = $secrets | Select-Object -First 1 -ExpandProperty SecretText
 
 $webSecrets = @{
-    "EntraExternalId:Instance"          = "https://login.microsoftonline.com"
+    "EntraExternalId:Instance"          = $EntraInstanceUrl
     "EntraExternalId:TenantId"          = $TenantId
     "EntraExternalId:ClientId"          = $webApp.AppId
     "EntraExternalId:ValidateAuthority" = "true"
+}
+if ($ApiClientId) {
+    $webSecrets["BackendApi:ClientId"] = $ApiClientId
 }
 if ($clientSecret) {
     $webSecrets["EntraExternalId:ClientSecret"] = $clientSecret

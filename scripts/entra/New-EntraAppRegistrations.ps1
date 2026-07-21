@@ -8,8 +8,8 @@
 #       -TenantId "<your-tenant-id>" `
 #       -WebAppRegistrationName "myproduct-web-dev-001" `
 #       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -WebProjectPath "../../src/Presentation.Blazor" `
-#       -ApiProjectPath "../../src/Presentation.WebApi"
+#       -WebProjectPath "../../src/Presentation.Web" `
+#       -ApiProjectPath "../../src/Presentation.Api"
 # -----------------------------------------------------------------------------
 # Notes:
 #   - Requires Azure PowerShell modules (Az.Accounts, Az.Resources, etc.)
@@ -434,7 +434,7 @@ $webApp = $webReg
 
 # Step 6: Write Web EEID values to $WebProjectPath via dotnet user-secrets
 $webSecrets = @{
-	"BackEndApi:ClientId"          		= $apiApp.AppId
+	"BackendApi:ClientId"           		= $apiApp.AppId
 	"EntraExternalId:Instance"          = $EntraInstanceUrl
 	"EntraExternalId:TenantId"          = $TenantId
 	"EntraExternalId:ClientId"          = $webApp.AppId
