@@ -16,7 +16,7 @@ param projectName string
 
 @description('Optional human-readable description for the Azure AI Foundry project resource.')
 @maxLength(256)
-param projectDescription string = 'Standalone Azure AI Foundry project for Crucible.'
+param projectDescription string = 'Standalone Azure AI Foundry project.'
 
 @description('Name of the model to deploy.')
 @allowed([
