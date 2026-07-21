@@ -23,9 +23,42 @@ param(
 	[string]$WebProjectPath = "../../src/Presentation.Web",
 	[string]$ApiProjectPath = "../../src/Presentation.Api",
 	[string]$DotNetVersion = "10",
-	[string]$WebRedirectUri = "https://localhost:7175/signin-oidc",
-	[string]$WebLogoutUri = "https://localhost:7175/signout-callback-oidc"
+	[string]$WebRedirectUri = "https://localhost:6195/signin-oidc",
+	[string]$WebLogoutUri = "https://localhost:6195/signout-callback-oidc"
 )
+
+function Update-WebRegistrationUris {
+	param(
+		[object]$WebApp,
+		[string]$WebRedirectUri,
+		[string]$WebLogoutUri
+	)
+
+	if (-not $WebApp -or -not $WebApp.Id) {
+		Write-Error "FATAL: Cannot update Web app registration URIs because the app object is missing."
+		exit 1
+	}
+
+	$existingRedirectUris = @()
+	if ($WebApp.Web -and $WebApp.Web.RedirectUris) {
+		$existingRedirectUris = @($WebApp.Web.RedirectUris)
+	}
+
+	$redirectUris = @($existingRedirectUris + $WebRedirectUri |
+		Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+		Select-Object -Unique)
+
+	Update-MgApplication -ApplicationId $WebApp.Id -Web @{
+		RedirectUris = $redirectUris
+		LogoutUrl = $WebLogoutUri
+		ImplicitGrantSettings = @{
+			EnableIdTokenIssuance = $false
+			EnableAccessTokenIssuance = $true
+		}
+	}
+
+	Write-Host "Ensured Web redirect URI(s) and logout URI include local launch profile defaults."
+}
 
 function New-ApiRegistration {
 	param(
@@ -182,6 +215,10 @@ function New-WebRegistration {
 	else {
 		Write-Host "Web app registration $WebAppRegistrationName already exists."
 	}
+
+	Update-WebRegistrationUris -WebApp $webApp -WebRedirectUri $WebRedirectUri -WebLogoutUri $WebLogoutUri
+	$webApp = Wait-ForApplicationPropagation -AppId $webApp.AppId -ObjectId $webApp.Id
+
 	Write-Host "Adding Microsoft Graph User.Read, email, profile delegated permissions to Web app registration..."
 	$msGraphSp = Get-MgServicePrincipal -Filter "displayName eq 'Microsoft Graph'" -ErrorAction Stop
 	if (-not $msGraphSp) {
