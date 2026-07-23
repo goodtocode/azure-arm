@@ -18,7 +18,7 @@ param azoaiName string
 param azoaiSku string = 'S0'
 
 @description('When true, deploys a model deployment into the Azure OpenAI account.')
-param deployModel bool = true
+param deployModel bool = false
 
 @description('Deployment name clients use at runtime for Azure OpenAI calls.')
 @minLength(1)
