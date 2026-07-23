@@ -24,7 +24,8 @@ param(
 	[string]$ApiProjectPath = "../../src/Presentation.Api",
 	[string]$DotNetVersion = "10",
 	[string]$WebRedirectUri = "https://localhost:6195/signin-oidc",
-	[string]$WebLogoutUri = "https://localhost:6195/signout-callback-oidc"
+	[string]$WebLogoutUri = "https://localhost:6195/signout-callback-oidc",
+	[string]$PasswordResetPolicyName = "B2C_1_passwordreset"
 )
 
 function Update-WebRegistrationUris {
@@ -475,6 +476,7 @@ $webSecrets = @{
 	"EntraExternalId:Instance"          = $EntraInstanceUrl
 	"EntraExternalId:TenantId"          = $TenantId
 	"EntraExternalId:ClientId"          = $webApp.AppId
+	"EntraExternalId:PasswordResetUrl"  = "$(($EntraInstanceUrl.TrimEnd('/')))/$TenantId/oauth2/v2.0/authorize?p=$PasswordResetPolicyName"
 	"EntraExternalId:ValidateAuthority" = "true"
 	"EntraExternalId:ClientSecret"      = $webApp.Secret
 }

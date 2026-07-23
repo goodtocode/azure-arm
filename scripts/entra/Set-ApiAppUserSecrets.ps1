@@ -18,7 +18,7 @@
 param(
     [string]$TenantId,
     [string]$ApiAppRegistrationName,
-    [string]$EntraInstanceUrl = "https://login.microsoftonline.com",
+    [string]$EntraInstanceUrl,
     [string]$ApiProjectPath
 )
 

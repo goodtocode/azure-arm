@@ -8,6 +8,8 @@
 #       -WebAppRegistrationName "myproduct-web-dev-001" `
 #       -ApiClientId "<api-app-client-id>" `
 #       -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" `
+#       -PasswordResetPolicyName "B2C_1_passwordreset" `
+#       -WebClientSecret "<web-app-client-secret>" `
 #       -WebProjectPath "../../src/Presentation.Web"
 # -----------------------------------------------------------------------------
 # Notes:
@@ -20,7 +22,9 @@ param(
     [string]$TenantId,
     [string]$WebAppRegistrationName,
     [string]$ApiClientId,
-    [string]$EntraInstanceUrl = "https://login.microsoftonline.com",
+    [string]$EntraInstanceUrl,
+    [string]$PasswordResetPolicyName = "B2C_1_passwordreset",
+    [string]$WebClientSecret,
     [string]$WebProjectPath
 )
 
@@ -73,19 +77,20 @@ if (-not $webApp) {
     exit 1
 }
 
-$secrets = Get-MgApplicationPassword -ApplicationId $webApp.Id
-$clientSecret = $secrets | Select-Object -First 1 -ExpandProperty SecretText
-
 $webSecrets = @{
     "EntraExternalId:Instance"          = $EntraInstanceUrl
     "EntraExternalId:TenantId"          = $TenantId
     "EntraExternalId:ClientId"          = $webApp.AppId
+    "EntraExternalId:PasswordResetUrl"  = "$(($EntraInstanceUrl.TrimEnd('/')))/$TenantId/oauth2/v2.0/authorize?p=$PasswordResetPolicyName"
     "EntraExternalId:ValidateAuthority" = "true"
 }
 if ($ApiClientId) {
     $webSecrets["BackendApi:ClientId"] = $ApiClientId
 }
-if ($clientSecret) {
-    $webSecrets["EntraExternalId:ClientSecret"] = $clientSecret
+if ($WebClientSecret) {
+    $webSecrets["EntraExternalId:ClientSecret"] = $WebClientSecret
+}
+else {
+    Write-Warning "Web client secret was not provided. If your Web app requires confidential client auth, set EntraExternalId:ClientSecret separately."
 }
 Set-ProjectUserSecrets -ProjectPath $WebProjectPath -Secrets $webSecrets
