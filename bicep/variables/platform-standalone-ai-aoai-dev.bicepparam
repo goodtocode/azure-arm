@@ -3,25 +3,25 @@ using '../templates/platform-standalone-ai-aoai.bicep'
 // =====================
 // Common
 // =====================
-var tenantIac = 'aacn'
-var productIac = 'devtest-ai'
+var tenantIac = 'COMPANY'
+var productIac = 'spoke-ai'
 var environmentIac = 'dev'
-var regionIac = 'westus'
+var regionIac = 'wus'
 var instanceIac = '001'
 param location = 'westus' // westus2 does not support Azure OpenAI yet
 param tags = {
   Environment: environmentIac
-  CostCenter: '1912-51210'
+  CostCenter: '0000'
   project: productIac
   owner: tenantIac
 }
 
 // =====================
-// Platform Standalone AI RG: rg-${productIac}-${environmentIac}-${regionIac}-${instanceIac}
-// i.e. rg-devtest-ai-dev-westus2-001
+// Platform Spoke AI RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// i.e. gtc-spoke-ai-dev-wus-001
 // =====================
 param azoaiSku = 'S0'
-param azoaiName = 'aoai-${productIac}-${environmentIac}-${regionIac}-${instanceIac}'
+param azoaiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-azoai'
 
 // Required model deployments for Azure OpenAI.
 param modelDeployments = [
