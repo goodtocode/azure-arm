@@ -15,6 +15,7 @@
 #   - Requires Azure PowerShell modules (Az.Accounts, Az.Resources, etc.)
 #   - Ensure you are authenticated: Connect-AzAccount
 # ============================================================================
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Justification = 'ResetUserFlowName is metadata for optional user flow routing, not a secret.')]
 param(
 	[string]$EntraInstanceUrl,
 	[string]$TenantId,
@@ -25,7 +26,7 @@ param(
 	[string]$DotNetVersion = "10",
 	[string]$WebRedirectUri = "https://localhost:6195/signin-oidc",
 	[string]$WebLogoutUri = "https://localhost:6195/signout-callback-oidc",
-	[string]$PasswordResetPolicyName = "B2C_1_passwordreset"
+	[string]$ResetUserFlowName = ""
 )
 
 function Update-WebRegistrationUris {
@@ -476,9 +477,11 @@ $webSecrets = @{
 	"EntraExternalId:Instance"          = $EntraInstanceUrl
 	"EntraExternalId:TenantId"          = $TenantId
 	"EntraExternalId:ClientId"          = $webApp.AppId
-	"EntraExternalId:PasswordResetUrl"  = "$(($EntraInstanceUrl.TrimEnd('/')))/$TenantId/oauth2/v2.0/authorize?p=$PasswordResetPolicyName"
 	"EntraExternalId:ValidateAuthority" = "true"
 	"EntraExternalId:ClientSecret"      = $webApp.Secret
+}
+if (-not [string]::IsNullOrWhiteSpace($ResetUserFlowName)) {
+	$webSecrets["EntraExternalId:PasswordResetUrl"] = "$(($EntraInstanceUrl.TrimEnd('/')))/$TenantId/oauth2/v2.0/authorize?p=$ResetUserFlowName"
 }
 Set-ProjectUserSecrets -ProjectPath $WebProjectPath -Secrets $webSecrets
 

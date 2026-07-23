@@ -8,7 +8,7 @@
 #       -WebAppRegistrationName "myproduct-web-dev-001" `
 #       -ApiClientId "<api-app-client-id>" `
 #       -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" `
-#       -PasswordResetPolicyName "B2C_1_passwordreset" `
+#       -ResetUserFlowName "" `
 #       -WebClientSecret "<web-app-client-secret>" `
 #       -WebProjectPath "../../src/Presentation.Web"
 # -----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ param(
     [string]$WebAppRegistrationName,
     [string]$ApiClientId,
     [string]$EntraInstanceUrl,
-    [string]$PasswordResetPolicyName = "B2C_1_passwordreset",
+    [string]$ResetUserFlowName = "",
     [string]$WebClientSecret,
     [string]$WebProjectPath
 )
@@ -81,8 +81,10 @@ $webSecrets = @{
     "EntraExternalId:Instance"          = $EntraInstanceUrl
     "EntraExternalId:TenantId"          = $TenantId
     "EntraExternalId:ClientId"          = $webApp.AppId
-    "EntraExternalId:PasswordResetUrl"  = "$(($EntraInstanceUrl.TrimEnd('/')))/$TenantId/oauth2/v2.0/authorize?p=$PasswordResetPolicyName"
     "EntraExternalId:ValidateAuthority" = "true"
+}
+if (-not [string]::IsNullOrWhiteSpace($ResetUserFlowName)) {
+    $webSecrets["EntraExternalId:PasswordResetUrl"] = "$(($EntraInstanceUrl.TrimEnd('/')))/$TenantId/oauth2/v2.0/authorize?p=$ResetUserFlowName"
 }
 if ($ApiClientId) {
     $webSecrets["BackendApi:ClientId"] = $ApiClientId
