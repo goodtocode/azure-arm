@@ -18,7 +18,39 @@ param azoaiName string
 param azoaiSku string = 'S0'
 
 @description('When true, deploys a model deployment into the Azure OpenAI account.')
-param deployModel bool = false
+param deployModel bool = true
+
+type AoaiModelName =
+  | 'gpt-5.6-sol'
+  | 'gpt-5.6-terra'
+  | 'gpt-5.6-luna'
+  | 'gpt-5.5'
+  | 'gpt-5.4'
+  | 'gpt-5.4-mini'
+  | 'gpt-5.4-nano'
+  | 'gpt-5.4-pro'
+  | 'gpt-5'
+  | 'gpt-5-mini'
+  | 'gpt-5-nano'
+  | 'gpt-4.1'
+  | 'gpt-4.1-mini'
+  | 'gpt-4.1-nano'
+  | 'gpt-4o'
+  | 'gpt-4o-mini'
+  | 'text-embedding-3-large'
+  | 'text-embedding-3-small'
+
+type AoaiDeploymentConfig = {
+  deploymentName: string
+  modelName: AoaiModelName
+  modelFormat: 'OpenAI'
+  modelVersion: string
+  modelDeploymentSkuName: 'Standard' | 'GlobalStandard'
+  modelDeploymentSkuCapacity: int
+}
+
+@description('Optional list of model deployments. When provided, one deployment is created per item. If empty, legacy single-model parameters are used when deployModel is true.')
+param modelDeployments AoaiDeploymentConfig[] = []
 
 @description('Deployment name clients use at runtime for Azure OpenAI calls.')
 @minLength(1)
@@ -76,6 +108,14 @@ module azoaiModule '../modules/aoai-azureopenai.bicep' = {
     location: location
     tags: tags
     deployModel: deployModel
+    modelDeployments: [for model in modelDeployments: {
+      deploymentName: model.deploymentName
+      modelName: model.modelName
+      modelFormat: model.modelFormat
+      modelVersion: model.modelVersion
+      deploymentSkuName: model.modelDeploymentSkuName
+      deploymentSkuCapacity: model.modelDeploymentSkuCapacity
+    }]
     deploymentName: modelDeploymentName
     modelName: modelName
     modelFormat: modelFormat
@@ -92,3 +132,6 @@ output secondaryAccessKey string = azoaiModule.outputs.secondaryAccessKey
 output deployedModelName string = azoaiModule.outputs.deployedModelName
 output deployedModelVersion string = azoaiModule.outputs.deployedModelVersion
 output deployedModelDeploymentName string = azoaiModule.outputs.deployedModelDeploymentName
+output deployedModelNames array = azoaiModule.outputs.deployedModelNames
+output deployedModelVersions array = azoaiModule.outputs.deployedModelVersions
+output deployedModelDeploymentNames array = azoaiModule.outputs.deployedModelDeploymentNames
