@@ -17,9 +17,6 @@ param azoaiName string
 @description('SKU for Azure OpenAI. Allowed value: S0. Defaults to S0.')
 param azoaiSku string = 'S0'
 
-@description('When true, deploys a model deployment into the Azure OpenAI account.')
-param deployModel bool = true
-
 type AoaiModelName =
   | 'gpt-5.6-sol'
   | 'gpt-5.6-terra'
@@ -45,60 +42,13 @@ type AoaiDeploymentConfig = {
   modelName: AoaiModelName
   modelFormat: 'OpenAI'
   modelVersion: string
-  modelDeploymentSkuName: 'Standard' | 'GlobalStandard'
-  modelDeploymentSkuCapacity: int
+  deploymentSkuName: 'Standard' | 'GlobalStandard'
+  deploymentSkuCapacity: int
 }
 
-@description('Optional list of model deployments. When provided, one deployment is created per item. If empty, legacy single-model parameters are used when deployModel is true.')
-param modelDeployments AoaiDeploymentConfig[] = []
-
-@description('Deployment name clients use at runtime for Azure OpenAI calls.')
+@description('Required list of model deployments. Each object creates one Azure OpenAI deployment.')
 @minLength(1)
-@maxLength(64)
-param modelDeploymentName string = 'default'
-
-@description('Model name to deploy when deployModel is true.')
-@allowed([
-  'gpt-5.6-sol'
-  'gpt-5.6-terra'
-  'gpt-5.6-luna'
-  'gpt-5.5'
-  'gpt-5.4'
-  'gpt-5.4-mini'
-  'gpt-5.4-nano'
-  'gpt-5.4-pro'
-  'gpt-5'
-  'gpt-5-mini'
-  'gpt-5-nano'
-  'gpt-4.1'
-  'gpt-4.1-mini'
-  'gpt-4.1-nano'
-  'gpt-4o'
-  'gpt-4o-mini'
-  'text-embedding-3-large'
-  'text-embedding-3-small'
-])
-param modelName string = 'gpt-5.5'
-
-@description('Model format required by Azure OpenAI deployment.')
-@allowed([
-  'OpenAI'
-])
-param modelFormat string = 'OpenAI'
-
-@description('Model version. Keep configurable because availability varies by region and subscription.')
-param modelVersion string = '2026-04-24'
-
-@description('Model deployment SKU name.')
-@allowed([
-  'Standard'
-  'GlobalStandard'
-])
-param modelDeploymentSkuName string = 'Standard'
-
-@description('Model deployment SKU capacity.')
-@minValue(1)
-param modelDeploymentSkuCapacity int = 1
+param modelDeployments AoaiDeploymentConfig[]
 
 module azoaiModule '../modules/aoai-azureopenai.bicep' = {
   name: 'azoaiModule'
@@ -107,21 +57,7 @@ module azoaiModule '../modules/aoai-azureopenai.bicep' = {
     sku: azoaiSku
     location: location
     tags: tags
-    deployModel: deployModel
-    modelDeployments: [for model in modelDeployments: {
-      deploymentName: model.deploymentName
-      modelName: model.modelName
-      modelFormat: model.modelFormat
-      modelVersion: model.modelVersion
-      deploymentSkuName: model.modelDeploymentSkuName
-      deploymentSkuCapacity: model.modelDeploymentSkuCapacity
-    }]
-    deploymentName: modelDeploymentName
-    modelName: modelName
-    modelFormat: modelFormat
-    modelVersion: modelVersion
-    deploymentSkuName: modelDeploymentSkuName
-    deploymentSkuCapacity: modelDeploymentSkuCapacity
+    modelDeployments: modelDeployments
     }
   }
 
