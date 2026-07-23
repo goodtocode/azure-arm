@@ -38,7 +38,7 @@ param modelDeployments = [
     modelName: 'gpt-5.4-mini'
     modelFormat: 'OpenAI'
     modelVersion: '2026-03-17'
-    deploymentSkuName: 'Standard'
+    deploymentSkuName: 'GlobalStandard'
     deploymentSkuCapacity: 1
   }
 ]
