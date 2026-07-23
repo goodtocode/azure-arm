@@ -8,7 +8,7 @@ var productIac = 'spoke-ai'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
-param location = 'westus2'
+param location = 'westus' // westus2 does not support Azure OpenAI yet
 param tags = {
   Environment: environmentIac
   CostCenter: '0000'
