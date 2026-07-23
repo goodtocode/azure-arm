@@ -66,18 +66,19 @@ resource azoaiResource 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
   }
 }
 
-resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = [for model in modelDeployments: {
+@batchSize(1)
+resource modelDeploymentsResource 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = [for deployment in modelDeployments: {
   parent: azoaiResource
-  name: model.deploymentName
+  name: deployment.deploymentName
   sku: {
-    name: model.deploymentSkuName
-    capacity: int(model.deploymentSkuCapacity)
+    name: deployment.deploymentSkuName
+    capacity: deployment.deploymentSkuCapacity
   }
   properties: {
     model: {
-      format: model.modelFormat
-      name: model.modelName
-      version: model.modelVersion
+      format: deployment.modelFormat
+      name: deployment.modelName
+      version: deployment.modelVersion
     }
     versionUpgradeOption: 'OnceNewDefaultVersionAvailable'
     raiPolicyName: 'Microsoft.Default'
@@ -92,7 +93,7 @@ output primaryAccessKey string = azoaiResource.listKeys().key1
 output secondaryAccessKey string = azoaiResource.listKeys().key2
 output deployedModelName string = modelDeployments[0].modelName
 output deployedModelVersion string = modelDeployments[0].modelVersion
-output deployedModelDeploymentName string = modelDeployment[0].name
-output deployedModelNames array = [for model in modelDeployments: model.modelName]
-output deployedModelVersions array = [for model in modelDeployments: model.modelVersion]
-output deployedModelDeploymentNames array = [for i in range(0, length(modelDeployments)): modelDeployment[i].name]
+output deployedModelDeploymentName string = modelDeployments[0].deploymentName
+output deployedModelNames array = [for deployment in modelDeployments: deployment.modelName]
+output deployedModelVersions array = [for deployment in modelDeployments: deployment.modelVersion]
+output deployedModelDeploymentNames array = [for deployment in modelDeployments: deployment.deploymentName]
