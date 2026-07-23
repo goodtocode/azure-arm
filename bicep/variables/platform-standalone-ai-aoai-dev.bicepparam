@@ -6,7 +6,7 @@ using '../templates/platform-standalone-ai-aoai.bicep'
 var tenantIac = 'COMPANY'
 var productIac = 'spoke-ai'
 var environmentIac = 'dev'
-var regionIac = 'wus2'
+var regionIac = 'wus'
 var instanceIac = '001'
 param location = 'westus' // westus2 does not support Azure OpenAI yet
 param tags = {
@@ -18,7 +18,7 @@ param tags = {
 
 // =====================
 // Platform Spoke AI RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// i.e. gtc-spoke-ai-dev-wus2-001
+// i.e. gtc-spoke-ai-dev-wus-001
 // =====================
 param azoaiSku = 'S0'
 param azoaiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-azoai'
