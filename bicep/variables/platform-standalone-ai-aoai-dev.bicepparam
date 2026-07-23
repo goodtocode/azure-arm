@@ -35,9 +35,9 @@ param modelDeployments = [
   }
   {
     deploymentName: 'openai-fast'
-    modelName: 'gpt-4o-mini'
+    modelName: 'gpt-5.4-mini'
     modelFormat: 'OpenAI'
-    modelVersion: '2024-07-18'
+    modelVersion: '2026-03-17'
     deploymentSkuName: 'Standard'
     deploymentSkuCapacity: 1
   }
