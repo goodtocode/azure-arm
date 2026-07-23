@@ -18,42 +18,30 @@ param projectName string
 @maxLength(256)
 param projectDescription string = 'Standalone Azure AI Foundry project.'
 
-@description('Name of the model to deploy.')
-@allowed([
-  'claude-opus'
-  'claude-sonnet'
-  'gpt-5.4'
-  'gpt-4.1'
-  'gpt-4.1-mini'
-  'phi-4'
-  'mai-code'
-])
-param modelName string = 'gpt-4.1-mini'
+type FoundryModelName =
+  | 'claude-opus'
+  | 'claude-sonnet'
+  | 'gpt-5.4'
+  | 'gpt-4.1'
+  | 'gpt-4.1-mini'
+  | 'phi-4'
+  | 'mai-image-2.5'
+  | 'mai-image-2.5-flash'
+  | 'mai-image-2.5-pro'
+  | 'mai-code'
 
-@description('Model format required by Azure AI model deployment.')
-@allowed([
-  'OpenAI'
-])
-param modelFormat string = 'OpenAI'
+type FoundryDeploymentConfig = {
+  deploymentName: string
+  modelName: FoundryModelName
+  modelFormat: 'OpenAI'
+  modelVersion: string
+  skuName: 'Standard' | 'GlobalStandard'
+  skuCapacity: int
+}
 
-@description('Model version. Keep configurable because model availability varies by region and subscription.')
-param modelVersion string = '2025-04-14'
-
-@description('Deployment name exposed to provider configuration.')
+@description('Required list of model deployments. Each object deploys one model. Allowed modelName values: claude-opus, claude-sonnet, gpt-5.4, gpt-4.1, gpt-4.1-mini, phi-4, mai-code, mai-image-2.5, mai-image-2.5-flash, mai-image-2.5-pro.')
 @minLength(1)
-@maxLength(64)
-param deploymentName string = 'default'
-
-@description('SKU for model deployment.')
-@allowed([
-  'Standard'
-  'GlobalStandard'
-])
-param skuName string = 'Standard'
-
-@description('Deployment capacity. For Standard SKU this is the unit count.')
-@minValue(1)
-param skuCapacity int = 1
+param modelDeployments FoundryDeploymentConfig[]
 
 @description('Enable diagnostics settings for the Azure AI Foundry hub resource.')
 param enableDiagnostics bool = false
@@ -89,23 +77,23 @@ resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-04-0
   }
 }
 
-resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+resource modelDeploymentsResource 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = [for model in modelDeployments: {
   parent: foundryHub
-  name: deploymentName
+  name: model.deploymentName
   sku: {
-    name: skuName
-    capacity: skuCapacity
+    name: model.skuName
+    capacity: int(model.skuCapacity)
   }
   properties: {
     model: {
-      format: modelFormat
-      name: modelName
-      version: modelVersion
+      format: model.modelFormat
+      name: model.modelName
+      version: model.modelVersion
     }
     versionUpgradeOption: 'OnceNewDefaultVersionAvailable'
     raiPolicyName: 'Microsoft.Default'
   }
-}
+}]
 
 resource foundryHubDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableDiagnostics) {
   name: '${foundryHub.name}-diagnostics'
@@ -114,7 +102,8 @@ resource foundryHubDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01
 }
 
 output endpoint string = foundryHub.properties.endpoint
-output deploymentName string = modelDeployment.name
+output deploymentName string = modelDeploymentsResource[0].name
+output deploymentNames array = [for i in range(0, length(modelDeployments)): modelDeploymentsResource[i].name]
 output projectName string = projectName
 output resourceId string = foundryHub.id
 output projectResourceId string = foundryProject.id
