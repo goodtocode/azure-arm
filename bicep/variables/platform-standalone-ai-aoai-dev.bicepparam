@@ -6,9 +6,9 @@ using '../templates/platform-standalone-ai-aoai.bicep'
 var tenantIac = 'COMPANY'
 var productIac = 'spoke-ai'
 var environmentIac = 'dev'
-var regionIac = 'wus2'
+var regionIac = 'wus'
 var instanceIac = '001'
-param location = 'westus2'
+param location = 'westus' // westus2 does not support Azure OpenAI yet
 param tags = {
   Environment: environmentIac
   CostCenter: '0000'
@@ -18,14 +18,27 @@ param tags = {
 
 // =====================
 // Platform Spoke AI RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// i.e. gtc-spoke-ai-dev-wus2-001
+// i.e. gtc-spoke-ai-dev-wus-001
 // =====================
 param azoaiSku = 'S0'
 param azoaiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-azoai'
-param deployModel = true
-param modelDeploymentName = 'default'
-param modelName = 'gpt-5.5'
-param modelFormat = 'OpenAI'
-param modelVersion = '2026-04-24'
-param modelDeploymentSkuName = 'Standard'
-param modelDeploymentSkuCapacity = 1
+
+// Required model deployments for Azure OpenAI.
+param modelDeployments = [
+  {
+    deploymentName: 'openai-chat'
+    modelName: 'gpt-5.4'
+    modelFormat: 'OpenAI'
+    modelVersion: '2026-03-05'
+    deploymentSkuName: 'GlobalStandard'
+    deploymentSkuCapacity: 1
+  }
+  {
+    deploymentName: 'openai-fast'
+    modelName: 'gpt-5.4-mini'
+    modelFormat: 'OpenAI'
+    modelVersion: '2026-03-17'
+    deploymentSkuName: 'GlobalStandard'
+    deploymentSkuCapacity: 1
+  }
+]

@@ -16,42 +16,30 @@ param foundryName string
 @description('Azure AI Foundry project name for logical project grouping.')
 param projectName string
 
-@description('Model name to deploy for Foundry inference.')
-@allowed([
-  'claude-opus'
-  'claude-sonnet'
-  'gpt-5.4'
-  'gpt-4.1'
-  'gpt-4.1-mini'
-  'phi-4'
-  'mai-code'
-])
-param modelName string = 'gpt-4.1-mini'
+type FoundryModelName =
+  | 'claude-opus'
+  | 'claude-sonnet'
+  | 'gpt-5.4'
+  | 'gpt-4.1'
+  | 'gpt-4.1-mini'
+  | 'phi-4'
+  | 'mai-image-2.5'
+  | 'mai-image-2.5-flash'
+  | 'mai-image-2.5-pro'
+  | 'mai-code'
 
+type FoundryDeploymentConfig = {
+  deploymentName: string
+  modelName: FoundryModelName
+  modelFormat: 'OpenAI'
+  modelVersion: string
+  skuName: 'Standard' | 'GlobalStandard'
+  skuCapacity: int
+}
+
+@description('Required list of model deployments. Each object deploys one model. Allowed modelName values: claude-opus, claude-sonnet, gpt-5.4, gpt-4.1, gpt-4.1-mini, phi-4, mai-code, mai-image-2.5, mai-image-2.5-flash, mai-image-2.5-pro.')
 @minLength(1)
-@maxLength(64)
-@description('Deployment name exposed to provider configuration.')
-param deploymentName string = 'default'
-
-@description('SKU for model deployment.')
-@allowed([
-  'Standard'
-  'GlobalStandard'
-])
-param skuName string = 'Standard'
-
-@description('Model format for deployment.')
-@allowed([
-  'OpenAI'
-])
-param modelFormat string = 'OpenAI'
-
-@description('Model version for deployment. Keep configurable for regional model availability.')
-param modelVersion string = '2025-04-14'
-
-@description('Capacity units for deployment SKU.')
-@minValue(1)
-param skuCapacity int = 1
+param modelDeployments FoundryDeploymentConfig[]
 
 @description('Enable diagnostics for Foundry hub resource.')
 param enableDiagnostics bool = false
@@ -66,12 +54,7 @@ module foundryModule '../modules/aif-foundry.bicep' = {
     location: location
     tags: tags
     projectName: projectName
-    modelName: modelName
-    deploymentName: deploymentName
-    skuName: skuName
-    modelFormat: modelFormat
-    modelVersion: modelVersion
-    skuCapacity: skuCapacity
+    modelDeployments: modelDeployments
     enableDiagnostics: enableDiagnostics
     diagnosticsSettings: diagnosticsSettings
   }
@@ -79,6 +62,7 @@ module foundryModule '../modules/aif-foundry.bicep' = {
 
 output endpoint string = foundryModule.outputs.endpoint
 output deploymentName string = foundryModule.outputs.deploymentName
+output deploymentNames array = foundryModule.outputs.deploymentNames
 output projectName string = foundryModule.outputs.projectName
 output resourceId string = foundryModule.outputs.resourceId
 output projectResourceId string = foundryModule.outputs.projectResourceId

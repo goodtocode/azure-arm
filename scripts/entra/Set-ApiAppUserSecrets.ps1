@@ -6,7 +6,8 @@
 #   pwsh -File ./Set-ApiAppUserSecrets.ps1 `
 #       -TenantId "<your-tenant-id>" `
 #       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -ApiProjectPath "../../src/Presentation.WebApi"
+#       -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" `
+#       -ApiProjectPath "../../src/Presentation.Api"
 # -----------------------------------------------------------------------------
 # Notes:
 #   - Requires Azure PowerShell modules (Az.Accounts, Microsoft.Graph.Applications)
@@ -17,6 +18,7 @@
 param(
     [string]$TenantId,
     [string]$ApiAppRegistrationName,
+    [string]$EntraInstanceUrl,
     [string]$ApiProjectPath
 )
 
@@ -70,7 +72,7 @@ if (-not $apiApp) {
 }
 
 $apiSecrets = @{
-    "EntraExternalId:Instance"          = "https://login.microsoftonline.com"
+    "EntraExternalId:Instance"          = $EntraInstanceUrl
     "EntraExternalId:TenantId"          = $TenantId
     "EntraExternalId:ClientId"          = $apiApp.AppId
     "EntraExternalId:ValidateAuthority" = "true"

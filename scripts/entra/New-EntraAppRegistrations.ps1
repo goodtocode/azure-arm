@@ -8,13 +8,14 @@
 #       -TenantId "<your-tenant-id>" `
 #       -WebAppRegistrationName "myproduct-web-dev-001" `
 #       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -WebProjectPath "../../src/Presentation.Blazor" `
-#       -ApiProjectPath "../../src/Presentation.WebApi"
+#       -WebProjectPath "../../src/Presentation.Web" `
+#       -ApiProjectPath "../../src/Presentation.Api"
 # -----------------------------------------------------------------------------
 # Notes:
 #   - Requires Azure PowerShell modules (Az.Accounts, Az.Resources, etc.)
 #   - Ensure you are authenticated: Connect-AzAccount
 # ============================================================================
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Justification = 'ResetUserFlowName is metadata for optional user flow routing, not a secret.')]
 param(
 	[string]$EntraInstanceUrl,
 	[string]$TenantId,
@@ -23,9 +24,43 @@ param(
 	[string]$WebProjectPath = "../../src/Presentation.Web",
 	[string]$ApiProjectPath = "../../src/Presentation.Api",
 	[string]$DotNetVersion = "10",
-	[string]$WebRedirectUri = "https://localhost:7175/signin-oidc",
-	[string]$WebLogoutUri = "https://localhost:7175/signout-callback-oidc"
+	[string]$WebRedirectUri = "https://localhost:6195/signin-oidc",
+	[string]$WebLogoutUri = "https://localhost:6195/signout-callback-oidc",
+	[string]$ResetUserFlowName = ""
 )
+
+function Update-WebRegistrationUris {
+	param(
+		[object]$WebApp,
+		[string]$WebRedirectUri,
+		[string]$WebLogoutUri
+	)
+
+	if (-not $WebApp -or -not $WebApp.Id) {
+		Write-Error "FATAL: Cannot update Web app registration URIs because the app object is missing."
+		exit 1
+	}
+
+	$existingRedirectUris = @()
+	if ($WebApp.Web -and $WebApp.Web.RedirectUris) {
+		$existingRedirectUris = @($WebApp.Web.RedirectUris)
+	}
+
+	$redirectUris = @($existingRedirectUris + $WebRedirectUri |
+		Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+		Select-Object -Unique)
+
+	Update-MgApplication -ApplicationId $WebApp.Id -Web @{
+		RedirectUris = $redirectUris
+		LogoutUrl = $WebLogoutUri
+		ImplicitGrantSettings = @{
+			EnableIdTokenIssuance = $false
+			EnableAccessTokenIssuance = $true
+		}
+	}
+
+	Write-Host "Ensured Web redirect URI(s) and logout URI include local launch profile defaults."
+}
 
 function New-ApiRegistration {
 	param(
@@ -182,6 +217,10 @@ function New-WebRegistration {
 	else {
 		Write-Host "Web app registration $WebAppRegistrationName already exists."
 	}
+
+	Update-WebRegistrationUris -WebApp $webApp -WebRedirectUri $WebRedirectUri -WebLogoutUri $WebLogoutUri
+	$webApp = Wait-ForApplicationPropagation -AppId $webApp.AppId -ObjectId $webApp.Id
+
 	Write-Host "Adding Microsoft Graph User.Read, email, profile delegated permissions to Web app registration..."
 	$msGraphSp = Get-MgServicePrincipal -Filter "displayName eq 'Microsoft Graph'" -ErrorAction Stop
 	if (-not $msGraphSp) {
@@ -434,12 +473,15 @@ $webApp = $webReg
 
 # Step 6: Write Web EEID values to $WebProjectPath via dotnet user-secrets
 $webSecrets = @{
-	"BackEndApi:ClientId"          		= $apiApp.AppId
+	"BackendApi:ClientId"           		= $apiApp.AppId
 	"EntraExternalId:Instance"          = $EntraInstanceUrl
 	"EntraExternalId:TenantId"          = $TenantId
 	"EntraExternalId:ClientId"          = $webApp.AppId
 	"EntraExternalId:ValidateAuthority" = "true"
 	"EntraExternalId:ClientSecret"      = $webApp.Secret
+}
+if (-not [string]::IsNullOrWhiteSpace($ResetUserFlowName)) {
+	$webSecrets["EntraExternalId:PasswordResetUrl"] = "$(($EntraInstanceUrl.TrimEnd('/')))/$TenantId/oauth2/v2.0/authorize?p=$ResetUserFlowName"
 }
 Set-ProjectUserSecrets -ProjectPath $WebProjectPath -Secrets $webSecrets
 

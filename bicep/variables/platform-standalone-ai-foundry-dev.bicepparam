@@ -22,12 +22,35 @@ param tags = {
 // =====================
 param foundryName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif'
 param projectName = '${productIac}-${environmentIac}'
-param modelName = 'phi-4'
-param deploymentName = 'default'
-param skuName = 'Standard'
-param modelFormat = 'OpenAI'
-param modelVersion = '2025-04-14'
-param skuCapacity = 1
+
+// Required N-model configuration.
+// Allowed modelName values are validated by the template type definition.
+param modelDeployments = [
+  {
+    deploymentName: 'openai-chat'
+    modelName: 'gpt-5.4'
+    modelFormat: 'OpenAI'
+    modelVersion: '2025-04-14'
+    skuName: 'Standard'
+    skuCapacity: 1
+  }
+  {
+    deploymentName: 'microsoft-reasoning'
+    modelName: 'phi-4'
+    modelFormat: 'OpenAI'
+    modelVersion: '2025-04-14'
+    skuName: 'Standard'
+    skuCapacity: 1
+  }
+  {
+    deploymentName: 'anthropic-chat'
+    modelName: 'claude-sonnet'
+    modelFormat: 'OpenAI'
+    modelVersion: '2025-04-14'
+    skuName: 'Standard'
+    skuCapacity: 1
+  }
+]
 
 // Keep diagnostics off by default for low-friction standalone deployments.
 param enableDiagnostics = false

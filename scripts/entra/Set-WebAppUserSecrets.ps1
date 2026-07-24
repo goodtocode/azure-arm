@@ -6,7 +6,11 @@
 #   pwsh -File ./Set-WebAppUserSecrets.ps1 `
 #       -TenantId "<your-tenant-id>" `
 #       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -WebProjectPath "../../src/Presentation.Blazor"
+#       -ApiClientId "<api-app-client-id>" `
+#       -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" `
+#       -ResetUserFlowName "" `
+#       -WebClientSecret "<web-app-client-secret>" `
+#       -WebProjectPath "../../src/Presentation.Web"
 # -----------------------------------------------------------------------------
 # Notes:
 #   - Requires Azure PowerShell modules (Az.Accounts, Microsoft.Graph.Applications)
@@ -17,6 +21,10 @@
 param(
     [string]$TenantId,
     [string]$WebAppRegistrationName,
+    [string]$ApiClientId,
+    [string]$EntraInstanceUrl,
+    [string]$ResetUserFlowName = "",
+    [string]$WebClientSecret,
     [string]$WebProjectPath
 )
 
@@ -69,16 +77,22 @@ if (-not $webApp) {
     exit 1
 }
 
-$secrets = Get-MgApplicationPassword -ApplicationId $webApp.Id
-$clientSecret = $secrets | Select-Object -First 1 -ExpandProperty SecretText
-
 $webSecrets = @{
-    "EntraExternalId:Instance"          = "https://login.microsoftonline.com"
+    "EntraExternalId:Instance"          = $EntraInstanceUrl
     "EntraExternalId:TenantId"          = $TenantId
     "EntraExternalId:ClientId"          = $webApp.AppId
     "EntraExternalId:ValidateAuthority" = "true"
 }
-if ($clientSecret) {
-    $webSecrets["EntraExternalId:ClientSecret"] = $clientSecret
+if (-not [string]::IsNullOrWhiteSpace($ResetUserFlowName)) {
+    $webSecrets["EntraExternalId:PasswordResetUrl"] = "$(($EntraInstanceUrl.TrimEnd('/')))/$TenantId/oauth2/v2.0/authorize?p=$ResetUserFlowName"
+}
+if ($ApiClientId) {
+    $webSecrets["BackendApi:ClientId"] = $ApiClientId
+}
+if ($WebClientSecret) {
+    $webSecrets["EntraExternalId:ClientSecret"] = $WebClientSecret
+}
+else {
+    Write-Warning "Web client secret was not provided. If your Web app requires confidential client auth, set EntraExternalId:ClientSecret separately."
 }
 Set-ProjectUserSecrets -ProjectPath $WebProjectPath -Secrets $webSecrets
