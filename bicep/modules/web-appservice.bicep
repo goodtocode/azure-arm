@@ -40,16 +40,16 @@ param planId string
 ])
 param kind string = 'app'
 
-@description('The .NET version for the Web App. Allowed values: v4.8 (for .NET Framework), 6.0, 7.0, 8.0, 9.0, 10.0 (for .NET). Default is 10.0.')
+@description('The .NET stack version for the Windows Web App. Use v4.8 for .NET Framework, or v6.0/v7.0/v8.0/v9.0/v10.0 for modern .NET. Default is v10.0.')
 @allowed([
   'v4.8'
-  '6.0'
-  '7.0'
-  '8.0'
-  '9.0'
-  '10.0' 
+  'v6.0'
+  'v7.0'
+  'v8.0'
+  'v9.0'
+  'v10.0'
 ])
-param dotnetVersion string = '10.0'
+param dotnetVersion string = 'v10.0'
 
 @description('Enable Always On for the App Service')
 param alwaysOn bool = false
