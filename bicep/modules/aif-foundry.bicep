@@ -53,6 +53,9 @@ resource foundryHub 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = 
   name: name
   location: location
   tags: empty(tags) ? null : tags
+  identity: {
+    type: 'SystemAssigned'
+  }
   kind: 'AIServices'
   sku: {
     name: 'S0'
