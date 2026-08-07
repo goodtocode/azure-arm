@@ -49,7 +49,7 @@ param enableDiagnostics bool = false
 @description('Diagnostics settings configuration (if enabled).')
 param diagnosticsSettings object = {}
 
-resource foundryHub 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
+resource foundryHub 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
   name: name
   location: location
   tags: empty(tags) ? null : tags
@@ -58,6 +58,7 @@ resource foundryHub 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
     name: 'S0'
   }
   properties: {
+    allowProjectManagement: true
     customSubDomainName: name
     networkAcls: {
       defaultAction: 'Allow'
@@ -80,6 +81,9 @@ resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-04-0
 resource modelDeploymentsResource 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = [for model in modelDeployments: {
   parent: foundryHub
   name: model.deploymentName
+  dependsOn: [
+    foundryProject
+  ]
   sku: {
     name: model.skuName
     capacity: int(model.skuCapacity)
