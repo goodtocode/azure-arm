@@ -49,7 +49,7 @@ param enableDiagnostics bool = false
 @description('Diagnostics settings configuration (if enabled).')
 param diagnosticsSettings object = {}
 
-resource foundryHub 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
+resource foundryHub 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
   name: name
   location: location
   tags: empty(tags) ? null : tags
@@ -71,10 +71,13 @@ resource foundryHub 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = 
   }
 }
 
-resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-preview' = {
+resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = {
   parent: foundryHub
   name: projectName
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     displayName: projectName
     description: projectDescription
