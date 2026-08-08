@@ -19,6 +19,49 @@ Located in the `bicep/templates/` directory, these are higher-level Bicep templa
 
 ---
 
+## Why This Repo Is Useful (What Is In It For Me?)
+
+This repository helps you stand up production-ready Azure foundations faster, with less copy-paste and fewer one-off templates.
+
+- **Faster time to first deployment**: Start from opinionated templates instead of building every resource definition from scratch.
+- **Safer changes in shared environments**: Use `what-if` before deployment to reduce infrastructure drift and surprise breakage.
+- **Composable architecture**: Reuse modules across workloads so web, API, and AI stacks stay consistent.
+- **Clear evolution path**: Begin standalone for speed, then move to hub-and-spoke templates as security and scale requirements grow.
+
+### High-Value Modules You Can Reuse
+
+- **AI Foundry**: `bicep/modules/aif-foundry.bicep` for Azure AI Foundry hub/project/model deployment with integration-friendly outputs.
+- **Web and API apps**: `bicep/modules/web-appservice.bicep` and `bicep/modules/api-appservice.bicep` for common App Service hosting patterns.
+- **App Service plans**: `bicep/modules/plan-appserviceplan.bicep` to standardize compute sizing and hosting tiers.
+- **SQL foundation**: `bicep/modules/sql-sqlserver.bicep`, `bicep/modules/sqldb-sqldatabase.bicep`, and `bicep/modules/sql-sqlserverdatabase.bicep` for SQL server and database deployment.
+- **Operational baseline**: `bicep/modules/appi-applicationinsights.bicep`, `bicep/modules/work-loganalyticsworkspace.bicep`, and `bicep/modules/kv-keyvault.bicep` for observability and secrets.
+
+### Template Tracks by Architecture Style
+
+- **Standalone templates (speed and simplicity)**:
+	`bicep/templates/platform-standalone-ai-foundry.bicep`,
+	`bicep/templates/platform-standalone-ai-ollama.bicep`,
+	`bicep/templates/landingzone-standalone-web-api-sql.bicep`
+- **Hub templates (shared platform services)**:
+	`bicep/templates/platform-hub-mgmt.bicep`,
+	`bicep/templates/platform-hub-network-publicroute.bicep`,
+	`bicep/templates/platform-hub-network-zerotrust.bicep`
+- **Spoke templates (workload isolation and scale-out)**:
+	`bicep/templates/platform-spoke-mgmt.bicep`,
+	`bicep/templates/platform-spoke-network-publicroute.bicep`,
+	`bicep/templates/platform-spoke-ai-ollama.bicep`
+- **Landing zone workload templates (web, API, SQL combos)**:
+	`bicep/templates/landingzone-web.bicep`,
+	`bicep/templates/landingzone-api.bicep`,
+	`bicep/templates/landingzone-web-api.bicep`,
+	`bicep/templates/landingzone-web-sql.bicep`,
+	`bicep/templates/landingzone-api-sql.bicep`,
+	`bicep/templates/landingzone-web-api-sql.bicep`
+
+If you are deciding where to begin, start with a standalone template to validate app behavior quickly, then adopt hub-and-spoke templates when governance, segmentation, and multi-team operations become priorities.
+
+---
+
 ## Usage
 
 ### 1. Validate a Deployment (What-If)
@@ -62,8 +105,8 @@ This repository includes a standalone Azure AI Foundry deployment path that avoi
 ### New Assets
 
 - Module: `bicep/modules/aif-foundry.bicep`
-- Template: `bicep/templates/landingzone-standalone-ai-foundry.bicep`
-- Variables: `bicep/variables/landingzone-standalone-ai-foundry-dev.bicepparam`
+- Template: `bicep/templates/platform-standalone-ai-foundry.bicep`
+- Variables: `bicep/variables/platform-standalone-ai-foundry-dev.bicepparam`
 
 ### Scope
 
@@ -77,8 +120,8 @@ This repository includes a standalone Azure AI Foundry deployment path that avoi
 ```sh
 az deployment group what-if \
 	--resource-group <your-resource-group> \
-	--template-file bicep/templates/landingzone-standalone-ai-foundry.bicep \
-	--parameters bicep/variables/landingzone-standalone-ai-foundry-dev.bicepparam
+	--template-file bicep/templates/platform-standalone-ai-foundry.bicep \
+	--parameters bicep/variables/platform-standalone-ai-foundry-dev.bicepparam
 ```
 
 ### Deploy
@@ -86,8 +129,8 @@ az deployment group what-if \
 ```sh
 az deployment group create \
 	--resource-group <your-resource-group> \
-	--template-file bicep/templates/landingzone-standalone-ai-foundry.bicep \
-	--parameters bicep/variables/landingzone-standalone-ai-foundry-dev.bicepparam
+	--template-file bicep/templates/platform-standalone-ai-foundry.bicep \
+	--parameters bicep/variables/platform-standalone-ai-foundry-dev.bicepparam
 ```
 
 ### Provider Configuration Example

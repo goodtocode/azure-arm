@@ -6,9 +6,9 @@ using '../templates/platform-standalone-ai-foundry.bicep'
 var tenantIac = 'COMPANY'
 var productIac = 'spoke-ai'
 var environmentIac = 'dev'
-var regionIac = 'wus2'
-var instanceIac = '001'
-param location = 'westus2'
+var regionIac = 'wus'
+var instanceIac = '100'
+param location = 'westus'
 param tags = {
   Environment: environmentIac
   CostCenter: '0000'
@@ -17,41 +17,44 @@ param tags = {
 }
 
 // =====================
-// Standalone Foundry RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
-// i.e. gtc-agentframework-dev-wus2-001-rg
+// Platform Spoke AI RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
 // =====================
 param foundryName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif'
-param projectName = '${productIac}-${environmentIac}'
+param projectName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-proj'
+param projectDescription = 'Development spoke AI project.'
 
-// Required N-model configuration.
-// Allowed modelName values are validated by the template type definition.
+// Required model deployments for Azure AI Foundry.
 param modelDeployments = [
   {
     deploymentName: 'openai-chat'
     modelName: 'gpt-5.4'
     modelFormat: 'OpenAI'
-    modelVersion: '2025-04-14'
-    skuName: 'Standard'
-    skuCapacity: 1
+    modelVersion: '2026-03-05'
+    skuName: 'GlobalStandard'
+    tokensPerMinute: 20000
   }
   {
-    deploymentName: 'microsoft-reasoning'
-    modelName: 'phi-4'
+    deploymentName: 'openai-fast'
+    modelName: 'gpt-4.1-mini'
     modelFormat: 'OpenAI'
     modelVersion: '2025-04-14'
-    skuName: 'Standard'
-    skuCapacity: 1
+    skuName: 'GlobalStandard'
+    tokensPerMinute: 20000
   }
   {
-    deploymentName: 'anthropic-chat'
-    modelName: 'claude-sonnet'
-    modelFormat: 'OpenAI'
-    modelVersion: '2025-04-14'
-    skuName: 'Standard'
-    skuCapacity: 1
+    deploymentName: 'ms-chat'
+    modelName: 'Phi-4'
+    modelFormat: 'Microsoft'
+    modelVersion: '7'
+    skuName: 'GlobalStandard'
+    tokensPerMinute: 10000
+  }
+  {
+    deploymentName: 'mai-image'
+    modelName: 'MAI-Image-2.5-Flash'
+    modelFormat: 'Microsoft'
+    modelVersion: '2026-06-02'
+    skuName: 'GlobalStandard'
+    tokensPerMinute: 2000
   }
 ]
-
-// Keep diagnostics off by default for low-friction standalone deployments.
-param enableDiagnostics = false
-param diagnosticsSettings = {}
