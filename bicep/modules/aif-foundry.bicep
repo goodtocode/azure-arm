@@ -84,6 +84,7 @@ resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-0
   }
 }
 
+@batchSize(1) // Remove if doesnt help
 resource modelDeploymentsResource 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = [for model in modelDeployments: {
   parent: foundryHub
   name: model.deploymentName
