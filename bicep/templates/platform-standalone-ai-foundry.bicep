@@ -24,26 +24,34 @@ type FoundryModelName =
   | 'claude-opus'
   | 'claude-sonnet'
   | 'gpt-5.4'
+  | 'gpt-5.3-chat'
+  | 'gpt-5.3-codex'
   | 'gpt-4.1'
   | 'gpt-4.1-mini'
-  | 'phi-4'
-  | 'mai-image-2.5'
-  | 'mai-image-2.5-flash'
-  | 'mai-image-2.5-pro'
-  | 'mai-code'
+  | 'Phi-4'
+  | 'MAI-Image-2'
+  | 'MAI-Image-2.5'
+  | 'MAI-Image-2.5-Flash'
+  | 'MAI-Image-2.5-Pro'
+  | 'MAI-Image-2e'
 
 type FoundryDeploymentConfig = {
   deploymentName: string
   modelName: FoundryModelName
-  modelFormat: 'OpenAI'
-  modelVersion: string
+  modelFormat: 'OpenAI' | 'Microsoft'
+  modelVersion: string?
   skuName: 'Standard' | 'GlobalStandard'
-  skuCapacity: int
+  @minValue(1000)
+  tokensPerMinute: int
 }
 
 @description('Required list of model deployments. Each object creates one Azure AI Foundry model deployment.')
 @minLength(1)
 param modelDeployments FoundryDeploymentConfig[]
+
+@description('Approximate tokens-per-minute provided by one deployment capacity unit. Used to convert tokensPerMinute into deployment SKU capacity. Default is 1000 TPM per unit.')
+@minValue(1)
+param tokensPerMinutePerCapacityUnit int = 1000
 
 module foundryModule '../modules/aif-foundry.bicep' = {
   name: 'foundryModule'
@@ -54,6 +62,7 @@ module foundryModule '../modules/aif-foundry.bicep' = {
     projectName: projectName
     projectDescription: projectDescription
     modelDeployments: modelDeployments
+    tokensPerMinutePerCapacityUnit: tokensPerMinutePerCapacityUnit
   }
 }
 

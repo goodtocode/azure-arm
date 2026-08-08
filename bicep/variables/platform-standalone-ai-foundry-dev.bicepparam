@@ -31,7 +31,7 @@ param modelDeployments = [
     modelFormat: 'OpenAI'
     modelVersion: '2026-03-05'
     skuName: 'GlobalStandard'
-    skuCapacity: 1
+    tokensPerMinute: 20000
   }
   {
     deploymentName: 'openai-fast'
@@ -39,6 +39,22 @@ param modelDeployments = [
     modelFormat: 'OpenAI'
     modelVersion: '2025-04-14'
     skuName: 'GlobalStandard'
-    skuCapacity: 1
+    tokensPerMinute: 20000
+  }
+  {
+    deploymentName: 'ms-chat'
+    modelName: 'Phi-4'
+    modelFormat: 'Microsoft'
+    modelVersion: '7'
+    skuName: 'GlobalStandard'
+    tokensPerMinute: 10000
+  }
+  {
+    deploymentName: 'mai-image'
+    modelName: 'MAI-Image-2.5-Flash'
+    modelFormat: 'Microsoft'
+    modelVersion: '2026-06-02'
+    skuName: 'GlobalStandard'
+    tokensPerMinute: 2000
   }
 ]
