@@ -132,7 +132,8 @@ This repository helps you stand up production-ready Azure foundations faster, wi
 	`bicep/templates/platform-shared-ai-foundry.bicep`,
 	`bicep/templates/platform-shared-ai-ollama.bicep`
 - **Shared workload templates (home workload consuming external shared services)**:
-	`bicep/templates/workload-shared-web.bicep`
+	`bicep/templates/workload-shared-web.bicep`,
+	`bicep/templates/workload-shared-func.bicep`
 - **Standalone workload templates (complete product stack in one home resource group)**:
 	`bicep/templates/workload-standalone-web-api-sql.bicep`
 - **Hub templates (shared platform services)**:

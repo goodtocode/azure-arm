@@ -76,9 +76,10 @@ Current repository example:
 
 ```text
 workload-shared-web
+workload-shared-func
 ```
 
-This template consumes an existing App Insights resource and an existing App Service plan from management resource groups, then installs the Web App in the home resource group.
+These templates consume existing platform resources from another resource group, then install product resources in the home resource group. `workload-shared-web` consumes an existing App Insights resource and App Service plan, then installs the Web App. `workload-shared-func` consumes an existing App Insights resource and App Service plan, optionally installs a Storage Account in the home resource group, and installs the Function App in the home resource group.
 
 For a shared platform service:
 
@@ -158,6 +159,7 @@ platform-spoke-ai-ollama
 platform-spoke-mgmt
 workload-shared-web
 workload-standalone-web-api-sql
+workload-shared-func
 workload-spoke-web
 workload-spoke-web-api
 workload-spoke-web-api-sql
