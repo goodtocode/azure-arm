@@ -28,8 +28,8 @@ This repository uses **Platform** and **Workload** terminology for Azure infrast
 - **Platform**: Enterprise-managed foundational services and controls shared across products, including networking, connectivity, DNS, firewalls, monitoring, identity integrations, App Configuration, Key Vault, and shared AI services.
 - **Workload**: Resources owned by one product, application, bounded context, or business capability, including web apps, API apps, Functions, App Service plans, and product databases.
 - **Hub** and **Spoke**: Network topology terms. The hub provides centralized connectivity and controls; spokes are workload or platform deployments connected to the hub.
-- **Shared**: A default deployment model for resources that do not require dedicated VNet/SNet onboarding. Shared does not mean every resource is owned by the platform team; use the `platform-` or `workload-` prefix to identify ownership.
-- **Standalone**: A fully self-contained deployment boundary with no hub, spoke, or shared-resource dependency. Microsoft Entra ID is the only expected enterprise dependency.
+- **Shared**: A deployment model where product resources are installed into the home resource group but shared services such as App Insights, Key Vault, or App Configuration are consumed from another resource group and are not installed by the workload template. Shared does not mean every resource is owned by the platform team; use the `platform-` or `workload-` prefix to identify ownership.
+- **Standalone**: A fully self-contained deployment boundary where the complete product stack is installed into one home resource group. Microsoft Entra ID is the only expected enterprise dependency.
 
 ### Deployment Models
 
@@ -49,12 +49,12 @@ Spoke deployments are expected to be onboarded to a VNet and subnet. A spoke tem
 
 #### Shared
 
-Use shared when the deployment is a default Azure installation without VNet/SNet onboarding. Shared services are not connected to a hub-and-spoke network.
+Use shared when the workload installs its product resources into the home resource group but consumes pre-existing shared services from another resource group. Shared templates do not install those external App Insights, Key Vault, or App Configuration resources. Shared is about the resource-group/resource-ownership boundary; it is separate from whether public networking or VNet onboarding is used.
 
 Examples include:
 
 - `platform-shared-*`: Shared App Insights, Key Vault, App Configuration, Azure AI Foundry, Azure OpenAI, or Ollama services owned by the platform.
-- `workload-shared-*`: A product stack such as web, API, Function, and SQL resources that is deployed without dedicated networking.
+- `workload-shared-*`: A product stack in the home resource group that consumes pre-existing platform services from another resource group. The current example is `workload-shared-web`.
 
 Some shared services may have a corresponding spoke template. For example, the repository contains both the default-install [platform-shared-ai-ollama.bicep](bicep/templates/platform-shared-ai-ollama.bicep) and the network-enabled [platform-spoke-ai-ollama.bicep](bicep/templates/platform-spoke-ai-ollama.bicep).
 
@@ -66,9 +66,9 @@ Restricted settings are only complete when the deployment also supplies the requ
 
 #### Standalone
 
-Use standalone only when all application resources are contained within one deployment boundary and the deployment does not consume or provision shared platform resources. A standalone deployment must not depend on shared App Insights, Key Vault, App Configuration, Foundry, Ollama, Azure OpenAI, hub networking, or spoke networking.
+Use standalone when all application and operational resources required by the product stack are installed into one home resource group. A standalone deployment may use public Azure defaults, but it must not rely on separately managed App Insights, Key Vault, App Configuration, Foundry, Ollama, Azure OpenAI, hub networking, or spoke networking.
 
-Standalone is an isolation boundary, not a synonym for a default install. Default installs of shared services use `platform-shared-*` or `workload-shared-*`.
+Standalone is a resource-group ownership boundary, not a synonym for private networking. Shared and standalone templates may both use public Azure defaults; the distinction is whether required resources are consumed externally or installed locally.
 
 ### Naming
 
@@ -107,7 +107,7 @@ rg-workload-shared-integration-prod-001
 rg-workload-standalone-poc-dev-001
 ```
 
-The resource suffix should describe the actual deployment, not the architecture term. For example, use `workload-spoke-web-api` for a network-bound product stack and `workload-shared-web-api-sql` for the same type of stack without VNet/SNet onboarding.
+The resource suffix should describe the actual deployment, not the architecture term. For example, use `workload-spoke-web-api` for a network-bound product stack, `workload-shared-web` when the home workload consumes existing management services, and `workload-standalone-web-api-sql` when the home resource group receives the complete web/API/SQL/monitoring stack.
 
 ## Why This Repo Is Useful (What Is In It For Me?)
 
@@ -116,7 +116,7 @@ This repository helps you stand up production-ready Azure foundations faster, wi
 - **Faster time to first deployment**: Start from opinionated templates instead of building every resource definition from scratch.
 - **Safer changes in shared environments**: Use `what-if` before deployment to reduce infrastructure drift and surprise breakage.
 - **Composable architecture**: Reuse modules across workloads so web, API, and AI stacks stay consistent.
-- **Clear evolution path**: Begin with a shared default install, then move to hub-and-spoke templates as security, segmentation, and scale requirements grow.
+- **Clear evolution path**: Use shared when platform services already exist in another resource group, standalone when the product must install its complete stack locally, and hub-and-spoke when security, segmentation, and scale requirements require network onboarding.
 
 ### High-Value Modules You Can Reuse
 
@@ -131,9 +131,10 @@ This repository helps you stand up production-ready Azure foundations faster, wi
 - **Shared platform templates (default installs without VNet/SNet onboarding)**:
 	`bicep/templates/platform-shared-ai-foundry.bicep`,
 	`bicep/templates/platform-shared-ai-ollama.bicep`
-- **Shared workload templates (product stacks without VNet/SNet onboarding)**:
-	`bicep/templates/workload-shared-web.bicep`,
-	`bicep/templates/workload-shared-web-api-sql.bicep`
+- **Shared workload templates (home workload consuming external shared services)**:
+	`bicep/templates/workload-shared-web.bicep`
+- **Standalone workload templates (complete product stack in one home resource group)**:
+	`bicep/templates/workload-standalone-web-api-sql.bicep`
 - **Hub templates (shared platform services)**:
 	`bicep/templates/platform-hub-mgmt.bicep`,
 	`bicep/templates/platform-hub-network-publicroute.bicep`,
@@ -151,7 +152,7 @@ This repository helps you stand up production-ready Azure foundations faster, wi
 	`bicep/templates/workload-spoke-api-sql.bicep`,
 	`bicep/templates/workload-spoke-web-api-sql.bicep`
 
-If you are deciding where to begin, start with the shared model for a default install without VNet/SNet onboarding. Adopt the spoke model when governance, segmentation, private connectivity, or multi-team operations require hub-and-spoke networking. Use standalone only for genuinely self-contained deployments.
+If you are deciding where to begin, use shared when the platform already owns the operational services in another resource group. Use standalone when the product deployment must install its complete stack into one home resource group. Adopt the spoke model when governance, segmentation, private connectivity, or multi-team operations require hub-and-spoke networking.
 
 ### Spoke Subscription and Environment Model
 

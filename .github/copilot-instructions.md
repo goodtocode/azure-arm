@@ -53,7 +53,7 @@
 
 - Do keep resource definitions public-access by default for shared scenarios unless explicitly asked otherwise.
 - Do keep model/deployment settings configurable through parameters with safe defaults.
-- Do not introduce VNet, private endpoint, or hub-spoke dependencies in standalone templates unless required by issue scope.
+- Standalone templates install the complete product stack into one home resource group and do not consume separately managed App Insights, Key Vault, App Configuration, or network resources.
 - Do not loosen existing typing/constraints for convenience.
 
 ## Deployment Workflow

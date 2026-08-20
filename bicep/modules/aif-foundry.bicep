@@ -16,7 +16,7 @@ param projectName string
 
 @description('Optional human-readable description for the Azure AI Foundry project resource.')
 @maxLength(256)
-param projectDescription string = 'Standalone Azure AI Foundry project.'
+param projectDescription string = 'Azure AI Foundry project.'
 
 type FoundryModelName =
   | 'claude-opus'
