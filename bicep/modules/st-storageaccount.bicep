@@ -25,6 +25,26 @@ param sku string = 'Standard_LRS'
 @description('List of allowed IP addresses for Storage Account access. Default is empty (no IPs allowed).')
 param allowedIpRules array = []
 
+@description('List of allowed virtual network subnet resource IDs for Storage Account access.')
+param allowedVirtualNetworkResourceIds array = []
+
+@description('Controls whether the Storage Account accepts public network traffic.')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param publicNetworkAccess string = 'Enabled'
+
+@description('Default network action for Storage Account traffic. Use Deny with explicit network rules for hub or spoke deployments.')
+@allowed([
+  'Allow'
+  'Deny'
+])
+param networkDefaultAction string = 'Allow'
+
+@description('Controls whether shared-key authentication is allowed. Use false for hub or spoke deployments using identity-based access.')
+param allowSharedKeyAccess bool = true
+
 resource stResource 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: name
   location: location
@@ -37,13 +57,15 @@ resource stResource 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     allowBlobPublicAccess: false
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
-    allowSharedKeyAccess: false
-    publicNetworkAccess: 'Disabled'
+    allowSharedKeyAccess: allowSharedKeyAccess
+    publicNetworkAccess: publicNetworkAccess
     networkAcls: {
-      defaultAction: 'Deny'
+      defaultAction: networkDefaultAction
       bypass: 'AzureServices'
       ipRules: allowedIpRules
-      virtualNetworkRules: []
+      virtualNetworkRules: [for subnetId in allowedVirtualNetworkResourceIds: {
+        id: subnetId
+      }]
     }
     encryption: {
       keySource: 'Microsoft.Storage'

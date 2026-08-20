@@ -1,4 +1,4 @@
-using '../templates/landingzone-web.bicep'
+using '../templates/workload-spoke-web.bicep'
 // Common
 
 var tenantIac = 'COMPANY'

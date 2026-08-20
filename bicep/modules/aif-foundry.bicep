@@ -58,6 +58,23 @@ param enableDiagnostics bool = false
 @description('Diagnostics settings configuration (if enabled).')
 param diagnosticsSettings object = {}
 
+@description('Default network action for the Azure AI Foundry hub. Use Deny for a private spoke deployment.')
+@allowed([
+  'Allow'
+  'Deny'
+])
+param networkDefaultAction string = 'Allow'
+
+@description('Controls whether the Azure AI Foundry hub accepts public network traffic.')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param publicNetworkAccess string = 'Enabled'
+
+@description('Controls whether local key-based authentication is allowed. Use true for spoke deployments that require identity-based access.')
+param disableLocalAuth bool = false
+
 resource foundryHub 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
   name: name
   location: location
@@ -73,10 +90,10 @@ resource foundryHub 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
     allowProjectManagement: true
     customSubDomainName: name
     networkAcls: {
-      defaultAction: 'Allow'
+      defaultAction: networkDefaultAction
     }
-    publicNetworkAccess: 'Enabled'
-    disableLocalAuth: false
+    publicNetworkAccess: publicNetworkAccess
+    disableLocalAuth: disableLocalAuth
   }
 }
 

@@ -22,6 +22,20 @@ param name string
 @minLength(1)
 param workResourceId string
 
+@description('Controls whether Application Insights accepts public telemetry ingestion.')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param publicNetworkAccessForIngestion string = 'Enabled'
+
+@description('Controls whether Application Insights accepts public query traffic.')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param publicNetworkAccessForQuery string = 'Enabled'
+
 resource appiResource 'Microsoft.Insights/components@2020-02-02' = {
   name: name
   location: location
@@ -31,6 +45,8 @@ resource appiResource 'Microsoft.Insights/components@2020-02-02' = {
     Application_Type: 'web'
     Flow_Type: 'Bluefield'
     WorkspaceResourceId: workResourceId
+    publicNetworkAccessForIngestion: publicNetworkAccessForIngestion
+    publicNetworkAccessForQuery: publicNetworkAccessForQuery
   }
 }
 

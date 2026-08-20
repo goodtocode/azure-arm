@@ -25,3 +25,7 @@ param sentSku = 'PerGB2018'
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 param kvName = '${productIac}-${environmentIac}-${instanceIac}-kv'
 param kvSku = 'standard'
+// Replace with the hub management subnet resource ID to enable private Key Vault access.
+param kvAllowedVirtualNetworkResourceIds = [
+  '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/hub-network-plat-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/hub-plat-wus2-001-vnet/subnets/management-snet'
+]

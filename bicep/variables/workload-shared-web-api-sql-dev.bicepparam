@@ -1,4 +1,4 @@
-using '../templates/landingzone-standalone-web-api-sql.bicep'
+using '../templates/workload-shared-web-api-sql.bicep'
 
 // Common
 var productIac = 'PRODUCT'

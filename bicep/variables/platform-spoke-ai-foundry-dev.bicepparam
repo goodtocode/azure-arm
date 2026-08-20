@@ -1,4 +1,4 @@
-using '../templates/platform-shared-ai-foundry.bicep'
+using '../templates/platform-spoke-ai-foundry.bicep'
 
 // =====================
 // Common
@@ -6,9 +6,9 @@ using '../templates/platform-shared-ai-foundry.bicep'
 var tenantIac = 'COMPANY'
 var productIac = 'spoke-ai'
 var environmentIac = 'dev'
-var regionIac = 'wus'
-var instanceIac = '100'
-param location = 'westus'
+var regionIac = 'wus2'
+var instanceIac = '001'
+param location = 'westus2'
 param tags = {
   Environment: environmentIac
   CostCenter: '0000'
@@ -17,11 +17,12 @@ param tags = {
 }
 
 // =====================
-// Platform Spoke AI RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// Foundry spoke resources
 // =====================
 param foundryName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif'
 param projectName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-proj'
 param projectDescription = 'Development spoke AI project.'
+param privateEndpointName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif-pe'
 
 // Required model deployments for Azure AI Foundry.
 param modelDeployments = [
@@ -49,12 +50,8 @@ param modelDeployments = [
     skuName: 'GlobalStandard'
     tokensPerMinute: 10000
   }
-  {
-    deploymentName: 'mai-image'
-    modelName: 'MAI-Image-2.5-Flash'
-    modelFormat: 'Microsoft'
-    modelVersion: '2026-06-02'
-    skuName: 'GlobalStandard'
-    tokensPerMinute: 2000
-  }
 ]
+
+// Replace these with the subnet and Private DNS zone in this spoke's subscription.
+param privateEndpointSubnetResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/spoke-network-dev-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/spoke-dev-wus2-001-vnet/subnets/private-endpoints-snet'
+param privateDnsZoneResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/platform-dns-dev-wus2-001-rg/providers/Microsoft.Network/privateDnsZones/privatelink.cognitiveservices.azure.com'

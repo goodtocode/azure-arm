@@ -77,6 +77,9 @@ param kvSku string = 'standard'
 @description('Specifies the Key Vault name. Defaults to a value derived from appcsName when not provided.')
 param kvName string = ''
 
+@description('Subnet resource IDs allowed to access spoke Key Vault. Supply the spoke management subnet for private access.')
+param kvAllowedVirtualNetworkResourceIds array = []
+
 // '-appcs-kv' is 9 chars, so truncate base to 15 chars max for 24-char total
 var kvNameBase = toLower(replace(appcsName, '-', ''))
 var kvNameTrunc = substring(kvNameBase, 0, min(15, length(kvNameBase)))
@@ -95,6 +98,8 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
     tags: tags
     name: appiName
     workResourceId: workResource.id
+    publicNetworkAccessForIngestion: 'Disabled'
+    publicNetworkAccessForQuery: 'Disabled'
   }
 }
 
@@ -106,6 +111,9 @@ module kvModule '../modules/kv-keyvault.bicep' = {
     name: kvNameResolved
     sku: kvSku
     tenantId: tenantId
+    publicNetworkAccess: empty(kvAllowedVirtualNetworkResourceIds) ? 'Enabled' : 'Disabled'
+    networkDefaultAction: empty(kvAllowedVirtualNetworkResourceIds) ? 'Allow' : 'Deny'
+    allowedVirtualNetworkResourceIds: kvAllowedVirtualNetworkResourceIds
   }
 } 
 
@@ -115,6 +123,8 @@ module appcsModule '../modules/appcs-appconfigurationstore.bicep' = {
     name: appcsName
     sku: appcsSku
     location: location
+    publicNetworkAccess: 'Disabled'
+    disableLocalAuth: true
   }
 }
 

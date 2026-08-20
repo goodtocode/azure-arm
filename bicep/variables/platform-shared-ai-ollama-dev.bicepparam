@@ -1,4 +1,4 @@
-using '../templates/platform-standalone-ai-ollama.bicep'
+using '../templates/platform-shared-ai-ollama.bicep'
 
 // =====================
 // Common

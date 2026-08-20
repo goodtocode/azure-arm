@@ -46,6 +46,9 @@ param stName string
 @allowed(['Standard_LRS', 'Standard_GRS', 'Standard_RAGRS', 'Standard_ZRS', 'Premium_LRS'])
 param stSku string = 'Standard_LRS'
 
+@description('Subnet resource ID allowed to access the Function App Storage Account. Required for the restricted spoke storage configuration.')
+param storageSubnetResourceId string
+
 @description('Name of the Function App.')
 @minLength(1)
 @maxLength(60)
@@ -76,6 +79,9 @@ module stModule '../modules/st-storageaccount.bicep' = {
     location: location
     name: stName
     sku: stSku
+    publicNetworkAccess: 'Disabled'
+    networkDefaultAction: 'Deny'
+    allowedVirtualNetworkResourceIds: [storageSubnetResourceId]
   }
 }
 
