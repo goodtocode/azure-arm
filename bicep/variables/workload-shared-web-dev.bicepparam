@@ -12,7 +12,9 @@ param location = 'westus2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 // Existing common services to wire the Web App to
+param appiResourceGroupName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-shared-rg'
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
+param planResourceGroupName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-shared-rg'
 param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 
 // App Service

@@ -17,11 +17,9 @@ param tags = {
   owner: tenantIac
 }
 
-// Existing shared platform services in another resource group.
-param appiSubscriptionId = '00000000-0000-0000-0000-000000000000'
+// Existing shared platform services in another resource group in the deployment subscription.
 param appiResourceGroupName = '${tenantIac}-spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
 param appiName = 'spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
-param planSubscriptionId = '00000000-0000-0000-0000-000000000000'
 param planResourceGroupName = '${tenantIac}-spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
 param planName = 'spoke-mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 

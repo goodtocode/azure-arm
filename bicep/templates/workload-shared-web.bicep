@@ -13,6 +13,26 @@ param location string = 'eastus'
 @description('Resource tags to be applied to all resources.')
 param tags object
 
+@description('Subscription ID containing the existing Application Insights resource. Defaults to the deployment subscription.')
+@minLength(1)
+@maxLength(64)
+param appiSubscriptionId string = subscription().subscriptionId
+
+@description('Subscription ID containing the existing App Service Plan. Defaults to the deployment subscription.')
+@minLength(1)
+@maxLength(64)
+param planSubscriptionId string = subscription().subscriptionId
+
+@description('Resource group in the subscription containing the existing Application Insights resource.')
+@minLength(1)
+@maxLength(90)
+param appiResourceGroupName string
+
+@description('Resource group in the subscription containing the existing App Service Plan.')
+@minLength(1)
+@maxLength(90)
+param planResourceGroupName string
+
 @minLength(1)
 @maxLength(255)
 @description('Name of the existing Application Insights resource to wire the Web App to. 1-255 characters, letters, numbers, and -')
@@ -53,10 +73,12 @@ param storageSku string = 'Standard_LRS'
 
 resource appiResource 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appiName
+  scope: resourceGroup(appiSubscriptionId, appiResourceGroupName)
 }
 
 resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   name: planName
+  scope: resourceGroup(planSubscriptionId, planResourceGroupName)
 }
 
 module storageModule '../modules/st-storageaccount.bicep' = if (deployStorage) {
