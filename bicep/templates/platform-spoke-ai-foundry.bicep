@@ -66,8 +66,8 @@ param privateDnsZoneResourceId string
 @maxLength(80)
 param privateEndpointName string
 
-module foundryModule '../modules/aif-foundry.bicep' = {
-  name: 'foundryModule'
+module aifModule '../modules/aif-foundry.bicep' = {
+  name: 'aifModule'
   params: {
     name: foundryName
     location: location
@@ -94,7 +94,7 @@ resource foundryPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-09-01' 
       {
         name: '${privateEndpointName}-connection'
         properties: {
-          privateLinkServiceId: foundryModule.outputs.resourceId
+          privateLinkServiceId: aifModule.outputs.resourceId
           groupIds: [
             'account'
           ]
@@ -120,22 +120,22 @@ resource foundryPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateD
 }
 
 @description('Resource ID of the Azure AI Foundry hub account.')
-output foundryResourceId string = foundryModule.outputs.resourceId
+output foundryResourceId string = aifModule.outputs.resourceId
 
 @description('Endpoint URI for the Azure AI Foundry hub account.')
-output endpoint string = foundryModule.outputs.endpoint
+output endpoint string = aifModule.outputs.endpoint
 
 @description('Name of the first deployed model deployment.')
-output deploymentName string = foundryModule.outputs.deploymentName
+output deploymentName string = aifModule.outputs.deploymentName
 
 @description('Names of all model deployments created in this deployment.')
-output deploymentNames array = foundryModule.outputs.deploymentNames
+output deploymentNames array = aifModule.outputs.deploymentNames
 
 @description('Name of the Azure AI Foundry project created in this deployment.')
-output projectName string = foundryModule.outputs.projectName
+output projectName string = aifModule.outputs.projectName
 
 @description('Resource ID of the Azure AI Foundry project created in this deployment.')
-output projectResourceId string = foundryModule.outputs.projectResourceId
+output projectResourceId string = aifModule.outputs.projectResourceId
 
 @description('Resource ID of the Foundry private endpoint.')
 output privateEndpointResourceId string = foundryPrivateEndpoint.id

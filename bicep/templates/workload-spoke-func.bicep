@@ -98,4 +98,5 @@ module funcModule '../modules/func-functionsapp.bicep' = {
     stName: stName
     alwaysOn: alwaysOn
   }
+  dependsOn: [stModule]
 }

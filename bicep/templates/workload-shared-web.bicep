@@ -81,8 +81,8 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   scope: resourceGroup(planSubscriptionId, planResourceGroupName)
 }
 
-module storageModule '../modules/st-storageaccount.bicep' = if (deployStorage) {
-  name: 'storageModule'
+module stModule '../modules/st-storageaccount.bicep' = if (deployStorage) {
+  name: 'stModule'
   params: {
     location: location
     tags: tags
