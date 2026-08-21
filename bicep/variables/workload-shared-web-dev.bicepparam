@@ -17,3 +17,8 @@ param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${inst
 
 // App Service
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
+
+// Optional home resource group Storage Account
+param storageAccountName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
+param deployStorage = false
+param storageSku = 'Standard_LRS'

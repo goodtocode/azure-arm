@@ -58,7 +58,7 @@ param planName string
 param storageAccountName string
 
 @description('Deploy the Storage Account into the current home resource group. Set to false when reusing an existing home-RG Storage Account.')
-param deployStorage bool = true
+param deployStorage bool = false
 
 @description('SKU for the optional home-RG Storage Account.')
 @allowed([

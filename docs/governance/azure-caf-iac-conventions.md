@@ -79,7 +79,7 @@ workload-shared-web
 workload-shared-func
 ```
 
-These templates consume existing platform resources from another resource group, then install product resources in the home resource group. `workload-shared-web` consumes an existing App Insights resource and App Service plan, then installs the Web App. `workload-shared-func` consumes an existing App Insights resource and App Service plan, optionally installs a Storage Account in the home resource group, and installs the Function App in the home resource group.
+These templates consume existing platform resources from another resource group, then install product resources in the home resource group. `workload-shared-web` consumes an existing App Insights resource and App Service plan, optionally installs a Storage Account in the home resource group, and installs the Web App. `workload-shared-func` consumes an existing App Insights resource and App Service plan, optionally installs a Storage Account in the home resource group, and installs the Function App in the home resource group.
 
 For a shared platform service:
 

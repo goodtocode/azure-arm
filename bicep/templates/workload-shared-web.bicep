@@ -33,12 +33,40 @@ param environmentApp string
 @description('Name of the Web App. 1-60 characters.')
 param webName string
 
+@minLength(3)
+@maxLength(24)
+@description('Name of the optional Storage Account installed in the home resource group.')
+param storageAccountName string
+
+@description('Deploy the optional Storage Account into the current home resource group.')
+param deployStorage bool = false
+
+@allowed([
+  'Standard_LRS'
+  'Standard_GRS'
+  'Standard_RAGRS'
+  'Standard_ZRS'
+  'Premium_LRS'
+])
+@description('SKU for the optional home resource group Storage Account.')
+param storageSku string = 'Standard_LRS'
+
 resource appiResource 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appiName
 }
 
 resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   name: planName
+}
+
+module storageModule '../modules/st-storageaccount.bicep' = if (deployStorage) {
+  name: 'storageModule'
+  params: {
+    location: location
+    tags: tags
+    name: storageAccountName
+    sku: storageSku
+  }
 }
 
 module webModule '../modules/web-appservice.bicep' = {

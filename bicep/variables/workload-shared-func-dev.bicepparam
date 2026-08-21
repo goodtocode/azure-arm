@@ -27,7 +27,7 @@ param planName = 'spoke-mgmt-${environmentIac}-${regionIac}-${planSku}-${instanc
 
 // Home resource group resources.
 param storageAccountName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
-param deployStorage = true
+param deployStorage = false
 param storageSku = 'Standard_LRS'
 param funcName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-func'
 param alwaysOn = true
