@@ -136,4 +136,5 @@ module funcModule '../modules/func-functionsapp.bicep' = {
     funcVersion: funcVersion
     alwaysOn: alwaysOn
   }
+  dependsOn: [stModule]
 }
