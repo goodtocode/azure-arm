@@ -24,6 +24,17 @@ param appiName = 'spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
 param planName = 'spoke-mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 
+// Optional VNet Integration
+param deployToVnet = true
+param vnetSubscriptionId = '00000000-0000-0000-0000-000000000000'
+param vnetResourceGroupName = 'spoke-network-${environmentIac}-${regionIac}-${instanceIac}-rg'
+param vnetName = 'spoke-${environmentIac}-${regionIac}-${instanceIac}-vnet'
+param subnetName = 'spoke-${environmentIac}-apps-snet'
+param vnetRouteAllEnabled = false
+param vnetImagePullEnabled = false
+param vnetContentShareEnabled = false
+param vnetBackupRestoreEnabled = false
+
 // SQL Server
 param sqlName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sql'
 param sqlAdminUser = 'LocalAdmin'

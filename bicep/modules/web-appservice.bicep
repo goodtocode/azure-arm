@@ -57,6 +57,21 @@ param alwaysOn bool = false
 @description('Enable WebSockets for the App Service')
 param websockets bool = true
 
+@description('Resource ID of the existing subnet to integrate the Web App with. Empty string skips VNet integration.')
+param subnetId string = ''
+
+@description('Route all outbound traffic through the VNet integration.')
+param vnetRouteAllEnabled bool = false
+
+@description('Route container image pull traffic through the VNet integration.')
+param vnetImagePullEnabled bool = false
+
+@description('Route content storage traffic through the VNet integration.')
+param vnetContentShareEnabled bool = false
+
+@description('Route backup/restore traffic through the VNet integration.')
+param vnetBackupRestoreEnabled bool = false
+
 resource webAppResource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
   location: location
@@ -65,6 +80,11 @@ resource webAppResource 'Microsoft.Web/sites@2023-12-01' = {
   properties: {    
     serverFarmId: planId
     httpsOnly: true
+    virtualNetworkSubnetId: empty(subnetId) ? null : subnetId
+    vnetRouteAllEnabled: vnetRouteAllEnabled
+    vnetImagePullEnabled: vnetImagePullEnabled
+    vnetContentShareEnabled: vnetContentShareEnabled
+    vnetBackupRestoreEnabled: vnetBackupRestoreEnabled
     siteConfig: {
       netFrameworkVersion: dotnetVersion
       ftpsState: 'Disabled'

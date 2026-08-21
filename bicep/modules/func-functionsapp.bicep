@@ -69,6 +69,21 @@ param funcVersion int = 4
 @description('Whether the Function App is always on. Default is false.')
 param alwaysOn bool = false
 
+@description('Resource ID of the existing subnet to integrate the Function App with. Empty string skips VNet integration.')
+param subnetId string = ''
+
+@description('Route all outbound traffic through the VNet integration.')
+param vnetRouteAllEnabled bool = false
+
+@description('Route container image pull traffic through the VNet integration.')
+param vnetImagePullEnabled bool = false
+
+@description('Route content storage traffic through the VNet integration.')
+param vnetContentShareEnabled bool = false
+
+@description('Route backup/restore traffic through the VNet integration.')
+param vnetBackupRestoreEnabled bool = false
+
 resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
   name: name 
   kind: 'functionapp'
@@ -76,6 +91,11 @@ resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
   tags: empty(tags) ? null : tags
   properties: {
     serverFarmId: planId
+    virtualNetworkSubnetId: empty(subnetId) ? null : subnetId
+    vnetRouteAllEnabled: vnetRouteAllEnabled
+    vnetImagePullEnabled: vnetImagePullEnabled
+    vnetContentShareEnabled: vnetContentShareEnabled
+    vnetBackupRestoreEnabled: vnetBackupRestoreEnabled
     siteConfig: {
       alwaysOn: alwaysOn
       appSettings: [

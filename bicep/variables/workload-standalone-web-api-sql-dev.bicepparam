@@ -20,6 +20,15 @@ param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web
 param apiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
 param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 
+// Optional VNet Integration
+param deployToVnet = false
+param vnetName = ''
+param subnetName = ''
+param vnetRouteAllEnabled = false
+param vnetImagePullEnabled = false
+param vnetContentShareEnabled = false
+param vnetBackupRestoreEnabled = false
+
 // SQL Server
 param sqlName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sql'
 param sqlAdminUser = 'LocalAdmin'

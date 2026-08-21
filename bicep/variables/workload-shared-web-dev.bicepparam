@@ -24,3 +24,12 @@ param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web
 param storageAccountName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
 param deployStorage = false
 param storageSku = 'Standard_LRS'
+
+// Optional VNet Integration
+param deployToVnet = false
+param vnetName = ''
+param subnetName = ''
+param vnetRouteAllEnabled = false
+param vnetImagePullEnabled = false
+param vnetContentShareEnabled = false
+param vnetBackupRestoreEnabled = false

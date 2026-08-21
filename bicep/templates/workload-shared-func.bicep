@@ -98,6 +98,37 @@ param funcRuntime string = 'dotnet'
 ])
 param funcVersion int = 4
 
+@description('Integrate the Function App with an existing subnet. Set to false to skip VNet integration entirely.')
+param deployToVnet bool = false
+
+@description('Subscription ID containing the existing virtual network. Defaults to the current subscription.')
+@minLength(1)
+@maxLength(64)
+param vnetSubscriptionId string = subscription().subscriptionId
+
+@description('Resource group containing the existing virtual network.')
+@minLength(1)
+@maxLength(90)
+param vnetResourceGroupName string = resourceGroup().name
+
+@description('Name of the existing virtual network.')
+param vnetName string = ''
+
+@description('Name of the existing subnet, delegated to Microsoft.Web/serverFarms, to integrate the Function App with.')
+param subnetName string = ''
+
+@description('Route all outbound traffic through the VNet integration.')
+param vnetRouteAllEnabled bool = false
+
+@description('Route container image pull traffic through the VNet integration.')
+param vnetImagePullEnabled bool = false
+
+@description('Route content storage traffic through the VNet integration.')
+param vnetContentShareEnabled bool = false
+
+@description('Route backup/restore traffic through the VNet integration.')
+param vnetBackupRestoreEnabled bool = false
+
 resource appiResource 'Microsoft.Insights/components@2020-02-02' existing = {
   name: appiName
   scope: resourceGroup(appiSubscriptionId, appiResourceGroupName)
@@ -108,8 +139,13 @@ resource planResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   scope: resourceGroup(planSubscriptionId, planResourceGroupName)
 }
 
-module stModule '../modules/st-storageaccount.bicep' = if (deployStorage) {
-  name: 'stModule'
+resource subnetResource 'Microsoft.Network/virtualNetworks/subnets@2023-06-01' existing = if (deployToVnet) {
+  name: '${vnetName}/${subnetName}'
+  scope: resourceGroup(vnetSubscriptionId, vnetResourceGroupName)
+}
+
+module storageModule '../modules/st-storageaccount.bicep' = if (deployStorage) {
+  name: 'storageModule'
   params: {
     location: location
     tags: tags
@@ -135,6 +171,12 @@ module funcModule '../modules/func-functionsapp.bicep' = {
     funcRuntime: funcRuntime
     funcVersion: funcVersion
     alwaysOn: alwaysOn
+    subnetId: deployToVnet ? subnetResource.id : ''
+    vnetRouteAllEnabled: vnetRouteAllEnabled
+    vnetImagePullEnabled: vnetImagePullEnabled
+    vnetContentShareEnabled: vnetContentShareEnabled
+    vnetBackupRestoreEnabled: vnetBackupRestoreEnabled
   }
-  dependsOn: [stModule]
+  // Ensure the storage account finishes provisioning before the Function App configures it.
+  dependsOn: deployStorage ? [storageModule] : []
 }
