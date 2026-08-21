@@ -15,7 +15,7 @@ param name string
 ])
 param sku string = 'Standard_LRS'
 
-resource storageAccountName 'Microsoft.Storage/storageAccounts@2023-05-01' = {
+resource stAccountName 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: name
   location: resourceGroup().location
   tags: {

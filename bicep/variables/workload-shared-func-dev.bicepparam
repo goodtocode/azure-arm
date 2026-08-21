@@ -24,9 +24,9 @@ param planResourceGroupName = '${tenantIac}-spoke-mgmt-${environmentIac}-${regio
 param planName = 'spoke-mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 
 // Home resource group resources.
-param storageAccountName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
+param stAccountName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
 param deployStorage = false
-param storageSku = 'Standard_LRS'
+param stSku = 'Standard_LRS'
 param funcName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-func'
 param alwaysOn = true
 param use32BitWorkerProcess = true

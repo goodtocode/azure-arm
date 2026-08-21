@@ -56,7 +56,7 @@ param webName string
 @minLength(3)
 @maxLength(24)
 @description('Name of the optional Storage Account installed in the home resource group.')
-param storageAccountName string
+param stAccountName string
 
 @description('Deploy the optional Storage Account into the current home resource group.')
 param deployStorage bool = false
@@ -69,7 +69,7 @@ param deployStorage bool = false
   'Premium_LRS'
 ])
 @description('SKU for the optional home resource group Storage Account.')
-param storageSku string = 'Standard_LRS'
+param stSku string = 'Standard_LRS'
 
 @description('Integrate the Web App with an existing subnet. Set to false to skip VNet integration entirely.')
 param deployToVnet bool = false
@@ -122,8 +122,8 @@ module stModule '../modules/st-storageaccount.bicep' = if (deployStorage) {
   params: {
     location: location
     tags: tags
-    name: storageAccountName
-    sku: storageSku
+    name: stAccountName
+    sku: stSku
   }
 }
 

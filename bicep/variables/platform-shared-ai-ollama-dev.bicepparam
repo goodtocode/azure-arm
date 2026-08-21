@@ -22,7 +22,7 @@ param tags = {
 // =====================
 param environmentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-acaenv'
 param containerAppName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-ollama'
-param storageAccountName = '${storageAccountProductIac}${environmentIac}${regionIac}${instanceIac}oll'
+param stAccountName = '${storageAccountProductIac}${environmentIac}${regionIac}${instanceIac}oll'
 param storageShareName = 'ollama-models'
 
 param modelName = 'phi4'
@@ -31,7 +31,7 @@ param cpuCores = 2
 param memoryGiB = '4Gi'
 param minReplicas = 1
 param maxReplicas = 1
-param storageSku = 'Standard_LRS'
+param stSku = 'Standard_LRS'
 param ingressExternal = true
 // RFC5737 TEST-NET-3 placeholder; replace with real caller egress CIDRs before deployment.
 param ingressAllowedCidrs = [

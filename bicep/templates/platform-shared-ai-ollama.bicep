@@ -19,7 +19,7 @@ param containerAppName string
 @minLength(3)
 @maxLength(24)
 @description('Name of the Storage Account used for persistent Ollama model storage.')
-param storageAccountName string
+param stAccountName string
 
 @minLength(3)
 @maxLength(63)
@@ -69,7 +69,7 @@ param maxReplicas int = 1
   'Standard_LRS'
   'Standard_ZRS'
 ])
-param storageSku string = 'Standard_LRS'
+param stSku string = 'Standard_LRS'
 
 @description('Set to true to expose Ollama publicly through external ingress.')
 param ingressExternal bool = true
@@ -94,7 +94,7 @@ module ollamaModule '../modules/aca-ollama.bicep' = {
     tags: tags
     managedEnvironmentName: environmentName
     containerAppName: containerAppName
-    storageAccountName: storageAccountName
+    stAccountName: stAccountName
     storageShareName: storageShareName
     modelName: modelName
     containerImage: containerImage
@@ -102,7 +102,7 @@ module ollamaModule '../modules/aca-ollama.bicep' = {
     memoryGiB: memoryGiB
     minReplicas: minReplicas
     maxReplicas: maxReplicas
-    storageSku: storageSku
+    stSku: stSku
     ingressExternal: ingressExternal
     ingressAllowedCidrs: ingressAllowedCidrs
   }

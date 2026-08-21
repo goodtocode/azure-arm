@@ -55,7 +55,7 @@ param planName string
 @description('Name of the Storage Account used by the Function App in the home resource group. When deployStorage is false, the account must already exist.')
 @minLength(3)
 @maxLength(24)
-param storageAccountName string
+param stAccountName string
 
 @description('Deploy the Storage Account into the current home resource group. Set to false when reusing an existing home-RG Storage Account.')
 param deployStorage bool = false
@@ -68,7 +68,7 @@ param deployStorage bool = false
   'Standard_ZRS'
   'Premium_LRS'
 ])
-param storageSku string = 'Standard_LRS'
+param stSku string = 'Standard_LRS'
 
 @description('Name of the Function App installed in the current home resource group.')
 @minLength(1)
@@ -149,8 +149,8 @@ module storageModule '../modules/st-storageaccount.bicep' = if (deployStorage) {
   params: {
     location: location
     tags: tags
-    name: storageAccountName
-    sku: storageSku
+    name: stAccountName
+    sku: stSku
   }
 }
 
@@ -164,7 +164,7 @@ module funcModule '../modules/func-functionsapp.bicep' = {
     appiKey: appiResource.properties.InstrumentationKey
     appiConnection: appiResource.properties.ConnectionString
     planId: planResource.id
-    stName: storageAccountName
+    stName: stAccountName
     stSubscriptionId: subscription().subscriptionId
     stResourceGroupName: resourceGroup().name
     use32BitWorkerProcess: use32BitWorkerProcess

@@ -21,9 +21,9 @@ param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${inst
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
 
 // Optional home resource group Storage Account
-param storageAccountName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
+param stAccountName = '${productIac}${environmentIac}${regionIac}${instanceIac}st'
 param deployStorage = false
-param storageSku = 'Standard_LRS'
+param stSku = 'Standard_LRS'
 
 // Optional VNet Integration
 param deployToVnet = false

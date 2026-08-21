@@ -13,16 +13,16 @@
     }
   },
   "variables": {
-    "storageAccountName": "[parameters('name')]"
+    "stAccountName": "[parameters('name')]"
   },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('storageAccountName')]",
+      "name": "[variables('stAccountName')]",
       "apiVersion": "2021-06-01",
       "location": "[resourceGroup().location]",
       "tags": {
-        "displayName": "[variables('storageAccountName')]"
+        "displayName": "[variables('stAccountName')]"
       },
       "sku": {
         "name": "[parameters('sku')]"
