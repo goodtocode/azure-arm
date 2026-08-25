@@ -40,6 +40,9 @@ param kvName string
 ])
 param kvSku string
 
+@description('Subnet resource IDs allowed to access the hub Key Vault. Leave empty for public default access.')
+param kvAllowedVirtualNetworkResourceIds array = []
+
 //
 // Management
 //
@@ -60,6 +63,8 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
     tags: tags
     name: appiName
     workResourceId: sentModule.outputs.id
+    publicNetworkAccessForIngestion: 'Disabled'
+    publicNetworkAccessForQuery: 'Disabled'
   }
 }
 
@@ -71,5 +76,8 @@ module kvModule '../modules/kv-keyvault.bicep' = {
     name: kvName
     sku: kvSku
     tenantId: tenantId
+    publicNetworkAccess: empty(kvAllowedVirtualNetworkResourceIds) ? 'Enabled' : 'Disabled'
+    networkDefaultAction: empty(kvAllowedVirtualNetworkResourceIds) ? 'Allow' : 'Deny'
+    allowedVirtualNetworkResourceIds: kvAllowedVirtualNetworkResourceIds
   }
 } 

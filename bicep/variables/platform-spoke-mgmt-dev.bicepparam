@@ -33,6 +33,10 @@ param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-ap
 param appcsName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appcs'
 param appcsSku = 'free'
 param kvName = '${productIac}-${environmentIac}-${instanceIac}-kv'
+// Replace with the spoke management subnet resource ID to enable private Key Vault access.
+param kvAllowedVirtualNetworkResourceIds = [
+  '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/spoke-network-dev-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/spoke-dev-wus2-001-vnet/subnets/management-snet'
+]
 param planSku = 'F1'
 param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 

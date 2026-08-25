@@ -1,4 +1,4 @@
-using '../templates/platform-standalone-ai-foundry.bicep'
+using '../templates/platform-shared-ai-foundry.bicep'
 
 // =====================
 // Common

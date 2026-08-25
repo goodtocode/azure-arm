@@ -1,4 +1,4 @@
-using '../templates/landingzone-standalone-web-api-sql.bicep'
+using '../templates/workload-standalone-web-api-sql.bicep'
 
 // Common
 var productIac = 'PRODUCT'
@@ -19,6 +19,15 @@ param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-wo
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
 param apiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
 param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
+
+// Optional VNet Integration
+param deployToVnet = false
+param vnetName = ''
+param subnetName = ''
+param vnetRouteAllEnabled = false
+param vnetImagePullEnabled = false
+param vnetContentShareEnabled = false
+param vnetBackupRestoreEnabled = false
 
 // SQL Server
 param sqlName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sql'

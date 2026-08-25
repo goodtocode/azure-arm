@@ -1,4 +1,4 @@
-using '../templates/landingzone-func.bicep'
+using '../templates/workload-spoke-func.bicep'
 // Common
 
 var tenantIac = 'COMPANY'
@@ -19,6 +19,8 @@ param appiName = 'spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
 // Storage
 param stName = '${productIac}${environmentIac}${instanceIac}st'
 param stSku = 'Standard_LRS'
+// Replace with the delegated spoke subnet resource ID used by the Function App.
+param storageSubnetResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/spoke-network-dev-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/spoke-dev-wus2-001-vnet/subnets/apps-snet'
 
 // Azure Functions
 param funcName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-func'

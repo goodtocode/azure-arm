@@ -1,4 +1,4 @@
-using '../templates/landingzone-web-api.bicep'
+using '../templates/workload-spoke-web-sql.bicep'
 // Common
 
 var tenantIac = 'COMPANY'
@@ -22,5 +22,22 @@ param appiName = 'spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // App Service
 param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web'
-param apiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
 param planName = 'spoke-mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
+
+// Optional VNet Integration
+param deployToVnet = true
+param vnetSubscriptionId = '00000000-0000-0000-0000-000000000000'
+param vnetResourceGroupName = 'spoke-network-${environmentIac}-${regionIac}-${instanceIac}-rg'
+param vnetName = 'spoke-${environmentIac}-${regionIac}-${instanceIac}-vnet'
+param subnetName = 'spoke-${environmentIac}-apps-snet'
+param vnetRouteAllEnabled = false
+param vnetImagePullEnabled = false
+param vnetContentShareEnabled = false
+param vnetBackupRestoreEnabled = false
+
+// SQL Server
+param sqlName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sql'
+param sqlAdminUser = 'LocalAdmin'
+param sqlAdminPassword = 'PASS_FROM_CLI_PARAMETERS'
+param sqldbName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sqldb'
+param sqldbSku = 'Basic'

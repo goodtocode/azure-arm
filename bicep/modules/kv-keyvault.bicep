@@ -34,6 +34,27 @@ param allowedIpRules array = []
 @description('List of allowed Virtual Network resource IDs for Key Vault access. Default is empty (no VNets allowed).')
 param allowedVirtualNetworkResourceIds array = []
 
+@description('Controls whether the Key Vault accepts public network traffic.')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param publicNetworkAccess string = 'Enabled'
+
+@description('Default network action for Key Vault traffic. Use Deny with explicit network rules for hub or spoke deployments.')
+@allowed([
+  'Allow'
+  'Deny'
+])
+param networkDefaultAction string = 'Allow'
+
+@description('Azure services that bypass the Key Vault network rules.')
+@allowed([
+  'AzureServices'
+  'None'
+])
+param networkBypass string = 'AzureServices'
+
 @description('Enable soft delete for the Key Vault. Default is true.')
 param enableSoftDelete bool = true
 
@@ -49,7 +70,7 @@ resource kvResource 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enabledForDiskEncryption: true
     enabledForTemplateDeployment: true
     tenantId: tenantId
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: publicNetworkAccess
     sku: {
       name: sku
       family: 'A'
@@ -59,8 +80,8 @@ resource kvResource 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enableSoftDelete: enableSoftDelete
     enablePurgeProtection: enablePurgeProtection
     networkAcls: {
-      defaultAction: 'Deny'
-      bypass: 'AzureServices'
+      defaultAction: networkDefaultAction
+      bypass: networkBypass
       virtualNetworkRules: allowedVirtualNetworkResourceIds
       ipRules: allowedIpRules
     }

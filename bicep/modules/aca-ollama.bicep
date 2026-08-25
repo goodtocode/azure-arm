@@ -17,7 +17,7 @@ param containerAppName string
 @minLength(3)
 @maxLength(24)
 @description('Name of the Storage Account used for persistent Ollama model storage. Must be globally unique, lowercase letters and numbers only.')
-param storageAccountName string
+param stAccountName string
 
 @minLength(3)
 @maxLength(63)
@@ -79,14 +79,14 @@ param ingressAllowedCidrs array = []
   'Standard_LRS'
   'Standard_ZRS'
 ])
-param storageSku string = 'Standard_LRS'
+param stSku string = 'Standard_LRS'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
-  name: storageAccountName
+  name: stAccountName
   location: location
   tags: empty(tags) ? null : tags
   sku: {
-    name: storageSku
+    name: stSku
   }
   kind: 'StorageV2'
   properties: {

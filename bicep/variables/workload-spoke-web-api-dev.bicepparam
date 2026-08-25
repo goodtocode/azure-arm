@@ -1,6 +1,6 @@
-using '../templates/landingzone-web-api-sql.bicep'
-
+using '../templates/workload-spoke-web-api.bicep'
 // Common
+
 var tenantIac = 'COMPANY'
 var productIac = 'PRODUCT'
 var environmentIac = 'dev'
@@ -12,6 +12,10 @@ param environmentApp = 'Development'
 param location = 'westus2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
+// Mgmt Resource Group (hub)
+param hubMgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
+param hubMgmtResourceGroupName = '${tenantIac}-hub-mgmt-plat-${regionIac}-${instanceIac}-rg'
+
 // Mgmt Resource Group (spoke)
 param spokeMgmtResourceGroupName = '${tenantIac}-spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
 param appiName = 'spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
@@ -21,9 +25,13 @@ param webName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-web
 param apiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-api'
 param planName = 'spoke-mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 
-// SQL Server
-param sqlName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sql'
-param sqlAdminUser = 'LocalAdmin'
-param sqlAdminPassword = 'PASS_FROM_CLI_PARAMETERS'
-param sqldbName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sqldb'
-param sqldbSku = 'Basic'
+// Optional VNet Integration
+param deployToVnet = true
+param vnetSubscriptionId = '00000000-0000-0000-0000-000000000000'
+param vnetResourceGroupName = 'spoke-network-${environmentIac}-${regionIac}-${instanceIac}-rg'
+param vnetName = 'spoke-${environmentIac}-${regionIac}-${instanceIac}-vnet'
+param subnetName = 'spoke-${environmentIac}-apps-snet'
+param vnetRouteAllEnabled = false
+param vnetImagePullEnabled = false
+param vnetContentShareEnabled = false
+param vnetBackupRestoreEnabled = false

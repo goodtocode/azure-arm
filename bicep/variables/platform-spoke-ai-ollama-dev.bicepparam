@@ -22,7 +22,7 @@ param tags = {
 // =====================
 param environmentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-acaenv'
 param containerAppName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-ollama'
-param storageAccountName = '${storageAccountProductIac}${environmentIac}${regionIac}${instanceIac}oll'
+param stAccountName = '${storageAccountProductIac}${environmentIac}${regionIac}${instanceIac}oll'
 param storageShareName = 'ollama-models'
 
 param modelName = 'phi4'
@@ -31,5 +31,5 @@ param cpuCores = 2
 param memoryGiB = '4Gi'
 param minReplicas = 1
 param maxReplicas = 1
-param storageSku = 'Standard_LRS'
+param stSku = 'Standard_LRS'
 param infrastructureSubnetResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/hub-network-dev-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/hub-dev-wus2-001-vnet/subnets/aca-infra-snet'
