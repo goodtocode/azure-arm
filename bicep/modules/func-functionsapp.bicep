@@ -53,7 +53,7 @@ param environmentApp string
   'python'
   'dotnet-isolated'
 ])
-param funcRuntime string = 'dotnet'
+param funcRuntime string = 'dotnet-isolated'
 
 
 @description('The version of the Azure Functions runtime. Allowed values: 1, 2, 3, 4. Default is 4.')

@@ -87,7 +87,7 @@ param use32BitWorkerProcess bool = true
   'python'
   'dotnet-isolated'
 ])
-param funcRuntime string = 'dotnet'
+param funcRuntime string = 'dotnet-isolated'
 
 @description('Azure Functions runtime version.')
 @allowed([

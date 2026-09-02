@@ -30,5 +30,5 @@ param stSku = 'Standard_LRS'
 param funcName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-func'
 param alwaysOn = true
 param use32BitWorkerProcess = true
-param funcRuntime = 'dotnet'
+param funcRuntime = 'dotnet-isolated'
 param funcVersion = 4
