@@ -3,7 +3,7 @@ using '../templates/platform-spoke-network-publicroute.bicep'
 // =====================
 // Common
 // =====================
-var tenantIac = 'COMPANY'
+var scopeOwner = 'ScopeOrTenant'
 var productIac = 'spoke-network'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
@@ -13,7 +13,7 @@ param tags = {
   Environment: environmentIac
   CostCenter: '0000'
   project: productIac
-  owner: tenantIac
+  owner: scopeOwner
 }
 
 // =====================

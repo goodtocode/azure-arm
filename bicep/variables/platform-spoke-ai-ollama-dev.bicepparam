@@ -3,7 +3,7 @@ using '../templates/platform-spoke-ai-ollama.bicep'
 // =====================
 // Common
 // =====================
-var tenantIac = 'COMPANY'
+var scopeOwner = 'ScopeOrTenant'
 var productIac = 'spoke-ai'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
@@ -14,7 +14,7 @@ param tags = {
   Environment: environmentIac
   CostCenter: '0000'
   project: productIac
-  owner: tenantIac
+  owner: scopeOwner
 }
 
 // =====================

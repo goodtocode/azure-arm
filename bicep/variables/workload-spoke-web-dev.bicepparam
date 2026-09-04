@@ -1,7 +1,7 @@
 using '../templates/workload-spoke-web.bicep'
 // Common
 
-var tenantIac = 'COMPANY'
+var scopeOwner = 'ScopeOrTenant'
 var productIac = 'PRODUCT'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
@@ -14,10 +14,10 @@ param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 // Mgmt Resource Group (hub)
 param hubMgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
-param hubMgmtResourceGroupName = '${tenantIac}-hub-mgmt-plat-${regionIac}-${instanceIac}-rg'
+param hubMgmtResourceGroupName = '${scopeOwner}-hub-mgmt-plat-${regionIac}-${instanceIac}-rg'
 
 // Mgmt Resource Group (spoke)
-param spokeMgmtResourceGroupName = '${tenantIac}-spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
+param spokeMgmtResourceGroupName = '${scopeOwner}-spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
 param appiName = 'spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
 
 // App Service
