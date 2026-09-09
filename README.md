@@ -72,6 +72,25 @@ Standalone is a resource-group ownership boundary, not a synonym for private net
 
 ### Naming
 
+#### Core Conventions
+
+Use five naming slots in order:
+
+| Slot | Purpose | Example | RG | Resources |
+| --- | --- | --- | --- | --- |
+| 1 | Scope Owner | platform, prod, devtest, shared, nursing, certification | Platform RG Slots Convention | Platform Resources Slots Convention |
+| 2 | Workload Scope | hub, spoke, education | `{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg` | `{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}` |
+| 3 | Service Domain / Product | connectivity, identity, management, security, beacon |  |  |
+| 4 | Region or Environment | Platform: region (westus2, eastus2); Business product: env (prod, dev) |  |  |
+| 5 | Instance | 100 |  |  |
+
+**Platform RG Slots Convention**: `{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg`  
+**Platform Resources Slots Convention**: `{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}`  
+**Business Product RG Slots Convention**: `{scopeOwner}-{businessUnit/familyLine}-{product}-{env}-{instance}-rg`  
+**Business Product Resources Slots Convention**: `{businessUnit/familyLine}-{product}-{env}-{instance}-{resourceAbbreviation}`
+
+Platform resource-group examples include `platform-hub-connectivity-westus2-100-rg` and `devtest-spoke-network-westus2-100-rg`. Business product examples include `devtest-nursing-beacon-dev-100-rg` and `nursing-beacon-prod-100-web`.
+
 Template and parameter names follow this format:
 
 ```text
@@ -94,17 +113,16 @@ workload-standalone-*
 Resource groups follow this format:
 
 ```text
-rg-{deployment-model}-{workload}-{environment}-{sequence}
+{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg
 ```
 
 Examples:
 
 ```text
-rg-platform-hub-networking-prod-001
-rg-platform-shared-ai-prod-001
-rg-workload-spoke-beacon-prod-001
-rg-workload-shared-integration-prod-001
-rg-workload-standalone-poc-dev-001
+platform-hub-connectivity-westus2-100-rg
+platform-hub-identity-westus2-100-rg
+devtest-spoke-network-westus2-100-rg
+production-nursing-beacon-prod-100-rg
 ```
 
 The resource suffix should describe the actual deployment, not the architecture term. For example, use `workload-spoke-web-api` for a network-bound product stack, `workload-shared-web` when the home workload consumes existing management services, and `workload-standalone-web-api-sql` when the home resource group receives the complete web/API/SQL/monitoring stack.

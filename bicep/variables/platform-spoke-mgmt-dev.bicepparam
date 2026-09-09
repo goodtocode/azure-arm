@@ -3,7 +3,7 @@ using '../templates/platform-spoke-mgmt.bicep'
 // =====================
 // Common
 // =====================
-var tenantIac = 'COMPANY'
+var scopeOwner = 'ScopeOrTenant'
 var productIac = 'spoke-mgmt'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
@@ -13,11 +13,11 @@ param tags = {
   Environment: environmentIac
   CostCenter: '0000'
   project: productIac
-  owner: tenantIac
+  owner: scopeOwner
 }
 
 // =====================
-// Platform Hub Management RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// Platform Hub Management RG: ${scopeOwner}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
 // i.e. gtc-hub-mgmt-plat-wus2-001
 // Note: Sentinel is the shared workspace log analytics
 // =====================
@@ -26,7 +26,7 @@ param hubMgmtResourceGroupName = 'hub-mgmt-plat-${regionIac}-${instanceIac}-rg'
 param workName = 'hub-mgmt-plat-${regionIac}-${instanceIac}-sent'
 
 // =====================
-// Platform Spoke Management RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// Platform Spoke Management RG: ${scopeOwner}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
 // i.e. gtc-spoke-mgmt-dev-wus2-001
 // =====================
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'

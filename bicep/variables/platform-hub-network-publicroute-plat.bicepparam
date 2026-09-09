@@ -3,7 +3,7 @@ using '../templates/platform-hub-network-publicroute.bicep'
 // =====================
 // Common
 // =====================
-var tenantIac = 'COMPANY'
+var scopeOwner = 'ScopeOrTenant'
 var productIac = 'hub-network'
 var environmentIac = 'plat'
 var regionIac = 'wus2'
@@ -13,11 +13,11 @@ param tags = {
   Environment: environmentIac
   CostCenter: '0000'
   project: productIac
-  owner: tenantIac
+  owner: scopeOwner
 }
 
 // =====================
-// Networking RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// Networking RG: ${scopeOwner}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
 // rg: gtc-hub-network-plat-wus2-001
 // =====================
 param afdSku = 'Standard_AzureFrontDoor'
