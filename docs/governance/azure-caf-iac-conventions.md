@@ -23,6 +23,62 @@ The conventions align with the Azure Cloud Adoption Framework (CAF) and Enterpri
 | Template | A composite Bicep deployment that composes modules for a deployment scenario. |
 | Variables | An environment-specific `.bicepparam` file that supplies names, locations, topology IDs, and deployment values to a template. |
 
+## Core Conventions
+
+Use five naming slots in order:
+
+| Slot | Purpose | Example | RG | Resources |
+| --- | --- | --- | --- | --- |
+| 1 | Scope Owner | platform, prod, devtest, shared, nursing, certification | Platform RG Slots Convention | Platform Resources Slots Convention |
+| 2 | Workload Scope | hub, spoke, education | `{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg` | `{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}` |
+| 3 | Service Domain / Product | connectivity, identity, management, security, beacon |  |  |
+| 4 | Region or Environment | Platform: region (westus2, eastus2); Business product: env (prod, dev) |  |  |
+| 5 | Instance | 100 |  |  |
+
+### Platform Slots
+
+**Platform RG Slots Convention**
+
+`{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg`
+
+**Platform Resources Slots Convention**
+
+`{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}`
+
+| Platform RG Examples | Platform Resource Examples |
+| --- | --- |
+| `platform-hub-connectivity-westus2-100-rg` | `hub-network-westus2-100-vnet` |
+| `platform-hub-identity-westus2-100-rg` | `hub-identity-westus2-100-rg` |
+| `devtest-spoke-network-westus2-100-rg` | `hub-vpngateway-westus2-100-pip` |
+| `production-spoke-network-westus2-100-rg` |  |
+
+### Business Product Slots
+
+**Business Product RG Slots Convention**
+
+`{scopeOwner}-{businessUnit/familyLine}-{product}-{env}-{instance}-rg`
+
+**Business Product Resources Slots Convention**
+
+`{businessUnit/familyLine}-{product}-{env}-{instance}-{resourceAbbreviation}`
+
+| Business Product RG Examples | Business Product Resource Examples |
+| --- | --- |
+| `devtest-nursing-beacon-dev-100-rg` | `nursing-beacon-prod-100-appi` |
+| `production-nursing-beacon-prod-100-rg` | `nursing-beacon-prod-100-web` |
+|  | `nursing-beacon-prod-100-func` |
+|  | `nursingbeaconprod001st` |
+
+### Domain Resource Groups
+
+| Domain Resource Group | Usage |
+| --- | --- |
+| connectivity | ExpressRoute, VPN, DNS, Routing |
+| network | VNet, Subnets, NSG, Peerings |
+| security | Firewall, Sentinel, DDoS |
+| identity | Entra, PIM, Domain Services |
+| management | Monitoring, Backup, Automation |
+
 ## Ownership Prefixes
 
 Use the owner prefix before the deployment model:
@@ -178,21 +234,19 @@ platform-hub-mgmt-plat.bicepparam
 
 ## Resource Group Naming
 
-Use:
+Use the suffix convention:
 
 ```text
-rg-{owner}-{deployment-model}-{workload}-{environment}-{sequence}
+{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg
 ```
 
 Examples:
 
 ```text
-rg-platform-hub-networking-prod-001
-rg-platform-shared-ai-prod-001
-rg-platform-spoke-management-dev-001
-rg-workload-shared-web-dev-001
-rg-workload-standalone-web-api-sql-dev-001
-rg-workload-spoke-beacon-prod-001
+platform-hub-connectivity-westus2-100-rg
+platform-hub-identity-westus2-100-rg
+devtest-spoke-network-westus2-100-rg
+production-nursing-beacon-prod-100-rg
 ```
 
 The resource group is a lifecycle and ownership boundary. A shared workload may have product resources in its home resource group and consume platform resources from a separate management resource group. A standalone workload owns all resources in its home resource group.
