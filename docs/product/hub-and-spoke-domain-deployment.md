@@ -11,9 +11,9 @@ The rows remain grouped by deployment domain. A shared or workload deployment ca
 |----------|----------|----------|----------|----------|
 | platform-hub-network-publicroute.bicep | platform-hub-network-publicroute-plat.bicepparam | hub-network-plat-wus2-001-rg | VNet | hub-network-plat-wus2-001-vnet |
 | platform-hub-network-publicroute.bicep | platform-hub-network-publicroute-plat.bicepparam | hub-network-plat-wus2-001-rg | Subnet | hub-network-hub-management-001-snet |
-| platform-hub-mgmt.bicep | platform-hub-mgmt-plat.bicepparam | hub-mgmt-plat-wus2-001-rg | Sentinel Workspace | hub-mgmt-plat-wus2-001-sent |
-| platform-hub-mgmt.bicep | platform-hub-mgmt-plat.bicepparam | hub-mgmt-plat-wus2-001-rg | Application Insights | hub-mgmt-plat-wus2-001-appi |
-| platform-hub-mgmt.bicep | platform-hub-mgmt-plat.bicepparam | hub-mgmt-plat-wus2-001-rg | Key Vault | hub-mgmt-plat-001-kv |
+| platform-hub-management.bicep | platform-hub-management-plat.bicepparam | hub-management-plat-wus2-001-rg | Sentinel Workspace | hub-management-plat-wus2-001-sent |
+| platform-hub-management.bicep | platform-hub-management-plat.bicepparam | hub-management-plat-wus2-001-rg | Application Insights | hub-management-plat-wus2-001-appi |
+| platform-hub-management.bicep | platform-hub-management-plat.bicepparam | hub-management-plat-wus2-001-rg | Key Vault | hub-management-plat-001-kv |
 
 ## Platform Spoke
 
@@ -21,11 +21,11 @@ The rows remain grouped by deployment domain. A shared or workload deployment ca
 |----------|----------|----------|----------|----------|
 | platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | spoke-network-dev-wus2-001-rg | VNet | spoke-network-dev-wus2-001-vnet |
 | platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | spoke-network-dev-wus2-001-rg | Subnet | spoke-network-hub-management-001-snet |
-| platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-mgmt-dev-wus2-001-rg | Application Insights | spoke-mgmt-dev-wus2-001-appi |
-| platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-mgmt-dev-wus2-001-rg | App Configuration | spoke-mgmt-dev-wus2-001-appcs |
-| platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-mgmt-dev-wus2-001-rg | Key Vault | spoke-mgmt-dev-001-kv |
-| platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-mgmt-dev-wus2-001-rg | App Service Plan | spoke-mgmt-dev-wus2-f1-001-plan |
-| platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | hub-mgmt-plat-wus2-001-rg | Sentinel Workspace | hub-mgmt-plat-wus2-001-sent |
+| platform-spoke-management.bicep | platform-spoke-management-dev.bicepparam | spoke-management-dev-wus2-001-rg | Application Insights | spoke-management-dev-wus2-001-appi |
+| platform-spoke-management.bicep | platform-spoke-management-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Configuration | spoke-management-dev-wus2-001-appcs |
+| platform-spoke-management.bicep | platform-spoke-management-dev.bicepparam | spoke-management-dev-wus2-001-rg | Key Vault | spoke-management-dev-001-kv |
+| platform-spoke-management.bicep | platform-spoke-management-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Service Plan | spoke-management-dev-wus2-f1-001-plan |
+| platform-spoke-management.bicep | platform-spoke-management-dev.bicepparam | hub-management-plat-wus2-001-rg | Sentinel Workspace | hub-management-plat-wus2-001-sent |
 
 ## Platform Spoke Analytics
 
@@ -58,7 +58,7 @@ The rows remain grouped by deployment domain. A shared or workload deployment ca
 | workload-shared-func.bicep | workload-shared-func-dev.bicepparam | PRODUCT-dev-wus2-001-rg | Function App | PRODUCT-dev-wus2-001-func |
 | workload-shared-web.bicep | workload-shared-web-dev.bicepparam | PRODUCT-dev-wus2-001-shared-rg | Web App | PRODUCT-dev-wus2-001-web |
 
-Both shared workload deployments reuse existing `spoke-mgmt-dev-wus2-001-rg` services where specified by their parameter files.
+Both shared workload deployments reuse existing `spoke-management-dev-wus2-001-rg` services where specified by their parameter files.
 
 ## Workload Spoke
 
@@ -80,7 +80,7 @@ Both shared workload deployments reuse existing `spoke-mgmt-dev-wus2-001-rg` ser
 | workload-spoke-web-sql.bicep | workload-spoke-web-sql-dev.bicepparam | PRODUCT-dev-wus2-001-rg | SQL Database | PRODUCT-dev-wus2-001-sqldb |
 | workload-spoke-func.bicep | workload-spoke-func-dev.bicepparam | PRODUCT-dev-wus2-001-rg | Function App | PRODUCT-dev-wus2-001-func |
 
-Workload spoke deployments reuse `spoke-mgmt-dev-wus2-001-rg` and `spoke-network-dev-wus2-001-rg` for shared management and network resources where specified by their parameter files.
+Workload spoke deployments reuse `spoke-management-dev-wus2-001-rg` and `spoke-network-dev-wus2-001-rg` for shared management and network resources where specified by their parameter files.
 
 ## Workload Standalone
 
