@@ -18,7 +18,7 @@ param projectName string
 
 @maxLength(256)
 @description('Optional human-readable description for the Azure AI Foundry project.')
-param projectDescription string = 'Cannery spoke AI project.'
+param projectDescription string = 'Spoke AI project.'
 
 type FoundryModelName =
   | 'claude-opus'
@@ -28,6 +28,7 @@ type FoundryModelName =
   | 'gpt-5.3-codex'
   | 'gpt-4.1'
   | 'gpt-4.1-mini'
+  | 'text-embedding-3-small'
   | 'Phi-4'
   | 'MAI-Image-2'
   | 'MAI-Image-2.5'

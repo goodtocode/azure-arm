@@ -80,6 +80,15 @@ param kvName string = ''
 @description('Subnet resource IDs allowed to access spoke Key Vault. Supply the spoke management subnet for private access.')
 param kvAllowedVirtualNetworkResourceIds array = []
 
+@description('public = Application Insights and App Configuration accept public traffic and keys (basic hub-and-spoke with public endpoints). restricted = ingestion, query and App Configuration public access disabled.')
+@allowed([
+  'public'
+  'restricted'
+])
+param networkAccess string = 'restricted'
+
+var restricted = networkAccess == 'restricted'
+
 // '-appcs-kv' is 9 chars, so truncate base to 15 chars max for 24-char total
 var kvNameBase = toLower(replace(appcsName, '-', ''))
 var kvNameTrunc = substring(kvNameBase, 0, min(15, length(kvNameBase)))
@@ -98,8 +107,8 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
     tags: tags
     name: appiName
     workResourceId: workResource.id
-    publicNetworkAccessForIngestion: 'Disabled'
-    publicNetworkAccessForQuery: 'Disabled'
+    publicNetworkAccessForIngestion: restricted ? 'Disabled' : 'Enabled'
+    publicNetworkAccessForQuery: restricted ? 'Disabled' : 'Enabled'
   }
 }
 
@@ -123,8 +132,8 @@ module appcsModule '../modules/appcs-appconfigurationstore.bicep' = {
     name: appcsName
     sku: appcsSku
     location: location
-    publicNetworkAccess: 'Disabled'
-    disableLocalAuth: true
+    publicNetworkAccess: restricted ? 'Disabled' : 'Enabled'
+    disableLocalAuth: restricted
   }
 }
 

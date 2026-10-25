@@ -76,6 +76,7 @@ The zero-trust hub network template is a work in progress: its private DNS zones
 |----------|----------|----------|----------|----------|
 | platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | spoke-network-dev-wus2-001-rg | VNet | spoke-network-dev-wus2-001-vnet |
 | platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | spoke-network-dev-wus2-001-rg | Subnet | spoke-network-hub-management-001-snet |
+| platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | spoke-network-dev-wus2-001-rg | Apps subnet (optional: `snetNameApps`/`snetCidrApps`; delegated to Microsoft.Web/serverFarms, Microsoft.Storage service endpoint) | spoke-network-apps-001-snet |
 | platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | Application Insights | spoke-management-dev-wus2-001-appi |
 | platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Configuration | spoke-management-dev-wus2-001-appcs |
 | platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | Key Vault | spoke-management-dev-001-kv |
@@ -132,3 +133,7 @@ Machines for people (developer boxes, desktops, VDI-style VMs). This archetype i
 | workload-usermachines-zerotrust.bicep | workload-usermachines-zerotrust-dev.bicepparam | zerotrust | devtest-devboxes-dev-001-rg | VM (Trusted Launch, encryption at host, Entra login), NIC | devboxes-dev-vm01 / -nic |
 
 Network and zerotrust modes attach to a subnet in `spoke-network-dev-wus2-001-rg`. Zero trust never attaches a public IP; reach machines through Bastion.
+
+## Public Endpoint Variant
+
+`platform-hub-mgmt` and `platform-spoke-mgmt` take `networkAccess` (`restricted` default, `public`). `public` leaves Application Insights ingestion/query and App Configuration open with local auth enabled, for hub-and-spoke deployments that do not use private endpoints yet. Workloads use `network` mode against the apps subnet so NSGs and route tables can be added later without changing the workload.

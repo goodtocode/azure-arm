@@ -43,6 +43,15 @@ param kvSku string
 @description('Subnet resource IDs allowed to access the hub Key Vault. Leave empty for public default access.')
 param kvAllowedVirtualNetworkResourceIds array = []
 
+@description('public = Application Insights accepts public ingestion and query (basic hub-and-spoke with public endpoints). restricted = ingestion and query public access disabled.')
+@allowed([
+  'public'
+  'restricted'
+])
+param networkAccess string = 'restricted'
+
+var restricted = networkAccess == 'restricted'
+
 //
 // Management
 //
@@ -63,8 +72,8 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
     tags: tags
     name: appiName
     workResourceId: sentModule.outputs.id
-    publicNetworkAccessForIngestion: 'Disabled'
-    publicNetworkAccessForQuery: 'Disabled'
+    publicNetworkAccessForIngestion: restricted ? 'Disabled' : 'Enabled'
+    publicNetworkAccessForQuery: restricted ? 'Disabled' : 'Enabled'
   }
 }
 

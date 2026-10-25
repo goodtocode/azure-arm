@@ -42,6 +42,13 @@ param modelDeployments = [
     tokensPerMinute: 20000
   }
   {
+    deploymentName: 'embedding-fast'
+    modelName: 'text-embedding-3-small'
+    modelFormat: 'OpenAI'
+    skuName: 'GlobalStandard'
+    tokensPerMinute: 20000
+  }
+  {
     deploymentName: 'ms-chat'
     modelName: 'Phi-4'
     modelFormat: 'Microsoft'
