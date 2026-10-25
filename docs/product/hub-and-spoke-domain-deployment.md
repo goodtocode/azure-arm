@@ -62,9 +62,13 @@ The rows remain grouped by deployment domain. A shared or workload deployment ca
 |----------|----------|----------|----------|----------|
 | platform-hub-network-publicroute.bicep | platform-hub-network-publicroute-plat.bicepparam | hub-network-plat-wus2-001-rg | VNet | hub-network-plat-wus2-001-vnet |
 | platform-hub-network-publicroute.bicep | platform-hub-network-publicroute-plat.bicepparam | hub-network-plat-wus2-001-rg | Subnet | hub-network-hub-management-001-snet |
-| platform-hub-management.bicep | platform-hub-management-plat.bicepparam | hub-management-plat-wus2-001-rg | Sentinel Workspace | hub-management-plat-wus2-001-sent |
-| platform-hub-management.bicep | platform-hub-management-plat.bicepparam | hub-management-plat-wus2-001-rg | Application Insights | hub-management-plat-wus2-001-appi |
-| platform-hub-management.bicep | platform-hub-management-plat.bicepparam | hub-management-plat-wus2-001-rg | Key Vault | hub-management-plat-001-kv |
+| platform-hub-network-zerotrust.bicep | platform-hub-network-zerotrust-plat.bicepparam | hub-network-plat-wus2-001-rg | VNet | hub-network-plat-wus2-001-vnet |
+| platform-hub-network-zerotrust.bicep | platform-hub-network-zerotrust-plat.bicepparam | hub-network-plat-wus2-001-rg | Front Door Premium, API Management | (see template) |
+| platform-hub-mgmt.bicep | platform-hub-mgmt-plat.bicepparam | hub-management-plat-wus2-001-rg | Sentinel Workspace | hub-management-plat-wus2-001-sent |
+| platform-hub-mgmt.bicep | platform-hub-mgmt-plat.bicepparam | hub-management-plat-wus2-001-rg | Application Insights | hub-management-plat-wus2-001-appi |
+| platform-hub-mgmt.bicep | platform-hub-mgmt-plat.bicepparam | hub-management-plat-wus2-001-rg | Key Vault | hub-management-plat-001-kv |
+
+The zero-trust hub network template is a work in progress: its private DNS zones and API Management private endpoint are still open items in the template.
 
 ## Platform Spoke
 
@@ -72,17 +76,17 @@ The rows remain grouped by deployment domain. A shared or workload deployment ca
 |----------|----------|----------|----------|----------|
 | platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | spoke-network-dev-wus2-001-rg | VNet | spoke-network-dev-wus2-001-vnet |
 | platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | spoke-network-dev-wus2-001-rg | Subnet | spoke-network-hub-management-001-snet |
-| platform-spoke-management.bicep | platform-spoke-management-dev.bicepparam | spoke-management-dev-wus2-001-rg | Application Insights | spoke-management-dev-wus2-001-appi |
-| platform-spoke-management.bicep | platform-spoke-management-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Configuration | spoke-management-dev-wus2-001-appcs |
-| platform-spoke-management.bicep | platform-spoke-management-dev.bicepparam | spoke-management-dev-wus2-001-rg | Key Vault | spoke-management-dev-001-kv |
-| platform-spoke-management.bicep | platform-spoke-management-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Service Plan | spoke-management-dev-wus2-f1-001-plan |
-| platform-spoke-management.bicep | platform-spoke-management-dev.bicepparam | hub-management-plat-wus2-001-rg | Sentinel Workspace | hub-management-plat-wus2-001-sent |
+| platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | Application Insights | spoke-management-dev-wus2-001-appi |
+| platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Configuration | spoke-management-dev-wus2-001-appcs |
+| platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | Key Vault | spoke-management-dev-001-kv |
+| platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Service Plan | spoke-management-dev-wus2-f1-001-plan |
+| platform-spoke-mgmt.bicep | platform-spoke-mgmt-dev.bicepparam | hub-management-plat-wus2-001-rg | Sentinel Workspace | hub-management-plat-wus2-001-sent |
 
 ## Platform Spoke Analytics
 
 | Bicep Template | Parameter File | Resource Group Example | Resource Type | Resource Name Example |
 |----------|----------|----------|----------|----------|
-| platform-spoke-analytics-fabric.bicep | platform-spoke-analytics-fabric-westus-300.bicepparam | spoke-analytics-prod-westus-300-rg | Fabric Capacity | spokeanalyticsprodwestus300 |
+| platform-spoke-analytics-fabric.bicep | platform-spoke-analytics-fabric-prod.bicepparam | spoke-analytics-prod-westus-300-rg | Fabric Capacity | spokeanalyticsprodwestus300 |
 
 ## Platform Shared AI
 
@@ -102,42 +106,29 @@ The rows remain grouped by deployment domain. A shared or workload deployment ca
 | platform-spoke-ai-foundry.bicep | platform-spoke-ai-foundry-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Azure AI Foundry Project | spoke-ai-dev-wus2-001-proj |
 | platform-spoke-ai-foundry.bicep | platform-spoke-ai-foundry-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Private Endpoint | spoke-ai-dev-wus2-001-aif-pe |
 
-## Workload Shared
+## Workload Digital Product
 
-| Bicep Template | Parameter File | Resource Group Example | Resource Type | Resource Name Example |
-|----------|----------|----------|----------|----------|
-| workload-shared-func.bicep | workload-shared-func-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | Function App | nursing-beacon-dev-001-func |
-| workload-shared-web.bicep | workload-shared-web-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | Web App | nursing-beacon-dev-001-web |
+One template serves modes 1-3. The mode and the component objects (web, api, sql, func) are set in the parameter file, so a product that has no web app, no SQL, or an extra Function App uses the same template.
 
-Both shared workload deployments reuse existing `spoke-management-dev-wus2-001-rg` services where specified by their parameter files.
+| Bicep Template | Parameter File | Mode | Resource Group Example | Resource Type | Resource Name Example |
+|----------|----------|----------|----------|----------|----------|
+| workload-digitalproduct.bicep | workload-digitalproduct-standalone-dev.bicepparam | standalone | devtest-nursing-beacon-dev-001-rg | Log Analytics, App Insights, App Service Plan | nursing-beacon-dev-001-work / -appi / -plan |
+| workload-digitalproduct.bicep | workload-digitalproduct-shared-dev.bicepparam | shared | devtest-nursing-beacon-dev-001-rg | Web App, API App | nursing-beacon-dev-001-web / -api |
+| workload-digitalproduct.bicep | workload-digitalproduct-network-dev.bicepparam | network | devtest-nursing-beacon-dev-001-rg | SQL Server, SQL Database | nursing-beacon-dev-001-sql / -sqldb |
+| workload-digitalproduct.bicep | any of the above | any | devtest-nursing-beacon-dev-001-rg | Function App and Storage | nursing-beacon-dev-001-func |
+| workload-digitalproduct-zerotrust.bicep | workload-digitalproduct-zerotrust-dev.bicepparam | zerotrust | devtest-nursing-beacon-dev-001-rg | Private endpoints | nursing-beacon-dev-001-web-pe / -api-pe / -sql-pe |
 
-## Workload Spoke
+Shared and network modes reuse the plan and App Insights in `spoke-management-dev-wus2-001-rg`. Network mode also integrates the apps with a subnet in `spoke-network-dev-wus2-001-rg`.
 
-| Bicep Template | Parameter File | Resource Group Example | Resource Type | Resource Name Example |
-|----------|----------|----------|----------|----------|
-| workload-spoke-api.bicep | workload-spoke-api-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | API App | nursing-beacon-dev-001-api |
-| workload-spoke-api-sql.bicep | workload-spoke-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | API App | nursing-beacon-dev-001-api |
-| workload-spoke-api-sql.bicep | workload-spoke-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | SQL Server | nursing-beacon-dev-001-sql |
-| workload-spoke-api-sql.bicep | workload-spoke-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | SQL Database | nursing-beacon-dev-001-sqldb |
-| workload-spoke-web.bicep | workload-spoke-web-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | Web App | nursing-beacon-dev-001-web |
-| workload-spoke-web-api.bicep | workload-spoke-web-api-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | Web App | nursing-beacon-dev-001-web |
-| workload-spoke-web-api.bicep | workload-spoke-web-api-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | API App | nursing-beacon-dev-001-api |
-| workload-spoke-web-api-sql.bicep | workload-spoke-web-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | Web App | nursing-beacon-dev-001-web |
-| workload-spoke-web-api-sql.bicep | workload-spoke-web-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | API App | nursing-beacon-dev-001-api |
-| workload-spoke-web-api-sql.bicep | workload-spoke-web-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | SQL Server | nursing-beacon-dev-001-sql |
-| workload-spoke-web-api-sql.bicep | workload-spoke-web-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | SQL Database | nursing-beacon-dev-001-sqldb |
-| workload-spoke-web-sql.bicep | workload-spoke-web-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | Web App | nursing-beacon-dev-001-web |
-| workload-spoke-web-sql.bicep | workload-spoke-web-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | SQL Server | nursing-beacon-dev-001-sql |
-| workload-spoke-web-sql.bicep | workload-spoke-web-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | SQL Database | nursing-beacon-dev-001-sqldb |
-| workload-spoke-func.bicep | workload-spoke-func-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | Function App | nursing-beacon-dev-001-func |
+## Workload User Machines
 
-Workload spoke deployments reuse `spoke-management-dev-wus2-001-rg` and `spoke-network-dev-wus2-001-rg` for shared management and network resources where specified by their parameter files.
+Machines for people (developer boxes, desktops, VDI-style VMs). This archetype is not a digital product and does not use the plan, App Insights, or SQL. `shared` is not a mode here because a VM always needs a subnet.
 
-## Workload Standalone
+| Bicep Template | Parameter File | Mode | Resource Group Example | Resource Type | Resource Name Example |
+|----------|----------|----------|----------|----------|----------|
+| workload-usermachines.bicep | workload-usermachines-standalone-dev.bicepparam | standalone | devtest-devboxes-dev-001-rg | VNet, Subnet, NSG | devboxes-dev-wus2-001-vnet / -machines-snet |
+| workload-usermachines.bicep | workload-usermachines-standalone-dev.bicepparam | standalone | devtest-devboxes-dev-001-rg | VM, NIC, optional public IP | devboxes-dev-vm01 / -nic / -pip |
+| workload-usermachines.bicep | workload-usermachines-network-dev.bicepparam | network | devtest-devboxes-dev-001-rg | VM, NIC (subnet in the spoke network RG) | devboxes-dev-vm01 / -nic |
+| workload-usermachines-zerotrust.bicep | workload-usermachines-zerotrust-dev.bicepparam | zerotrust | devtest-devboxes-dev-001-rg | VM (Trusted Launch, encryption at host, Entra login), NIC | devboxes-dev-vm01 / -nic |
 
-| Bicep Template | Parameter File | Resource Group Example | Resource Type | Resource Name Example |
-|----------|----------|----------|----------|----------|
-| workload-standalone-web-api-sql.bicep | workload-standalone-web-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | Web App | nursing-beacon-dev-001-web |
-| workload-standalone-web-api-sql.bicep | workload-standalone-web-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | API App | nursing-beacon-dev-001-api |
-| workload-standalone-web-api-sql.bicep | workload-standalone-web-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | SQL Server | nursing-beacon-dev-001-sql |
-| workload-standalone-web-api-sql.bicep | workload-standalone-web-api-sql-dev.bicepparam | devtest-nursing-beacon-dev-001-rg | SQL Database | nursing-beacon-dev-001-sqldb |
+Network and zerotrust modes attach to a subnet in `spoke-network-dev-wus2-001-rg`. Zero trust never attaches a public IP; reach machines through Bastion.

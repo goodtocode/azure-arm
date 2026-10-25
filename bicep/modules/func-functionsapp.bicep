@@ -84,6 +84,10 @@ param vnetContentShareEnabled bool = false
 @description('Route backup/restore traffic through the VNet integration.')
 param vnetBackupRestoreEnabled bool = false
 
+@description('Public network access. Set to Disabled when the app is reached only through a private endpoint.')
+@allowed(['Enabled', 'Disabled'])
+param publicNetworkAccess string = 'Enabled'
+
 resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
   name: name 
   kind: 'functionapp'
@@ -91,6 +95,7 @@ resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
   tags: empty(tags) ? null : tags
   properties: {
     serverFarmId: planId
+    publicNetworkAccess: publicNetworkAccess
     virtualNetworkSubnetId: empty(subnetId) ? null : subnetId
     vnetRouteAllEnabled: vnetRouteAllEnabled
     vnetImagePullEnabled: vnetImagePullEnabled
@@ -143,3 +148,6 @@ resource functionapp 'Microsoft.Web/sites@2023-12-01' = {
     type: 'SystemAssigned'
   }
 }
+
+@description('Resource ID of the Function App.')
+output id string = functionapp.id

@@ -70,6 +70,10 @@ param vnetContentShareEnabled bool = false
 @description('Route backup/restore traffic through the VNet integration.')
 param vnetBackupRestoreEnabled bool = false
 
+@description('Public network access. Set to Disabled when the app is reached only through a private endpoint.')
+@allowed(['Enabled', 'Disabled'])
+param publicNetworkAccess string = 'Enabled'
+
 resource apiAppResource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
   location: location
@@ -78,6 +82,7 @@ resource apiAppResource 'Microsoft.Web/sites@2023-12-01' = {
   properties: {
     serverFarmId: planId
     httpsOnly: true
+    publicNetworkAccess: publicNetworkAccess
     virtualNetworkSubnetId: empty(subnetId) ? null : subnetId
     vnetRouteAllEnabled: vnetRouteAllEnabled
     vnetImagePullEnabled: vnetImagePullEnabled

@@ -18,6 +18,10 @@ param sku string = 'PerGB2018'
 @description('Tags to apply to the Log Analytics workspace resource.')
 param tags object = {}
 
+@description('The data retention period in days. Minimum is 30. Default is 30.')
+@minValue(30)
+param retentionInDays int = 30
+
 resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: name
   location: location
@@ -26,7 +30,7 @@ resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
     sku: {
       name: sku
     }
-    retentionInDays: 30
+    retentionInDays: retentionInDays
   }
 }
 

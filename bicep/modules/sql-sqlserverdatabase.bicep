@@ -53,6 +53,13 @@ param sku string = 'Basic'
 @minValue(1048576)
 param maxSizeBytes int = 1073741824
 
+@description('Public network access. Set to Disabled when the server is reached only through a private endpoint.')
+@allowed(['Enabled', 'Disabled'])
+param publicNetworkAccess string = 'Enabled'
+
+@description('Create the firewall rule that allows Azure services (0.0.0.0). Set to false for private-only servers.')
+param allowAzureServices bool = true
+
 resource sqlServer 'Microsoft.Sql/servers@2023-08-01-preview' = {
   name: name
   location: location
@@ -60,10 +67,11 @@ resource sqlServer 'Microsoft.Sql/servers@2023-08-01-preview' = {
   properties: {
     administratorLogin: adminLogin
     administratorLoginPassword: adminPassword
+    publicNetworkAccess: publicNetworkAccess
   }
 }
 
-resource sqlServerFirewall 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = {
+resource sqlServerFirewall 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = if (allowAzureServices) {
   parent: sqlServer
   name: 'AllowAllWindowsAzureIps'
   properties: {

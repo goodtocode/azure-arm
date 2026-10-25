@@ -1,13 +1,144 @@
 
 # Azure ARM Bicep Atomic Design Repository
 
-This repository implements an **atomic design** approach for Azure infrastructure-as-code using [Bicep](https://docs.microsoft.com/azure/azure-resource-manager/bicep/overview). It is organized into two main categories:
+This repository implements an **atomic design** approach for Azure infrastructure-as-code using [Bicep](https://docs.microsoft.com/azure/azure-resource-manager/bicep/overview). It is organized into three main categories:
 
 ## Atoms (Modules)
 Located in the `bicep/modules/` directory, these are small, reusable Bicep modules representing individual Azure resources (e.g., storage accounts, key vaults, app services). Each module is designed to be composable and independently deployable.
 
 ## Organisms (Templates)
 Located in the `bicep/templates/` directory, these are higher-level Bicep templates that combine multiple modules (atoms) to define more complex Azure solutions or environments. Organisms orchestrate the deployment of multiple resources as a cohesive unit.
+
+## Variables
+Located in the `bicep/variables/` directory, these are `.bicepparam` files that bind a template to one mode and one environment. They only set names, topology references, and feature selections.
+
+---
+
+## Who Uses This Repo
+
+| Repo type | Owner | What it deploys | Templates |
+| --- | --- | --- | --- |
+| Platform | Cloud / platform engineers | Hub, spokes, and once per spoke shared resources: management RG (App Insights, Log Analytics, App Service plans, Key Vault), network, and the shared AI RG (Foundry and projects) | `platform-*` |
+| Workload | Product teams | One home RG per product: web app, API, SQL server and database, optional Azure Function | `workload-*` |
+
+## Modes
+
+Every workload is deployed in one of four modes. The mode decides where shared resources come from and how traffic reaches the apps. It does not decide which components are deployed.
+
+| # | Mode | Home RG contains | Reuses from another RG (same subscription) | Networking | Template |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `standalone` | Everything: plan, Log Analytics, App Insights, apps, SQL, Function | Nothing (Microsoft Entra ID only) | Public Azure defaults | `workload-<archetype>` |
+| 2 | `shared` | Apps, SQL, Function and its storage | App Service plan, App Insights (spoke mgmt RG) | Public Azure defaults | `workload-<archetype>` |
+| 3 | `network` | Same as `shared` | Same as `shared`, plus an existing VNet subnet | Regional VNet integration, storage limited to the subnet | `workload-<archetype>` |
+| 4 | `zerotrust` | Same as `network`, plus a private endpoint per app, SQL server and storage sub-resource | Same as `network`, plus a private endpoint subnet and Private DNS zones | Private endpoints, public access disabled, all outbound traffic through the VNet | `workload-<archetype>-zerotrust` |
+
+Modes 1 to 3 share one template because they differ only in where the plan and App Insights come from and whether a subnet is supplied. Mode 4 needs private endpoints, DNS, and public access switched off on every resource, so it gets its own template instead of adding conditions to the others. Both templates import the same component types from `bicep/types/digitalproduct-types.bicep`, so a product moves from mode 3 to mode 4 by changing the variables file, not the component settings. Mode 4 does not yet cover Application Insights over Private Link, Entra-only SQL authentication, or inbound routing through Front Door or Application Gateway, and it must be deployed from a runner inside the VNet.
+
+The platform side supports modes 2 to 4 by providing the spoke management RG, the spoke network RG, and the shared AI RG. Mode 2 does not need a hub or VNet, only the spoke management resources.
+
+### Archetypes
+
+An archetype says what kind of workload the home RG holds. Each archetype has its own template pair, component types, and the modes it supports.
+
+| Archetype | Holds | Modes | Templates |
+| --- | --- | --- | --- |
+| `digitalproduct` | A digital product: web, API, SQL, Function in any combination | standalone, shared, network, zerotrust | `workload-digitalproduct`, `workload-digitalproduct-zerotrust` |
+| `usermachines` | Machines for people: developer boxes, desktops, VDI-style VMs. Not a digital product | standalone, network, zerotrust | `workload-usermachines`, `workload-usermachines-zerotrust` |
+
+For `usermachines` the modes mean:
+
+| Mode | Meaning |
+| --- | --- |
+| `standalone` | Own VNet, subnet and NSG in the home RG. A public IP per machine is optional. |
+| `network` | Machines join an existing spoke subnet. Never a public IP. |
+| `zerotrust` | `network` plus Trusted Launch, encryption at host, Microsoft Entra ID login. Reach machines through Bastion. |
+
+`shared` is not offered for `usermachines` because a VM always needs a subnet, so there is nothing to share without a network. The validator enforces the modes each archetype supports.
+
+## Slot system
+
+Template and variables names are built from fixed slots. `scripts/validation/Test-IacConventions.ps1` enforces them.
+
+| File | Pattern | Example |
+| --- | --- | --- |
+| Workload template | `workload-{archetype}[-zerotrust].bicep` | `workload-digitalproduct.bicep` |
+| Workload variables | `workload-{archetype}-{mode}-{env}.bicepparam` | `workload-digitalproduct-shared-dev.bicepparam` |
+| Platform template | `platform-(hub\|spoke\|shared)-{capability}[-{variant}].bicep` | `platform-spoke-network-publicroute.bicep` |
+| Platform variables | `platform-{template name}-{env}.bicepparam` | `platform-spoke-mgmt-dev.bicepparam` |
+
+| Slot | Allowed values |
+| --- | --- |
+| `archetype` | `digitalproduct` (web, API, SQL, Function) or `usermachines` (user VMs, VDI-style desktops) |
+| `mode` | `standalone`, `shared`, `network`, `zerotrust` |
+| `env` | `dev`, `test`, `stage`, `prod`; `plat` for platform files that are not tied to an environment |
+
+Rules the validator checks:
+
+- The `using` line must point at an existing template.
+- A workload variables file's `mode` slot must match `param mode`, `zerotrust` must use the `-zerotrust` template, and the mode must be one the archetype supports.
+- A platform variables file must be the template name plus `-{env}`.
+- Every template and variables file must compile.
+
+To add a new archetype, add a template named `workload-{archetype}.bicep` (plus `-zerotrust` if needed), a `bicep/types/{archetype}-types.bicep`, register the archetype and its modes in `$workloadArchetypes` and `$archetypeModes` in the validator, and add one variables file per mode.
+
+## Bicep folder
+
+```text
+bicep/
+  modules/     atoms: one resource or tightly scoped capability, named {abbreviation}-{resource}.bicep
+  templates/   organisms: compose modules for one platform scenario or workload archetype
+  types/       user-defined types imported by templates (workload-types, digitalproduct-types, usermachines-types)
+  variables/   .bicepparam files, one per template, mode, and environment
+```
+
+How a workload template is configured (`workload-digitalproduct`):
+
+- `mode` selects standalone, shared, or network.
+- `hosting` names the App Service plan and App Insights. Standalone mode creates them (with `planSku` and `workspaceName`); the other modes look them up.
+- `shared` points to the RG that already holds the plan and App Insights (modes 2 and 3).
+- `vnet` points to an existing subnet (mode 3).
+- `web`, `api`, `sql`, and `func` are each optional objects. Supply one to deploy that component; omit it to skip.
+
+Example variables file (mode 2, API and SQL only):
+
+```bicep
+using '../templates/workload-digitalproduct.bicep'
+
+param mode = 'shared'
+param location = 'westus2'
+param environmentApp = 'Development'
+param tags = { Environment: 'dev', CostCenter: '0000' }
+param shared = { resourceGroupName: 'ScopeOrTenant-spoke-mgmt-dev-wus2-001-rg' }
+param hosting = {
+  appiName: 'spoke-mgmt-dev-wus2-001-appi'
+  planName: 'spoke-mgmt-dev-wus2-F1-001-plan'
+}
+param api = { name: 'PRODUCT-dev-wus2-001-api' }
+param sql = {
+  serverName: 'PRODUCT-dev-wus2-001-sql'
+  databaseName: 'PRODUCT-dev-wus2-001-sqldb'
+  adminLogin: 'LocalAdmin'
+  adminPassword: readEnvironmentVariable('SQL_ADMIN_PASSWORD')
+}
+```
+
+Compile checks write no files:
+
+```sh
+az bicep build --stdout --file bicep/templates/workload-digitalproduct.bicep
+az bicep build-params --stdout --file bicep/variables/workload-digitalproduct-shared-dev.bicepparam
+```
+
+## Scripts
+
+PowerShell scripts under `scripts/` automate the work around the templates. Paths inside the hub-and-spoke scripts are relative to the `scripts/hub-and-spoke` folder.
+
+| Folder | Purpose |
+| --- | --- |
+| `scripts/validation/` | `Test-IacConventions.ps1` checks the slot system and compiles every template and variables file. Run it before every commit and in CI. |
+| `scripts/hub-and-spoke/` | `New-PlatformHub.ps1` deploys the hub mgmt and network templates, `New-PlatformSpoke.ps1` deploys the spoke mgmt and network templates, and `New-VnetPeering.ps1` peers a spoke VNet with the hub. Each runs what-if first. |
+| `scripts/entra/` | Microsoft Entra External ID setup for .NET solutions. `New-EntraSolution.ps1` orchestrates API, Web, and optional E2E app registrations (helpers in `entra/auth/`); `Set-*UserSecrets.ps1` write the values to dotnet user-secrets or Key Vault; `Verify-EntraSetup.ps1` checks redirect URIs and scopes. |
+| `scripts/System.psm1` | Shared PowerShell helper functions. |
 
 ---
 
@@ -54,13 +185,13 @@ Use shared when the workload installs its product resources into the home resour
 Examples include:
 
 - `platform-shared-*`: Shared App Insights, Key Vault, App Configuration, Azure AI Foundry, Azure OpenAI, or Ollama services owned by the platform.
-- `workload-shared-*`: A product stack in the home resource group that consumes pre-existing platform services from another resource group. The current example is `workload-shared-web`.
+- `workload-{archetype}`: A product stack in the home resource group. In shared and network modes it consumes pre-existing platform services from another resource group. The current archetype is `workload-digitalproduct`.
 
 Some shared services may have a corresponding spoke template. For example, the repository contains both the default-install [platform-shared-ai-ollama.bicep](bicep/templates/platform-shared-ai-ollama.bicep) and the network-enabled [platform-spoke-ai-ollama.bicep](bicep/templates/platform-spoke-ai-ollama.bicep).
 
 ### Default and Restricted Module Settings
 
-Reusable modules default to portal-style public deployment settings: public network access is enabled, network ACLs allow traffic, and compatible local authentication remains available. `platform-hub-*`, `platform-spoke-*`, and `workload-spoke-*` templates explicitly override those defaults where the resource supports network restriction or identity-based access.
+Reusable modules default to portal-style public deployment settings: public network access is enabled, network ACLs allow traffic, and compatible local authentication remains available. `platform-hub-*`, `platform-spoke-*`, and `workload-digitalproduct` in network mode explicitly override those defaults where the resource supports network restriction or identity-based access.
 
 Restricted settings are only complete when the deployment also supplies the required connectivity. Private Key Vault, App Configuration, Storage, Application Insights, Foundry, and Ollama settings require the appropriate VNet/subnet rules, private endpoints, private DNS zones, managed identities, or RBAC assignments. A template must not disable public access without providing a supported private access path.
 
@@ -91,23 +222,13 @@ Use five naming slots in order:
 
 Platform resource-group examples include `platform-hub-connectivity-westus2-100-rg` and `devtest-spoke-network-westus2-100-rg`. Business product examples include `devtest-nursing-beacon-dev-100-rg` and `nursing-beacon-prod-100-web`.
 
-Template and parameter names follow this format:
+Template and variables file names follow the slot system described in [Slot system](#slot-system):
 
 ```text
-{owner}-{deployment-model}-{resource-or-scenario}
-```
-
-Valid prefixes are:
-
-```text
-platform-hub-*
-platform-spoke-*
-platform-shared-*
-platform-standalone-*
-
-workload-spoke-*
-workload-shared-*
-workload-standalone-*
+workload-{archetype}[-zerotrust].bicep
+platform-(hub|spoke|shared)-{capability}[-{variant}].bicep
+workload-{archetype}-{mode}-{env}.bicepparam
+platform-{template name}-{env}.bicepparam
 ```
 
 Resource groups follow this format:
@@ -125,7 +246,7 @@ devtest-spoke-network-westus2-100-rg
 production-nursing-beacon-prod-100-rg
 ```
 
-The resource suffix should describe the actual deployment, not the architecture term. For example, use `workload-spoke-web-api` for a network-bound product stack, `workload-shared-web` when the home workload consumes existing management services, and `workload-standalone-web-api-sql` when the home resource group receives the complete web/API/SQL/monitoring stack.
+The workload archetype describes what the product is (`digitalproduct`), and the mode describes how it is hosted (`standalone`, `shared`, `network`, `zerotrust`). Components such as web, API, SQL, and Function App are switched on by supplying their object in the variables file, never by creating another template.
 
 ## Why This Repo Is Useful (What Is In It For Me?)
 
@@ -141,37 +262,29 @@ This repository helps you stand up production-ready Azure foundations faster, wi
 - **AI Foundry**: `bicep/modules/aif-foundry.bicep` for Azure AI Foundry hub/project/model deployment with integration-friendly outputs.
 - **Web and API apps**: `bicep/modules/web-appservice.bicep` and `bicep/modules/api-appservice.bicep` for common App Service hosting patterns.
 - **App Service plans**: `bicep/modules/plan-appserviceplan.bicep` to standardize compute sizing and hosting tiers.
-- **SQL foundation**: `bicep/modules/sql-sqlserver.bicep`, `bicep/modules/sqldb-sqldatabase.bicep`, and `bicep/modules/sql-sqlserverdatabase.bicep` for SQL server and database deployment.
-- **Operational baseline**: `bicep/modules/appi-applicationinsights.bicep`, `bicep/modules/work-loganalyticsworkspace.bicep`, and `bicep/modules/kv-keyvault.bicep` for observability and secrets.
+- **SQL foundation**: `bicep/modules/sql-sqlserver.bicep` and `bicep/modules/sqldb-sqldatabase.bicep` are the server and database atoms; `bicep/modules/sql-sqlserverdatabase.bicep` is the combined server and database module the workload templates use.
+- **Operational baseline**: `bicep/modules/appi-applicationinsights.bicep`, `bicep/modules/work-loganalyticsworkspace.bicep` (`sent-loganalyticsworkspace.bicep` wraps it and adds Sentinel onboarding), and `bicep/modules/kv-keyvault.bicep` for observability and secrets.
+- **Virtual machines**: `bicep/modules/vm-virtualmachine.bicep`, `nic-networkinterface.bicep`, and `pip-publicipaddress.bicep` for user machines.
 
 ### Template Tracks by Architecture Style
 
 - **Shared platform templates (default installs without VNet/SNet onboarding)**:
 	`bicep/templates/platform-shared-ai-foundry.bicep`,
 	`bicep/templates/platform-shared-ai-ollama.bicep`
-- **Shared workload templates (home workload consuming external shared services)**:
-	`bicep/templates/workload-shared-web.bicep`,
-	`bicep/templates/workload-shared-func.bicep`
-- **Standalone workload templates (complete product stack in one home resource group)**:
-	`bicep/templates/workload-standalone-web-api-sql.bicep`
+- **Workload templates (one per archetype; mode and components set in the variables file)**:
+	`bicep/templates/workload-digitalproduct.bicep` (modes: standalone, shared, network), `bicep/templates/workload-digitalproduct-zerotrust.bicep` (mode: zerotrust),
+	`bicep/templates/workload-usermachines.bicep` (modes: standalone, network), and `bicep/templates/workload-usermachines-zerotrust.bicep` (mode: zerotrust)
 - **Hub templates (shared platform services)**:
 	`bicep/templates/platform-hub-mgmt.bicep`,
 	`bicep/templates/platform-hub-network-publicroute.bicep`,
-	`bicep/templates/platform-hub-network-zerotrust.bicep`
+	`bicep/templates/platform-hub-network-zerotrust.bicep` (variables: `platform-hub-network-zerotrust-plat.bicepparam`)
 - **Spoke templates (workload isolation and scale-out)**:
 	`bicep/templates/platform-spoke-mgmt.bicep`,
 	`bicep/templates/platform-spoke-network-publicroute.bicep`,
 	`bicep/templates/platform-spoke-ai-ollama.bicep`,
 	`bicep/templates/platform-spoke-ai-foundry.bicep`
-- **Spoke workload templates (web, API, SQL combos)**:
-	`bicep/templates/workload-spoke-web.bicep`,
-	`bicep/templates/workload-spoke-api.bicep`,
-	`bicep/templates/workload-spoke-web-api.bicep`,
-	`bicep/templates/workload-spoke-web-sql.bicep`,
-	`bicep/templates/workload-spoke-api-sql.bicep`,
-	`bicep/templates/workload-spoke-web-api-sql.bicep`
 
-If you are deciding where to begin, use shared when the platform already owns the operational services in another resource group. Use standalone when the product deployment must install its complete stack into one home resource group. Adopt the spoke model when governance, segmentation, private connectivity, or multi-team operations require hub-and-spoke networking.
+If you are deciding where to begin, use the `standalone` mode when the product must install its complete stack into one home resource group. Use `shared` when the platform already owns the plan and App Insights in another resource group of the same subscription. Use `network` when the apps also need VNet integration, and `zerotrust` when private endpoints are required.
 
 ### Spoke Subscription and Environment Model
 
@@ -210,15 +323,61 @@ az deployment group create \
 	--parameters <parameters-file>
 ```
 
+### 3. Supply Secrets and Per-Run Overrides
+
+Never store passwords in a variables file. The workload variables files read secrets from environment variables at build time, with the placeholder `PASS_FROM_CLI_PARAMETERS` as the fallback so the file still compiles:
+
+| Variable | Used by | Parameter |
+| --- | --- | --- |
+| `SQL_ADMIN_PASSWORD` | `workload-digitalproduct-*` | `sql.adminPassword` |
+| `VM_ADMIN_PASSWORD` | `workload-usermachines-*` | `adminPassword` |
+
+Set the variable for the session, then deploy as usual. Do not echo it, and do not commit it.
+
+```powershell
+# PowerShell: prompt for the secret so it never appears in history or files
+$env:SQL_ADMIN_PASSWORD = Read-Host -Prompt 'SQL admin password' -MaskInput
+
+az deployment group create `
+	--resource-group <your-resource-group> `
+	--template-file bicep/templates/workload-digitalproduct.bicep `
+	--parameters bicep/variables/workload-digitalproduct-shared-dev.bicepparam
+```
+
+```sh
+# bash: read without echo
+read -rsp 'SQL admin password: ' SQL_ADMIN_PASSWORD; export SQL_ADMIN_PASSWORD
+
+az deployment group create \
+	--resource-group <your-resource-group> \
+	--template-file bicep/templates/workload-digitalproduct.bicep \
+	--parameters bicep/variables/workload-digitalproduct-shared-dev.bicepparam
+```
+
+In CI, map the variable from the pipeline secret store (for example `SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}` in GitHub Actions). Prefer a Key Vault-backed secret where the pipeline supports it.
+
+To override a top-level parameter for one run, add inline `name=value` pairs after the `.bicepparam` file. Inline values win over the file, and the file must be a `.bicepparam` (do not mix it with a JSON parameters file). This needs a recent Azure CLI and Bicep CLI.
+
+```powershell
+az deployment group create `
+	--resource-group <your-resource-group> `
+	--template-file bicep/templates/workload-usermachines.bicep `
+	--parameters bicep/variables/workload-usermachines-standalone-dev.bicepparam `
+	--parameters adminUsername=<user> adminPassword=$env:VM_ADMIN_PASSWORD
+```
+
+Inline overrides replace a whole top-level parameter. Object parameters such as `sql` cannot have one property overridden (`sql.adminPassword=...` is not supported), so use the environment variable for secrets nested inside `sql`. Passing secrets as inline arguments can expose them in process listings and shell history; prefer the environment variable or a prompt.
+
 ---
 
 ## Repository Structure
 
 - `bicep/modules/` — Atomic Bicep modules (atoms)
 - `bicep/templates/` — Composite Bicep templates (organisms)
+- `bicep/types/` — Shared user-defined types (modes, shared and VNet references)
 - `bicep/variables/` — Environment-specific `.bicepparam` files for templates
-- `scripts/` — PowerShell and CLI scripts for automation
-- `variables/` — Parameter and variable files
+- `scripts/` — PowerShell automation (see [Scripts](#scripts))
+- `docs/` — Governance conventions and product deployment examples
 
 ---
 

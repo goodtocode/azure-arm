@@ -19,8 +19,8 @@ param siteName string
 @maxLength(256)
 param thumbprint string
 
-var deployFqdn = (empty(fqdn) ? bool('false') : bool('true'))
-var deployHeadlessDn = (empty(headlessDn) ? bool('false') : bool('true'))
+var deployFqdn = !empty(fqdn)
+var deployHeadlessDn = !empty(headlessDn)
 
 resource siteName_fqdn 'Microsoft.Web/sites/hostNameBindings@2023-12-01' = if (deployFqdn) {
   name: '${siteName}/${fqdn}'
