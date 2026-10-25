@@ -1,0 +1,41 @@
+using '../templates/platform-spoke-mgmt.bicep'
+
+// =====================
+// Common
+// =====================
+var scopeOwner = 'ScopeOrTenant'
+var productIac = 'spoke-mgmt'
+var environmentIac = 'prod'
+var regionIac = 'wus2'
+var instanceIac = '001'
+param location = 'westus2'
+param tags = {
+  Environment: environmentIac
+  CostCenter: '0000'
+  project: productIac
+  owner: scopeOwner
+}
+
+// =====================
+// Platform Hub Management RG: ${scopeOwner}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// i.e. gtc-hub-mgmt-plat-wus2-001
+// Note: Sentinel is the shared workspace log analytics
+// =====================
+param hubMgmtSubscriptionId = '00000000-0000-0000-0000-000000000000'
+param hubMgmtResourceGroupName = 'hub-mgmt-plat-${regionIac}-${instanceIac}-rg'
+param workName = 'hub-mgmt-plat-${regionIac}-${instanceIac}-sent'
+
+// =====================
+// Platform Spoke Management RG: ${scopeOwner}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// i.e. gtc-spoke-mgmt-prod-wus2-001
+// =====================
+param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
+param appcsName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appcs'
+param appcsSku = 'free'
+param kvName = '${productIac}-${environmentIac}-${instanceIac}-kv'
+// Replace with the spoke management subnet resource ID to enable private Key Vault access.
+param kvAllowedVirtualNetworkResourceIds = [
+  '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/spoke-network-prod-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/spoke-prod-wus2-001-vnet/subnets/management-snet'
+]
+param planSku = 'F1'
+param planName = '${productIac}-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'

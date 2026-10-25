@@ -1,0 +1,25 @@
+using '../templates/platform-spoke-network-publicroute.bicep'
+
+// =====================
+// Common
+// =====================
+var scopeOwner = 'ScopeOrTenant'
+var productIac = 'spoke-network'
+var environmentIac = 'prod'
+var regionIac = 'wus2'
+var instanceIac = '001'
+param location = 'westus2'
+param tags = {
+  Environment: environmentIac
+  CostCenter: '0000'
+  project: productIac
+  owner: scopeOwner
+}
+
+// =====================
+// Networking RG
+// =====================
+param vnetName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-vnet'
+param vnetCidr = '10.20.0.0/16'
+param snetNameManagement = '${productIac}-hub-management-${instanceIac}-snet'
+param snetCidrManagement = '10.20.1.0/24'
