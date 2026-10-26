@@ -59,7 +59,7 @@ var sharedSubscriptionId = shared.?subscriptionId ?? subscription().subscription
 var sharedResourceGroupName = shared.?resourceGroupName ?? resourceGroup().name
 var vnetSubscriptionId = vnet.?subscriptionId ?? subscription().subscriptionId
 
-module workModule '../modules/work-loganalyticsworkspace.bicep' = if (isStandalone) {
+module workModule '../modules/law-loganalyticsworkspace.bicep' = if (isStandalone) {
   name: 'digitalproduct-work'
   params: {
     name: hosting.?workspaceName ?? '${hosting.appiName}-work'

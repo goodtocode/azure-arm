@@ -23,7 +23,7 @@ param tags object = {}
 param retentionInDays int = 30
 
 // Sentinel = the plain workspace (work-) plus onboarding
-module workspace 'work-loganalyticsworkspace.bicep' = {
+module workspace 'law-loganalyticsworkspace.bicep' = {
   name: 'sent-${name}'
   params: {
     name: name

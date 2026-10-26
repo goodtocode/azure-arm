@@ -63,14 +63,40 @@ Template and variables names are built from fixed slots. `scripts/validation/Tes
 | --- | --- | --- |
 | Workload template | `workload-{archetype}[-zerotrust].bicep` | `workload-digitalproduct.bicep` |
 | Workload variables | `workload-{archetype}-{mode}-{env}.bicepparam` | `workload-digitalproduct-shared-dev.bicepparam` |
-| Platform template | `platform-(hub\|spoke\|shared)-{capability}[-{variant}].bicep` | `platform-spoke-network-publicroute.bicep` |
-| Platform variables | `platform-{template name}-{env}.bicepparam` | `platform-spoke-mgmt-dev.bicepparam` |
+| Platform template | `platform-[(hub\|spoke\|shared)-]{capability}[-{variant}].bicep` | `platform-mgmt.bicep`, `platform-shared-edge-frontdoor.bicep` |
+| Platform variables | `platform-{template name}-{env}.bicepparam` | `platform-mgmt-dev.bicepparam` |
 
 | Slot | Allowed values |
 | --- | --- |
 | `archetype` | `digitalproduct` (web, API, SQL, Function) or `usermachines` (user VMs, VDI-style desktops) |
 | `mode` | `standalone`, `shared`, `network`, `zerotrust` |
 | `env` | `dev`, `test`, `stage`, `prod`; `plat` for platform files that are not tied to an environment |
+| `scope` (platform only) | `hub`, `spoke`, or `shared`. See below. |
+| `capability` | What the template provides: `network`, `mgmt`, `edge`, `ai`, `analytics` |
+| `variant` | Optional route or flavor of the capability: `publicroute`, `zerotrust`, `frontdoor`, `appgateway`, `foundry`, `ollama` |
+
+### Platform vs workload prefix
+
+The first word says who owns the deployment and where it lands.
+
+| Prefix | Owner | Lands in | Naming |
+| --- | --- | --- | --- |
+| `platform-` | Platform engineers | Platform or spoke subscriptions and resource groups shared by many products | `platform-{scope}-{capability}[-{variant}]` |
+| `workload-` | One product team | One home resource group for one product | `workload-{archetype}[-zerotrust]`, with the mode in the variables file |
+
+### Scope slot: `hub`, `spoke` and `shared`
+
+The scope slot of a platform template says how it relates to the hub-and-spoke network.
+
+| Scope | Meaning | Needs a hub or spoke VNet | Typical target |
+| --- | --- | --- | --- |
+| `hub` | Part of the hub: central connectivity and controls | Creates or extends the hub VNet | Platform (hub) management group or subscription |
+| `spoke` | Part of a spoke: onboarded to a spoke VNet and peered to the hub | Yes, a spoke VNet and subnet | Spoke management group or subscription |
+| `shared` | Not part of hub and spoke. Complements `standalone`: deployable with no hub, no spoke, and no VNet | No | Any subscription |
+
+Use `shared` for capabilities that do not depend on a VNet, such as Azure Front Door and Azure AI Foundry with public access. A capability that has both forms gets two templates, for example `platform-shared-ai-foundry` and `platform-spoke-ai-foundry`. `hub` and `spoke` mean the template is integrated with hub-and-spoke networking, so a repo that has no hub and spoke yet can still use every `shared` template and every `workload-` template in `standalone` mode. The scope can be omitted when a template works the same with or without a network, as `platform-mgmt` does.
+
+This `shared` scope is about topology. It is not the workload `shared` mode, which is about where the App Service plan and App Insights come from.
 
 Rules the validator checks:
 
@@ -80,6 +106,33 @@ Rules the validator checks:
 - Every template and variables file must compile.
 
 To add a new archetype, add a template named `workload-{archetype}.bicep` (plus `-zerotrust` if needed), a `bicep/types/{archetype}-types.bicep`, register the archetype and its modes in `$workloadArchetypes` and `$archetypeModes` in the validator, and add one variables file per mode.
+
+## Bundles
+
+A bundle is the set of templates, variables and pipelines deployed together for one maturity phase. Each phase adds to the previous one; nothing is redesigned or replatformed. Pick the phase that matches the customer and deploy only its bundle. This repository contains every template; a customer's own repo copies only the templates of its phase (see `github-actions` for the matching pipelines).
+
+### Resource group slot
+
+Resource groups are named `{product/purpose}-{env}-{region}-{instance}-rg`, for example `crucible-dev-wus2-001-rg`, `mgmt-dev-wus2-001-rg` and `edge-plat-wus2-001-rg`. There is no tenant prefix. Use `plat` for platform-subscription groups and `dev`, `prod` for environments. Resource names inside follow `{product/purpose}-{env}-{region}-{instance}-{abbreviation}`.
+
+| Phase | Goal | Subscriptions | Resource groups | Templates deployed | Pipelines |
+| --- | --- | --- | --- | --- | --- |
+| 1. Cloud native startup | Ship fast with minimal operations | 1 | `shared-dev-...`, `{product}-dev-...` | `workload-digitalproduct` (`standalone` mode: workspace, App Insights, plan, web, API, SQL); optional `platform-shared-edge-frontdoor`, `platform-shared-ai-foundry` | `PRODUCT-standalone-iac.yml` |
+| 2. Subscription segmentation | Separate platform, development and production | 3 (platform, development, production) | `edge-plat-...`; `mgmt-dev-...`, `{product}-dev-...`; `mgmt-prod-...`, `{product}-prod-...` | `platform-shared-edge-frontdoor` (platform); `platform-mgmt` per environment (workspace created locally); `workload-digitalproduct` in `shared` mode per product | `platform-edge-iac.yml`, `platform-mgmt-iac.yml`, `PRODUCT-iac.yml` |
+| 3. Enterprise network foundation | Network boundaries and shared operations | 3 | Phase 2 plus `network-plat-...`, `mgmt-plat-...`, `network-dev-...`, `network-prod-...` | Phase 2 plus `platform-hub-network-publicroute`, `platform-hub-mgmt`, `platform-spoke-network-publicroute`; `platform-mgmt` points at the hub workspace; workloads move to `network` mode | `platform-hub-iac.yml`, `platform-spoke-iac.yml` |
+| 4. Zero trust private services | Private endpoints, public access disabled | 3 | Same as Phase 3 | `platform-hub-network-zerotrust`, plus workloads in `zerotrust` mode (`workload-digitalproduct-zerotrust`) | Phase 3 pipelines with the zero-trust templates |
+
+Within a phase, public ingress is one of two routes and they are not mixed: `platform-shared-edge-frontdoor` (default, needs no VNet) or `platform-hub-edge-appgateway` (Application Gateway WAF, Azure Firewall and optional DDoS IP Protection in the hub VNet, Phase 3 and up).
+
+Phase 2 notes:
+
+- AI resources belong to the product that uses them (for example in `crucible-dev-...`), not a shared AI group, unless several products share models or you need central AI governance.
+- Phase 2 and Phase 3 use the same `platform-mgmt` template. Leave `hubMgmtResourceGroupName` empty to create the Log Analytics workspace in the same group (Phase 2). Set it to use the platform workspace (Phase 3).
+- `platform-hub-mgmt` (Sentinel-enabled workspace) is only needed from Phase 3.
+
+## Module naming
+
+Modules are named `{abbreviation}-{resource}.bicep`. Abbreviations follow the Cloud Adoption Framework (CAF) resource abbreviations where one exists, for example `law-loganalyticsworkspace`, `appi-applicationinsights` and `kv-keyvault`. `sent-loganalyticsworkspace` is kept for the Sentinel-enabled workspace, which composes `law-loganalyticsworkspace`.
 
 ## Bicep folder
 
@@ -108,10 +161,10 @@ param mode = 'shared'
 param location = 'westus2'
 param environmentApp = 'Development'
 param tags = { Environment: 'dev', CostCenter: '0000' }
-param shared = { resourceGroupName: 'ScopeOrTenant-spoke-mgmt-dev-wus2-001-rg' }
+param shared = { resourceGroupName: 'ScopeOrTenant-mgmt-dev-wus2-001-rg' }
 param hosting = {
-  appiName: 'spoke-mgmt-dev-wus2-001-appi'
-  planName: 'spoke-mgmt-dev-wus2-F1-001-plan'
+  appiName: 'mgmt-dev-wus2-001-appi'
+  planName: 'mgmt-dev-wus2-F1-001-plan'
 }
 param api = { name: 'PRODUCT-dev-wus2-001-api' }
 param sql = {
@@ -159,7 +212,7 @@ This repository uses **Platform** and **Workload** terminology for Azure infrast
 - **Platform**: Enterprise-managed foundational services and controls shared across products, including networking, connectivity, DNS, firewalls, monitoring, identity integrations, App Configuration, Key Vault, and shared AI services.
 - **Workload**: Resources owned by one product, application, bounded context, or business capability, including web apps, API apps, Functions, App Service plans, and product databases.
 - **Hub** and **Spoke**: Network topology terms. The hub provides centralized connectivity and controls; spokes are workload or platform deployments connected to the hub.
-- **Shared**: A deployment model where product resources are installed into the home resource group but shared services such as App Insights, Key Vault, or App Configuration are consumed from another resource group and are not installed by the workload template. Shared does not mean every resource is owned by the platform team; use the `platform-` or `workload-` prefix to identify ownership.
+- **Shared**: A platform deployment that is not part of hub and spoke. It needs no hub or spoke VNet, so it complements `standalone` and works without any hub-and-spoke architecture. Use the `platform-shared-` prefix for these. This is separate from the workload `shared` mode, which only means the App Service plan and App Insights are consumed from another resource group.
 - **Standalone**: A fully self-contained deployment boundary where the complete product stack is installed into one home resource group. Microsoft Entra ID is the only expected enterprise dependency.
 
 ### Deployment Models
@@ -180,14 +233,14 @@ Spoke deployments are expected to be onboarded to a VNet and subnet. A spoke tem
 
 #### Shared
 
-Use shared when the workload installs its product resources into the home resource group but consumes pre-existing shared services from another resource group. Shared templates do not install those external App Insights, Key Vault, or App Configuration resources. Shared is about the resource-group/resource-ownership boundary; it is separate from whether public networking or VNet onboarding is used.
+Use shared when a platform capability must work without hub-and-spoke networking, for example a Front Door profile or an Azure AI Foundry account with public access. Shared templates do not reference a hub or spoke VNet.
 
 Examples include:
 
-- `platform-shared-*`: Shared App Insights, Key Vault, App Configuration, Azure AI Foundry, Azure OpenAI, or Ollama services owned by the platform.
-- `workload-{archetype}`: A product stack in the home resource group. In shared and network modes it consumes pre-existing platform services from another resource group. The current archetype is `workload-digitalproduct`.
+- `platform-shared-*`: Azure Front Door, Azure AI Foundry, Azure OpenAI or Ollama services that are deployed without VNet integration.
+- `workload-{archetype}`: A product stack in the home resource group. In its `shared` and `network` modes it consumes pre-existing platform services from another resource group. The current archetype is `workload-digitalproduct`.
 
-Some shared services may have a corresponding spoke template. For example, the repository contains both the default-install [platform-shared-ai-ollama.bicep](bicep/templates/platform-shared-ai-ollama.bicep) and the network-enabled [platform-spoke-ai-ollama.bicep](bicep/templates/platform-spoke-ai-ollama.bicep).
+Some shared capabilities have a corresponding spoke template. For example, the repository contains both the default-install [platform-shared-ai-ollama.bicep](bicep/templates/platform-shared-ai-ollama.bicep) and the network-enabled [platform-spoke-ai-ollama.bicep](bicep/templates/platform-spoke-ai-ollama.bicep).
 
 ### Default and Restricted Module Settings
 
@@ -279,7 +332,7 @@ This repository helps you stand up production-ready Azure foundations faster, wi
 	`bicep/templates/platform-hub-network-publicroute.bicep`,
 	`bicep/templates/platform-hub-network-zerotrust.bicep` (variables: `platform-hub-network-zerotrust-plat.bicepparam`)
 - **Spoke templates (workload isolation and scale-out)**:
-	`bicep/templates/platform-spoke-mgmt.bicep`,
+	`bicep/templates/platform-mgmt.bicep`,
 	`bicep/templates/platform-spoke-network-publicroute.bicep`,
 	`bicep/templates/platform-spoke-ai-ollama.bicep`,
 	`bicep/templates/platform-spoke-ai-foundry.bicep`

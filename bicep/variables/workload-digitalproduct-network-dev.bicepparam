@@ -18,12 +18,12 @@ param environmentApp = 'Development'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 param shared = {
-  resourceGroupName: '${scopeOwner}-spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
+  resourceGroupName: '${scopeOwner}-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
 }
 
 param hosting = {
-  appiName: 'spoke-mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
-  planName: 'spoke-mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
+  appiName: 'mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
+  planName: 'mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
 }
 
 param vnet = {

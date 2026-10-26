@@ -2,8 +2,8 @@
 az login
 
 $mgmtRg = "ScopeOrTenant-hub-mgmt-wus2-001-rg"
-$mgmtTemplate = "../bicep/templates/platform-spoke-mgmt.bicep"
-$mgmtParams = "../bicep/variables/platform-spoke-mgmt-dev.bicepparam"
+$mgmtTemplate = "../bicep/templates/platform-mgmt.bicep"
+$mgmtParams = "../bicep/variables/platform-mgmt-dev.bicepparam"
 $networkRg = "ScopeOrTenant-hub-network-wus2-001-rg"
 $networkTemplate = "../bicep/templates/platform-spoke-network-publicroute.bicep"
 $networkParams = "../bicep/variables/platform-spoke-network-publicroute-dev.bicepparam"

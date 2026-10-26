@@ -5,19 +5,17 @@ param tenantId string = tenant().tenantId
 param location string = resourceGroup().location
 param tags object
 
-@minLength(1)
 @maxLength(64)
-@description('Specifies the subscription ID for the hub management. Must not be empty.')
+@description('Subscription ID of the shared workspace. Used only when hubMgmtResourceGroupName is set.')
 param hubMgmtSubscriptionId string = subscription().subscriptionId
 
-@minLength(1)
 @maxLength(90)
-@description('Specifies the resource group name for hub management. Must not be empty. 1-90 characters, letters, numbers, -, _, (, ) and .')
-param hubMgmtResourceGroupName string
+@description('Resource group of an existing shared Log Analytics workspace. Leave empty to create the workspace in this resource group.')
+param hubMgmtResourceGroupName string = ''
 
 @minLength(4)
 @maxLength(63)
-@description('Specifies the name of the Log Analytics workspace. 4-63 characters, letters, numbers, and -')
+@description('Specifies the name of the Log Analytics workspace, created here or existing in the hub resource group. 4-63 characters, letters, numbers, and -')
 param workName string
 
 @minLength(1)
@@ -95,10 +93,18 @@ var kvNameTrunc = substring(kvNameBase, 0, min(15, length(kvNameBase)))
 var kvNameDefault = '${kvNameTrunc}-appcs-kv'
 var kvNameResolved = empty(kvName) ? kvNameDefault : kvName
 
-resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
-  name: workName 
-  scope: resourceGroup(hubMgmtSubscriptionId, hubMgmtResourceGroupName)
+var useSharedWorkspace = !empty(hubMgmtResourceGroupName)
+
+module lawModule '../modules/law-loganalyticsworkspace.bicep' = if (!useSharedWorkspace) {
+  name: 'workName'
+  params: {
+    name: workName
+    location: location
+    tags: tags
+  }
 }
+
+var workResourceId = useSharedWorkspace ? resourceId(hubMgmtSubscriptionId, hubMgmtResourceGroupName, 'Microsoft.OperationalInsights/workspaces', workName) : lawModule!.outputs.id
 
 module appiModule '../modules/appi-applicationinsights.bicep' = {
   name: 'appiName'
@@ -106,7 +112,7 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
     location: location
     tags: tags
     name: appiName
-    workResourceId: workResource.id
+    workResourceId: workResourceId
     publicNetworkAccessForIngestion: restricted ? 'Disabled' : 'Enabled'
     publicNetworkAccessForQuery: restricted ? 'Disabled' : 'Enabled'
   }

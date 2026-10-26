@@ -5,7 +5,7 @@
 # -----------------------------------------------------------------------------
 # Slots (see README "Slot system"):
 #   Template  : workload-{archetype}[-zerotrust].bicep
-#               platform-(hub|spoke|shared)-{capability}[-{variant}].bicep
+#               platform-[(hub|spoke|shared)-]{capability}[-{variant}].bicep
 #   Variables : workload-{archetype}-{mode}-{env}.bicepparam
 #               platform-{template slots}-{env}.bicepparam
 #   mode      : standalone | shared | network | zerotrust
@@ -51,8 +51,8 @@ foreach ($t in $templates) {
         }
     }
     elseif ($base -match '^platform-') {
-        if ($base -notmatch '^platform-(hub|spoke|shared)(-[a-z0-9]+)+$') {
-            Add-Violation "Template '$($t.Name)' must match platform-(hub|spoke|shared)-{capability}[-{variant}].bicep"
+        if ($base -notmatch '^platform-((hub|spoke|shared)-)?[a-z0-9]+(-[a-z0-9]+)*$') {
+            Add-Violation "Template '$($t.Name)' must match platform-[(hub|spoke|shared)-]{capability}[-{variant}].bicep"
         }
     }
     else {

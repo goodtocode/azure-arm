@@ -9,6 +9,9 @@ param location string = resourceGroup().location
 @description('Tags to apply to the public IP address.')
 param tags object = {}
 
+@description('Enable Azure DDoS IP Protection on this public IP (additional per-IP cost).')
+param ddosProtection bool = false
+
 resource pip 'Microsoft.Network/publicIPAddresses@2023-11-01' = {
   name: name
   location: location
@@ -19,6 +22,9 @@ resource pip 'Microsoft.Network/publicIPAddresses@2023-11-01' = {
   properties: {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
+    ddosSettings: ddosProtection ? {
+      protectionMode: 'Enabled'
+    } : null
   }
 }
 

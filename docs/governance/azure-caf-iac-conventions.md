@@ -220,7 +220,7 @@ platform-shared-ai-foundry
 platform-shared-ai-ollama
 platform-spoke-ai-foundry
 platform-spoke-ai-ollama
-platform-spoke-mgmt
+platform-mgmt
 workload-digitalproduct
 workload-digitalproduct-zerotrust
 workload-usermachines
@@ -297,7 +297,7 @@ The repository currently applies restricted settings in these compositions:
 
 - `platform-spoke-ai-foundry`: public access disabled, network default action denied, local authentication disabled, private endpoint required, and Private DNS zone required.
 - `platform-spoke-ai-ollama`: VNet-integrated Container Apps environment and internal ingress.
-- `platform-spoke-mgmt`: restricted Application Insights, Key Vault subnet rules, and disabled App Configuration public access/local authentication.
+- `platform-mgmt`: restricted Application Insights, Key Vault subnet rules, and disabled App Configuration public access/local authentication.
 - `platform-hub-mgmt`: restricted Application Insights and optional Key Vault subnet rules.
 - `workload-digitalproduct` in network mode: Function App storage restricted to the integration subnet (default action `Deny`).
 - `workload-digitalproduct-zerotrust`: public access disabled on apps, SQL, and Function storage, with private endpoints and Private DNS records for each.
