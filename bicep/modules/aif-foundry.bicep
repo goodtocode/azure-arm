@@ -26,6 +26,7 @@ type FoundryModelName =
   | 'gpt-5.3-codex'
   | 'gpt-4.1'
   | 'gpt-4.1-mini'
+  | 'text-embedding-3-small'
   | 'phi-4'
   | 'Phi-4'
   | 'MAI-Image-2'
@@ -44,7 +45,7 @@ type FoundryDeploymentConfig = {
   tokensPerMinute: int
 }
 
-@description('Required list of model deployments. Each object deploys one model. Allowed modelName values: claude-opus, claude-sonnet, gpt-5.4, gpt-4.1, gpt-4.1-mini, phi-4, MAI-Image-2, MAI-Image-2.5, MAI-Image-2.5-Flash, MAI-Image-2.5-Pro, MAI-Image-2e. modelVersion is optional; if omitted, Azure assigns the current default model version.')
+@description('Required list of model deployments. Each object deploys one model. Allowed modelName values: claude-opus, claude-sonnet, gpt-5.4, gpt-4.1, gpt-4.1-mini, text-embedding-3-small, phi-4, MAI-Image-2, MAI-Image-2.5, MAI-Image-2.5-Flash, MAI-Image-2.5-Pro, MAI-Image-2e. modelVersion is optional; if omitted, Azure assigns the current default model version.')
 @minLength(1)
 param modelDeployments FoundryDeploymentConfig[]
 

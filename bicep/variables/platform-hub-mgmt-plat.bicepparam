@@ -3,7 +3,7 @@ using '../templates/platform-hub-mgmt.bicep'
 // =====================
 // Common
 // =====================
-var tenantIac = 'COMPANY'
+var scopeOwner = 'ScopeOrTenant'
 var productIac = 'hub-mgmt'
 var environmentIac = 'plat'
 var regionIac = 'wus2'
@@ -13,11 +13,11 @@ param tags = {
   Environment: environmentIac
   CostCenter: '0000'
   project: productIac
-  owner: tenantIac
+  owner: scopeOwner
 }
 
 // =====================
-// Management RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// Management RG: ${scopeOwner}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
 // rg: gtc-hub-mgmt-plat-wus2-001
 // =====================
 param sentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'

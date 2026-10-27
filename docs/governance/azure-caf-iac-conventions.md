@@ -12,6 +12,8 @@ The conventions align with the Azure Cloud Adoption Framework (CAF) and Enterpri
 | --- | --- |
 | Platform | Enterprise-managed foundational Azure services and controls shared across products. Examples include networking, DNS, firewalls, monitoring, identity integrations, App Configuration, Key Vault, Azure AI Foundry, Azure OpenAI, and Ollama. |
 | Workload | Resources owned by one product, application, bounded context, or business capability. Examples include web apps, API apps, Functions, App Service plans, storage, SQL, and product-specific services. |
+| Archetype | The kind of workload a home resource group holds. Defined archetypes: `digitalproduct` (web, API, SQL, Function) and `usermachines` (VMs for people: developer boxes, desktops, VDI-style). Each archetype owns a template, a component types file, and a list of supported modes. |
+| Mode | How a workload is deployed relative to shared resources and networking: `standalone`, `shared`, `network`, or `zerotrust`. Set by the variables file, not by the template name (except `zerotrust`, which has its own template). |
 | Hub | Centralized network and connectivity boundary owned by the platform. A hub provides shared VNets, routing, DNS, firewalls, gateways, security controls, and management services. |
 | Spoke | A VNet-onboarded deployment boundary connected to a hub. Spokes are normally created per environment, product, subsidiary tenant, or other isolation boundary. |
 | Shared | A resource-group ownership model. A shared workload installs its product resources in the home resource group while consuming pre-existing shared services from another resource group. A shared platform deployment installs a reusable platform service without dedicated spoke networking. |
@@ -22,6 +24,62 @@ The conventions align with the Azure Cloud Adoption Framework (CAF) and Enterpri
 | Module | A reusable Bicep deployment unit representing one resource or tightly scoped capability. |
 | Template | A composite Bicep deployment that composes modules for a deployment scenario. |
 | Variables | An environment-specific `.bicepparam` file that supplies names, locations, topology IDs, and deployment values to a template. |
+
+## Core Conventions
+
+Use five naming slots in order:
+
+| Slot | Purpose | Example | RG | Resources |
+| --- | --- | --- | --- | --- |
+| 1 | Scope Owner | platform, prod, devtest, shared, nursing, certification | Platform RG Slots Convention | Platform Resources Slots Convention |
+| 2 | Workload Scope | hub, spoke, education | `{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg` | `{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}` |
+| 3 | Service Domain / Product | connectivity, identity, management, security, beacon |  |  |
+| 4 | Region or Environment | Platform: region (westus2, eastus2); Business product: env (prod, dev) |  |  |
+| 5 | Instance | 100 |  |  |
+
+### Platform Slots
+
+**Platform RG Slots Convention**
+
+`{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg`
+
+**Platform Resources Slots Convention**
+
+`{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}`
+
+| Platform RG Examples | Platform Resource Examples |
+| --- | --- |
+| `platform-hub-connectivity-westus2-100-rg` | `hub-network-westus2-100-vnet` |
+| `platform-hub-identity-westus2-100-rg` | `hub-identity-westus2-100-rg` |
+| `devtest-spoke-network-westus2-100-rg` | `hub-vpngateway-westus2-100-pip` |
+| `production-spoke-network-westus2-100-rg` |  |
+
+### Business Product Slots
+
+**Business Product RG Slots Convention**
+
+`{scopeOwner}-{businessUnit/familyLine}-{product}-{env}-{instance}-rg`
+
+**Business Product Resources Slots Convention**
+
+`{businessUnit/familyLine}-{product}-{env}-{instance}-{resourceAbbreviation}`
+
+| Business Product RG Examples | Business Product Resource Examples |
+| --- | --- |
+| `devtest-nursing-beacon-dev-100-rg` | `nursing-beacon-prod-100-appi` |
+| `production-nursing-beacon-prod-100-rg` | `nursing-beacon-prod-100-web` |
+|  | `nursing-beacon-prod-100-func` |
+|  | `nursingbeaconprod001st` |
+
+### Domain Resource Groups
+
+| Domain Resource Group | Usage |
+| --- | --- |
+| connectivity | ExpressRoute, VPN, DNS, Routing |
+| network | VNet, Subnets, NSG, Peerings |
+| security | Firewall, Sentinel, DDoS |
+| identity | Entra, PIM, Domain Services |
+| management | Monitoring, Backup, Automation |
 
 ## Ownership Prefixes
 
@@ -75,11 +133,10 @@ For a shared workload:
 Current repository example:
 
 ```text
-workload-shared-web
-workload-shared-func
+workload-digitalproduct   (param mode = 'shared' or 'network')
 ```
 
-These templates consume existing platform resources from another resource group, then install product resources in the home resource group. `workload-shared-web` consumes an existing App Insights resource and App Service plan, optionally installs a Storage Account in the home resource group, and installs the Web App. `workload-shared-func` consumes an existing App Insights resource and App Service plan, optionally installs a Storage Account in the home resource group, and installs the Function App in the home resource group.
+In these modes the template consumes an existing App Insights resource and App Service plan from the shared resource group (same subscription) and installs whichever of the Web App, API App, SQL, and Function App (with storage) are supplied in the home resource group. Network mode adds regional VNet integration into an existing subnet.
 
 For a shared platform service:
 
@@ -113,38 +170,45 @@ A standalone template may install:
 Current repository example:
 
 ```text
-workload-standalone-web-api-sql
+workload-digitalproduct   (param mode = 'standalone')
 ```
 
-This template creates its own Log Analytics workspace, App Insights, App Service plan, Web App, API App, SQL Server, and SQL Database in the home resource group.
+In standalone mode this template creates its own Log Analytics workspace, App Insights, and App Service plan, plus whichever of the Web App, API App, SQL Server and Database, and Function App (with storage) are supplied, all in the home resource group.
 
 Standalone is not synonymous with private networking. A standalone template may use public Azure defaults. Standalone describes ownership and deployment boundaries, not network exposure.
 
 A standalone deployment must not depend on separately managed App Insights, Key Vault, App Configuration, Foundry, Ollama, Azure OpenAI, hub networking, or spoke networking.
 
+### User Machines
+
+`workload-usermachines` is the archetype for VMs that people use (developer machines, desktops, VDI-style). It is not a digital product and shares no components with `workload-digitalproduct`.
+
+- `standalone`: creates its own VNet, subnet, and NSG in the home resource group. A public IP is optional per machine and inbound RDP/SSH is only opened to `allowedAdminCidr`.
+- `network`: attaches to an existing spoke subnet and never creates a public IP.
+- `zerotrust` (separate template): `network` plus Trusted Launch, encryption at host, and Microsoft Entra ID login. The subscription needs the `EncryptionAtHost` feature registered.
+- There is no `shared` mode because a VM cannot exist without a subnet.
+
+The local administrator password is supplied through `readEnvironmentVariable('VM_ADMIN_PASSWORD', ...)` in the variables file.
+
 ## Naming Convention
 
-Template and parameter names use:
+Template names use:
 
 ```text
-{owner}-{deployment-model}-{resource-or-scenario}
+workload-{archetype}[-zerotrust]
+platform-(hub|spoke|shared)-{capability}[-{variant}]
 ```
 
-Valid forms are:
+Parameter files use:
 
 ```text
-platform-hub-*
-platform-spoke-*
-platform-shared-*
-platform-standalone-*
-
-workload-hub-*       # use only when a workload-owned hub composition is required
-workload-spoke-*
-workload-shared-*
-workload-standalone-*
+workload-{archetype}-{mode}-{env}.bicepparam     mode: standalone | shared | network | zerotrust
+platform-{template name}-{env}.bicepparam        env:  dev | test | stage | prod | plat
 ```
 
-The suffix describes the actual resource or scenario. Do not use `landingzone-` as a deployment prefix.
+Workload archetypes currently defined: `digitalproduct` (modes standalone, shared, network, zerotrust) and `usermachines` (modes standalone, network, zerotrust; `shared` is excluded because a VM always needs a subnet). Do not use `landingzone-` as a deployment prefix. `scripts/validation/Test-IacConventions.ps1` enforces these rules, including the modes each archetype supports, and compiles every template and parameter file.
+
+Module names use `{abbreviation}-{resource}` in lower case, for example `vm-virtualmachine` or `pe-privateendpoint`. Where two modules cover the same resource, one must be the atom and the other must compose it rather than copy it (for example `sent-loganalyticsworkspace` composes `work-loganalyticsworkspace` and adds Sentinel onboarding).
 
 Examples:
 
@@ -156,43 +220,44 @@ platform-shared-ai-foundry
 platform-shared-ai-ollama
 platform-spoke-ai-foundry
 platform-spoke-ai-ollama
-platform-spoke-mgmt
-workload-shared-web
-workload-standalone-web-api-sql
-workload-shared-func
-workload-spoke-web
-workload-spoke-web-api
-workload-spoke-web-api-sql
+platform-mgmt
+workload-digitalproduct
+workload-digitalproduct-zerotrust
+workload-usermachines
+workload-usermachines-zerotrust
 ```
 
-Parameter files use the matching template name and append the environment or operating scope:
+Parameter file examples:
 
 ```text
 platform-shared-ai-foundry-dev.bicepparam
 platform-spoke-ai-foundry-dev.bicepparam
-workload-shared-web-dev.bicepparam
-workload-standalone-web-api-sql-dev.bicepparam
-workload-spoke-web-api-dev.bicepparam
 platform-hub-mgmt-plat.bicepparam
+platform-hub-network-zerotrust-plat.bicepparam
+workload-digitalproduct-standalone-dev.bicepparam
+workload-digitalproduct-shared-dev.bicepparam
+workload-digitalproduct-network-dev.bicepparam
+workload-digitalproduct-zerotrust-dev.bicepparam
+workload-usermachines-standalone-dev.bicepparam
+workload-usermachines-network-dev.bicepparam
+workload-usermachines-zerotrust-dev.bicepparam
 ```
 
 ## Resource Group Naming
 
-Use:
+Use the suffix convention:
 
 ```text
-rg-{owner}-{deployment-model}-{workload}-{environment}-{sequence}
+{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg
 ```
 
 Examples:
 
 ```text
-rg-platform-hub-networking-prod-001
-rg-platform-shared-ai-prod-001
-rg-platform-spoke-management-dev-001
-rg-workload-shared-web-dev-001
-rg-workload-standalone-web-api-sql-dev-001
-rg-workload-spoke-beacon-prod-001
+platform-hub-connectivity-westus2-100-rg
+platform-hub-identity-westus2-100-rg
+devtest-spoke-network-westus2-100-rg
+production-nursing-beacon-prod-100-rg
 ```
 
 The resource group is a lifecycle and ownership boundary. A shared workload may have product resources in its home resource group and consume platform resources from a separate management resource group. A standalone workload owns all resources in its home resource group.
@@ -232,9 +297,12 @@ The repository currently applies restricted settings in these compositions:
 
 - `platform-spoke-ai-foundry`: public access disabled, network default action denied, local authentication disabled, private endpoint required, and Private DNS zone required.
 - `platform-spoke-ai-ollama`: VNet-integrated Container Apps environment and internal ingress.
-- `platform-spoke-mgmt`: restricted Application Insights, Key Vault subnet rules, and disabled App Configuration public access/local authentication.
+- `platform-mgmt`: restricted Application Insights, Key Vault subnet rules, and disabled App Configuration public access/local authentication.
 - `platform-hub-mgmt`: restricted Application Insights and optional Key Vault subnet rules.
-- `workload-spoke-func`: restricted Storage network access through an explicit application subnet.
+- `workload-digitalproduct` in network mode: Function App storage restricted to the integration subnet (default action `Deny`).
+- `workload-digitalproduct-zerotrust`: public access disabled on apps, SQL, and Function storage, with private endpoints and Private DNS records for each.
+- `workload-usermachines` in network mode: no public IP is ever attached; machines join an existing subnet whose NSG is owned by the platform.
+- `workload-usermachines-zerotrust`: no public IP, Trusted Launch, encryption at host, and Microsoft Entra ID login; reached through Bastion.
 
 Shared and standalone templates inherit module public defaults unless their own scenario explicitly requires another behavior.
 
@@ -261,6 +329,7 @@ Use the repository structure:
 bicep/
   modules/       # atoms: single resources or tightly scoped capabilities
   templates/     # organisms: scenario compositions
+  types/         # shared user-defined types (workload-types plus one {archetype}-types per archetype)
   variables/     # environment-specific .bicepparam files
 ```
 
@@ -302,11 +371,11 @@ For hub and spoke deployments, validate that the deployment identity has permiss
 
 ## Decision Rules
 
-1. If the template installs the complete product and operational stack into one home resource group, name it `workload-standalone-*`.
-2. If the template installs product resources into the home resource group but consumes pre-existing platform services elsewhere, name it `workload-shared-*`.
+1. Workloads use `workload-{archetype}`; the deployment model is the `mode` parameter, not part of the template name. `workload-digitalproduct` covers standalone, shared, and network modes; `workload-usermachines` covers standalone and network.
+2. Standalone mode installs the complete product and operational stack into one home resource group. Shared mode consumes the plan and App Insights from another resource group in the same subscription. Network mode adds VNet integration to shared.
 3. If the template installs a reusable enterprise service without dedicated spoke networking, name it `platform-shared-*`.
-4. If the template is VNet/subnet onboarded and participates in hub-and-spoke networking, name it `platform-spoke-*` or `workload-spoke-*` according to ownership.
-5. Use `platform-hub-*` for centralized connectivity and platform network services.
+4. Private endpoints and Private DNS (zero trust) get their own template, `workload-{archetype}-zerotrust`, because the configuration depth is much larger than VNet integration.
+5. Use `platform-hub-*` for centralized connectivity and platform network services and `platform-spoke-*` for per-spoke platform services.
 6. Do not use `landingzone-` as a Bicep template or parameter prefix.
 7. Keep module defaults portal-style and public; put restrictive network and identity settings in hub/spoke compositions.
 8. Do not make a deployment private unless its private access path, DNS, identity, and RBAC requirements are supplied.

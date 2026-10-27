@@ -6,12 +6,12 @@ az provider register --namespace Microsoft.OperationsManagement
 az provider register --namespace Microsoft.SecurityInsights
 
 
-$mgmtRg = "COMPANY-hub-mgmt-wus2-001-rg"
+$mgmtRg = "ScopeOrTenant-hub-mgmt-wus2-001-rg"
 $mgmtTemplate = "../bicep/templates/platform-hub-mgmt.bicep"
-$mgmtParams = "../bicep/variables/platform-hub-mgmt.bicepparam"
-$networkRg = "COMPANY-hub-network-wus2-001-rg"
+$mgmtParams = "../bicep/variables/platform-hub-mgmt-plat.bicepparam"
+$networkRg = "ScopeOrTenant-hub-network-wus2-001-rg"
 $networkTemplate = "../bicep/templates/platform-hub-network-publicroute.bicep"
-$networkParams = "../bicep/variables/platform-hub-network-publicroute.bicepparam"
+$networkParams = "../bicep/variables/platform-hub-network-publicroute-plat.bicepparam"
 $hubSubId = "<HubSubID>"
 
 # Create resource groups if not exist

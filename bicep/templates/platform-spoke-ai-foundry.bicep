@@ -28,6 +28,7 @@ type FoundryModelName =
   | 'gpt-5.3-codex'
   | 'gpt-4.1'
   | 'gpt-4.1-mini'
+  | 'text-embedding-3-small'
   | 'Phi-4'
   | 'MAI-Image-2'
   | 'MAI-Image-2.5'

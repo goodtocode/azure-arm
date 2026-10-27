@@ -23,6 +23,15 @@ param snetNameManagement string
 @description('Specifies the address prefix (CIDR block) for the management subnet. Example: 10.0.1.0/24')
 param snetCidrManagement string
 
+@maxLength(80)
+@description('Name of the app integration subnet delegated to Microsoft.Web/serverFarms, used by workloads for App Service regional VNet integration. Leave empty to skip.')
+param snetNameApps string = ''
+
+@maxLength(18)
+@description('Address prefix (CIDR block) for the app integration subnet. Required when snetNameApps is set. Example: 10.0.2.0/24')
+param snetCidrApps string = ''
+
+var deployApps = !empty(snetNameApps)
 var platformManagementSecurityRules = [
   {
     name: 'AllowPlatformHTTP'
@@ -86,4 +95,43 @@ module snetHub '../modules/snet-virtualnetworksubnet.bicep' = {
     cidr: snetCidrManagement
     nsgId: nsgSnet.outputs.id
   }
+  dependsOn: [
+    vnet
+  ]
 }
+
+// The apps NSG has no custom rules yet, so Azure default rules apply. Add rules here (and a route table on the subnet) when the spoke is locked down.
+module nsgApps '../modules/nsg-networksecuritygroup.bicep' = if (deployApps) {
+  name: 'nsgNameApps'
+  params: {
+    name: '${snetNameApps}-nsg'
+    tags: tags
+    location: location
+  }
+}
+
+module snetApps '../modules/snet-virtualnetworksubnet.bicep' = if (deployApps) {
+  name: 'snetNameApps'
+  params: {
+    vnetName: vnetName
+    snetName: snetNameApps
+    cidr: snetCidrApps
+    nsgId: nsgApps!.outputs.id
+    delegation: 'Microsoft.Web/serverFarms'
+    serviceEndpoints: [
+      'Microsoft.Storage'
+    ]
+  }
+  dependsOn: [
+    snetHub
+  ]
+}
+
+@description('Resource ID of the spoke VNet.')
+output vnetId string = vnet.outputs.id
+
+@description('Resource ID of the management subnet.')
+output snetManagementId string = snetHub.outputs.id
+
+@description('Resource ID of the app integration subnet. Empty when not deployed.')
+output snetAppsId string = deployApps ? snetApps!.outputs.id : ''

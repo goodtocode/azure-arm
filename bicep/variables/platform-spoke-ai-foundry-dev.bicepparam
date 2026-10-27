@@ -3,7 +3,7 @@ using '../templates/platform-spoke-ai-foundry.bicep'
 // =====================
 // Common
 // =====================
-var tenantIac = 'COMPANY'
+var scopeOwner = 'ScopeOrTenant'
 var productIac = 'spoke-ai'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
@@ -13,7 +13,7 @@ param tags = {
   Environment: environmentIac
   CostCenter: '0000'
   project: productIac
-  owner: tenantIac
+  owner: scopeOwner
 }
 
 // =====================
@@ -41,6 +41,14 @@ param modelDeployments = [
     modelVersion: '2025-04-14'
     skuName: 'GlobalStandard'
     tokensPerMinute: 20000
+  }
+  {
+    deploymentName: 'embedding-fast'
+    modelName: 'text-embedding-3-small'
+    modelFormat: 'OpenAI'
+    modelVersion: '1'
+    skuName: 'GlobalStandard'
+    tokensPerMinute: 10000
   }
   {
     deploymentName: 'ms-chat'

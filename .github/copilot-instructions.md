@@ -49,6 +49,18 @@
 - `projectName`
 - `resourceId`
 
+## Workload Template Pattern
+
+- Workloads use one template per archetype: `bicep/templates/workload-<archetype>.bicep`. Current archetypes: `digitalproduct` (web, API, SQL, Function) and `usermachines` (VMs for people; not a digital product). Do not create per-component-combination templates.
+- Slots: templates `workload-<archetype>[-zerotrust].bicep`; variables `workload-<archetype>-<mode>-<env>.bicepparam` (env: dev|test|stage|prod); platform variables `<template name>-<env|plat>.bicepparam`.
+- Modes: 1 `standalone`, 2 `shared`, 3 `network`, 4 `zerotrust`. Each archetype declares which it supports (`digitalproduct`: all four; `usermachines`: standalone, network, zerotrust). Register new archetypes and modes in `$workloadArchetypes` and `$archetypeModes` in the validator.
+- Mode is a typed parameter imported from `bicep/types/workload-types.bicep` (`digitalproduct`) or `bicep/types/usermachines-types.bicep`; private endpoints and hardening get a separate `workload-<archetype>-zerotrust.bicep`.
+- Each archetype keeps its component contracts in `bicep/types/<archetype>-types.bicep`, shared by its standard and zero-trust templates so moving between modes only changes the variables file.
+- Digital product components (web, api, sql, func) are optional typed object parameters; supplying the object deploys the component. User machines take a `machines` array.
+- Reuse the atom for a resource; do not copy it. Compose (as `sent-` does with `work-`) or add a parameter with a public-by-default value.
+- Secrets in variables files come from `readEnvironmentVariable(...)`, never literals.
+- Run `pwsh scripts/validation/Test-IacConventions.ps1` after any template, types, or variables change. It must report no errors or warnings.
+
 ## Do / Do Not
 
 - Do keep resource definitions public-access by default for shared scenarios unless explicitly asked otherwise.

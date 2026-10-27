@@ -3,7 +3,7 @@ using '../templates/platform-shared-ai-foundry.bicep'
 // =====================
 // Common
 // =====================
-var tenantIac = 'COMPANY'
+var scopeOwner = 'ScopeOrTenant'
 var productIac = 'spoke-ai'
 var environmentIac = 'dev'
 var regionIac = 'wus'
@@ -13,11 +13,11 @@ param tags = {
   Environment: environmentIac
   CostCenter: '0000'
   project: productIac
-  owner: tenantIac
+  owner: scopeOwner
 }
 
 // =====================
-// Platform Spoke AI RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// Platform Spoke AI RG: ${scopeOwner}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
 // =====================
 param foundryName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif'
 param projectName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-proj'
@@ -38,6 +38,13 @@ param modelDeployments = [
     modelName: 'gpt-4.1-mini'
     modelFormat: 'OpenAI'
     modelVersion: '2025-04-14'
+    skuName: 'GlobalStandard'
+    tokensPerMinute: 20000
+  }
+  {
+    deploymentName: 'embedding-fast'
+    modelName: 'text-embedding-3-small'
+    modelFormat: 'OpenAI'
     skuName: 'GlobalStandard'
     tokensPerMinute: 20000
   }
