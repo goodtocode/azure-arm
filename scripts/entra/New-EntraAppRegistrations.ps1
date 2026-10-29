@@ -1,26 +1,25 @@
-# ============================================================================
-# Script Name:   New-EntraAppRegistrations.ps1
-# Description:   Creates new Entra External ID App Registrations.
-# -----------------------------------------------------------------------------
-# Example CLI Usage:
-#   pwsh -File ./New-EntraAppRegistrations.ps1 `
-#       -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" `
-#       -TenantId "<your-tenant-id>" `
-#       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -WebProjectPath "../../src/Presentation.Web" `
-#       -ApiProjectPath "../../src/Presentation.Api"
-# -----------------------------------------------------------------------------
-# Notes:
-#   - Requires Azure PowerShell modules (Az.Accounts, Az.Resources, etc.)
-#   - Ensure you are authenticated: Connect-AzAccount
-# ============================================================================
+<#
+.SYNOPSIS
+Creates new Entra External ID app registrations (Web and API).
+
+.DESCRIPTION
+Requires Azure PowerShell modules (Az.Accounts, Az.Resources, Microsoft.Graph.Applications).
+All four of -EntraInstanceUrl, -TenantId, -WebAppRegistrationName and -ApiAppRegistrationName are required.
+
+.EXAMPLE
+# From a PowerShell prompt (single line, safe to paste):
+.\New-EntraAppRegistrations.ps1 -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" -TenantId "<your-tenant-id>" -WebAppRegistrationName "myproduct-web-dev-001" -ApiAppRegistrationName "myproduct-api-dev-001"
+
+.EXAMPLE
+# From cmd.exe or any other shell (single line, safe to paste):
+pwsh -NoProfile -File .\New-EntraAppRegistrations.ps1 -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" -TenantId "<your-tenant-id>" -WebAppRegistrationName "myproduct-web-dev-001" -ApiAppRegistrationName "myproduct-api-dev-001"
+#>
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '', Justification = 'ResetUserFlowName is metadata for optional user flow routing, not a secret.')]
 param(
-	[string]$EntraInstanceUrl,
-	[string]$TenantId,
-	[string]$WebAppRegistrationName,
-	[string]$ApiAppRegistrationName,
+	[Parameter(Mandatory)][string]$EntraInstanceUrl,
+	[Parameter(Mandatory)][string]$TenantId,
+	[Parameter(Mandatory)][string]$WebAppRegistrationName,
+	[Parameter(Mandatory)][string]$ApiAppRegistrationName,
 	[string]$WebProjectPath = "../../src/Presentation.Web",
 	[string]$ApiProjectPath = "../../src/Presentation.Api",
 	[string]$DotNetVersion = "10",
