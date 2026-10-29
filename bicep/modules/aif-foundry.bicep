@@ -19,33 +19,61 @@ param projectName string
 param projectDescription string = 'Azure AI Foundry project.'
 
 type FoundryModelName =
-  | 'claude-opus'
-  | 'claude-sonnet'
+  | 'claude-opus-5-5'
+  | 'claude-sonnet-5-5'
+  | 'gpt-chat-latest'
+  | 'gpt-6.1-sol'
+  | 'gpt-6.1-terra'
+  | 'gpt-6-astra'
+  | 'gpt-6-luna'
+  | 'gpt-6-sol'
+  | 'gpt-5.6-sol'
+  | 'gpt-5.6-terra'
+  | 'gpt-5.6-luna'
+  | 'gpt-5.5'
   | 'gpt-5.4'
-  | 'gpt-5.3-chat'
+  | 'gpt-5.4-pro'
+  | 'gpt-5.4-mini'
+  | 'gpt-5.4-nano'
   | 'gpt-5.3-codex'
   | 'gpt-4.1'
   | 'gpt-4.1-mini'
+  | 'gpt-4.1-nano'
   | 'text-embedding-3-small'
-  | 'phi-4'
+  | 'text-embedding-3-large'
   | 'Phi-4'
-  | 'MAI-Image-2'
+  | 'Phi-4-mini-instruct'
+  | 'Phi-4-multimodal-instruct'
+  | 'Phi-4-reasoning'
+  | 'Phi-4-mini-reasoning'
+  | 'MAI-Thinking-1'
+  | 'MAI-Image-2.6'
+  | 'MAI-Image-2.6-Flash'
   | 'MAI-Image-2.5'
   | 'MAI-Image-2.5-Flash'
   | 'MAI-Image-2.5-Pro'
   | 'MAI-Image-2e'
+  | 'mai-code-1.1-flash'
+
+type FoundryModelProviderData = {
+  organizationName: string
+  countryCode: string
+  industry: 'technology' | 'finance' | 'healthcare' | 'education' | 'retail' | 'manufacturing' | 'government' | 'media' | 'other'
+}
 
 type FoundryDeploymentConfig = {
   deploymentName: string
   modelName: FoundryModelName
-  modelFormat: 'OpenAI' | 'Microsoft'
+  modelFormat: 'OpenAI' | 'Microsoft' | 'Anthropic'
   modelVersion: string?
+  modelProviderData: FoundryModelProviderData?
+  raiPolicyName: string?
   skuName: 'Standard' | 'GlobalStandard'
   @minValue(1000)
   tokensPerMinute: int
 }
 
-@description('Required list of model deployments. Each object deploys one model. Allowed modelName values: claude-opus, claude-sonnet, gpt-5.4, gpt-4.1, gpt-4.1-mini, text-embedding-3-small, phi-4, MAI-Image-2, MAI-Image-2.5, MAI-Image-2.5-Flash, MAI-Image-2.5-Pro, MAI-Image-2e. modelVersion is optional; if omitted, Azure assigns the current default model version.')
+@description('Required list of current Foundry model deployments. modelVersion is optional; if omitted, Azure assigns the current default model version. Anthropic deployments require modelFormat Anthropic, modelProviderData attestation values, and typically raiPolicyName Microsoft.DefaultV2.')
 @minLength(1)
 param modelDeployments FoundryDeploymentConfig[]
 
@@ -111,7 +139,7 @@ resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-0
   }
 }
 
-@batchSize(1) // Remove if doesnt help
+@batchSize(1)
 resource modelDeploymentsResource 'Microsoft.CognitiveServices/accounts/deployments@2026-05-01' = [for model in modelDeployments: {
   parent: foundryHub
   name: model.deploymentName
@@ -122,7 +150,7 @@ resource modelDeploymentsResource 'Microsoft.CognitiveServices/accounts/deployme
     name: model.skuName
     capacity: int((model.tokensPerMinute + tokensPerMinutePerCapacityUnit - 1) / tokensPerMinutePerCapacityUnit)
   }
-  properties: {
+  properties: union({
     model: union({
       format: model.modelFormat
       name: model.modelName
@@ -130,8 +158,12 @@ resource modelDeploymentsResource 'Microsoft.CognitiveServices/accounts/deployme
       version: model.?modelVersion
     })
     versionUpgradeOption: 'OnceNewDefaultVersionAvailable'
-    raiPolicyName: 'Microsoft.Default'
-  }
+    raiPolicyName: model.?raiPolicyName ?? 'Microsoft.Default'
+  }, empty(model.?modelProviderData) ? {} : {
+    // The service supports this required Anthropic attestation before the bundled Bicep type exposes it.
+    #disable-next-line BCP037
+    modelProviderData: model.?modelProviderData
+  })
 }]
 
 resource foundryHubDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableDiagnostics) {
