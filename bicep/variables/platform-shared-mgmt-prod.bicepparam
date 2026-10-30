@@ -1,4 +1,4 @@
-using '../templates/platform-mgmt.bicep'
+using '../templates/platform-shared-mgmt.bicep'
 
 // Phase 2: shared management for the production subscription. Public endpoints, no VNet.
 // RG: {product/purpose}-{env}-{region}-{instance}-rg, i.e. mgmt-prod-wus2-001-rg

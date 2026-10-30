@@ -63,8 +63,8 @@ Template and variables names are built from fixed slots. `scripts/validation/Tes
 | --- | --- | --- |
 | Workload template | `workload-{archetype}[-zerotrust].bicep` | `workload-digitalproduct.bicep` |
 | Workload variables | `workload-{archetype}-{mode}-{env}.bicepparam` | `workload-digitalproduct-shared-dev.bicepparam` |
-| Platform template | `platform-[(hub\|spoke\|shared)-]{capability}[-{variant}].bicep` | `platform-mgmt.bicep`, `platform-shared-edge-frontdoor.bicep` |
-| Platform variables | `platform-{template name}-{env}.bicepparam` | `platform-mgmt-dev.bicepparam` |
+| Platform template | `platform-(hub\|spoke\|shared)-{capability}[-{variant}].bicep` | `platform-shared-mgmt.bicep`, `platform-shared-edge-frontdoor.bicep` |
+| Platform variables | `platform-{template name}-{env}.bicepparam` | `platform-shared-mgmt-dev.bicepparam` |
 
 | Slot | Allowed values |
 | --- | --- |
@@ -94,7 +94,7 @@ The scope slot of a platform template says how it relates to the hub-and-spoke n
 | `spoke` | Part of a spoke: onboarded to a spoke VNet and peered to the hub | Yes, a spoke VNet and subnet | Spoke management group or subscription |
 | `shared` | Not part of hub and spoke. Complements `standalone`: deployable with no hub, no spoke, and no VNet | No | Any subscription |
 
-Use `shared` for capabilities that do not depend on a VNet, such as Azure Front Door and Azure AI Foundry with public access. A capability that has both forms gets two templates, for example `platform-shared-ai-foundry` and `platform-spoke-ai-foundry`. `hub` and `spoke` mean the template is integrated with hub-and-spoke networking, so a repo that has no hub and spoke yet can still use every `shared` template and every `workload-` template in `standalone` mode. The scope can be omitted when a template works the same with or without a network, as `platform-mgmt` does.
+Use `shared` for capabilities that do not depend on a VNet, such as Azure Front Door and Azure AI Foundry with public access. A capability that has both forms gets two templates, for example `platform-shared-ai-foundry` and `platform-spoke-ai-foundry`. `hub` and `spoke` mean the template is integrated with hub-and-spoke networking, so a repo that has no hub and spoke yet can still use every `shared` template and every `workload-` template in `standalone` mode. Shared platform resource groups such as management, AI and edge are `shared` (for example `platform-shared-mgmt`); a standalone product has no platform templates.
 
 This `shared` scope is about topology. It is not the workload `shared` mode, which is about where the App Service plan and App Insights come from.
 
@@ -118,8 +118,8 @@ Resource groups are named `{product/purpose}-{env}-{region}-{instance}-rg`, for 
 | Phase | Goal | Subscriptions | Resource groups | Templates deployed | Pipelines |
 | --- | --- | --- | --- | --- | --- |
 | 1. Cloud native startup | Ship fast with minimal operations | 1 | `shared-dev-...`, `{product}-dev-...` | `workload-digitalproduct` (`standalone` mode: workspace, App Insights, plan, web, API, SQL); optional `platform-shared-edge-frontdoor`, `platform-shared-ai-foundry` | `PRODUCT-standalone-iac.yml` |
-| 2. Subscription segmentation | Separate platform, development and production | 3 (platform, development, production) | `edge-plat-...`; `mgmt-dev-...`, `{product}-dev-...`; `mgmt-prod-...`, `{product}-prod-...` | `platform-shared-edge-frontdoor` (platform); `platform-mgmt` per environment (workspace created locally); `workload-digitalproduct` in `shared` mode per product | `platform-edge-iac.yml`, `platform-mgmt-iac.yml`, `PRODUCT-iac.yml` |
-| 3. Enterprise network foundation | Network boundaries and shared operations | 3 | Phase 2 plus `network-plat-...`, `mgmt-plat-...`, `network-dev-...`, `network-prod-...` | Phase 2 plus `platform-hub-network-publicroute`, `platform-hub-mgmt`, `platform-spoke-network-publicroute`; `platform-mgmt` points at the hub workspace; workloads move to `network` mode | `platform-hub-iac.yml`, `platform-spoke-iac.yml` |
+| 2. Subscription segmentation | Separate platform, development and production | 3 (platform, development, production) | `edge-plat-...`; `mgmt-dev-...`, `{product}-dev-...`; `mgmt-prod-...`, `{product}-prod-...` | `platform-shared-edge-frontdoor` (platform); `platform-shared-mgmt` per environment (workspace created locally); `workload-digitalproduct` in `shared` mode per product | `platform-shared-edge-iac.yml`, `platform-shared-mgmt-iac.yml`, `PRODUCT-iac.yml` |
+| 3. Enterprise network foundation | Network boundaries and shared operations | 3 | Phase 2 plus `network-plat-...`, `mgmt-plat-...`, `network-dev-...`, `network-prod-...` | Phase 2 plus `platform-hub-network-publicroute`, `platform-hub-mgmt`, `platform-spoke-network-publicroute`; `platform-shared-mgmt` points at the hub workspace; workloads move to `network` mode | `platform-hub-iac.yml`, `platform-spoke-iac.yml` |
 | 4. Zero trust private services | Private endpoints, public access disabled | 3 | Same as Phase 3 | `platform-hub-network-zerotrust`, plus workloads in `zerotrust` mode (`workload-digitalproduct-zerotrust`) | Phase 3 pipelines with the zero-trust templates |
 
 Within a phase, public ingress is one of two routes and they are not mixed: `platform-shared-edge-frontdoor` (default, needs no VNet) or `platform-hub-edge-appgateway` (Application Gateway WAF, Azure Firewall and optional DDoS IP Protection in the hub VNet, Phase 3 and up).
@@ -127,7 +127,7 @@ Within a phase, public ingress is one of two routes and they are not mixed: `pla
 Phase 2 notes:
 
 - AI resources belong to the product that uses them (for example in `crucible-dev-...`), not a shared AI group, unless several products share models or you need central AI governance.
-- Phase 2 and Phase 3 use the same `platform-mgmt` template. Leave `hubMgmtResourceGroupName` empty to create the Log Analytics workspace in the same group (Phase 2). Set it to use the platform workspace (Phase 3).
+- Phase 2 and Phase 3 use the same `platform-shared-mgmt` template. Leave `hubMgmtResourceGroupName` empty to create the Log Analytics workspace in the same group (Phase 2). Set it to use the platform workspace (Phase 3).
 - `platform-hub-mgmt` (Sentinel-enabled workspace) is only needed from Phase 3.
 
 ## Module naming
@@ -332,7 +332,7 @@ This repository helps you stand up production-ready Azure foundations faster, wi
 	`bicep/templates/platform-hub-network-publicroute.bicep`,
 	`bicep/templates/platform-hub-network-zerotrust.bicep` (variables: `platform-hub-network-zerotrust-plat.bicepparam`)
 - **Spoke templates (workload isolation and scale-out)**:
-	`bicep/templates/platform-mgmt.bicep`,
+	`bicep/templates/platform-shared-mgmt.bicep`,
 	`bicep/templates/platform-spoke-network-publicroute.bicep`,
 	`bicep/templates/platform-spoke-ai-ollama.bicep`,
 	`bicep/templates/platform-spoke-ai-foundry.bicep`
