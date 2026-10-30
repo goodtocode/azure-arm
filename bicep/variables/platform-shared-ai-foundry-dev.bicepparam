@@ -43,8 +43,9 @@ param modelDeployments = [
   }
   {
     deploymentName: 'embedding-fast'
-    modelName: 'text-embedding-3-small'
-    modelFormat: 'OpenAI'
+    modelName: 'Cohere-embed-v3-multilingual'
+    modelFormat: 'Cohere'
+    modelVersion: '1'
     skuName: 'GlobalStandard'
     tokensPerMinute: 20000
   }

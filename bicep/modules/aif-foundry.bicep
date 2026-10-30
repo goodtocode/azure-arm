@@ -41,6 +41,8 @@ type FoundryModelName =
   | 'gpt-4.1-nano'
   | 'text-embedding-3-small'
   | 'text-embedding-3-large'
+  | 'Cohere-embed-v3-english'
+  | 'Cohere-embed-v3-multilingual'
   | 'Phi-4'
   | 'Phi-4-mini-instruct'
   | 'Phi-4-multimodal-instruct'
@@ -64,7 +66,7 @@ type FoundryModelProviderData = {
 type FoundryDeploymentConfig = {
   deploymentName: string
   modelName: FoundryModelName
-  modelFormat: 'OpenAI' | 'Microsoft' | 'Anthropic'
+  modelFormat: 'OpenAI' | 'Microsoft' | 'Anthropic' | 'Cohere'
   modelVersion: string?
   modelProviderData: FoundryModelProviderData?
   raiPolicyName: string?
