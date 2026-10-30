@@ -27,17 +27,18 @@ param privateEndpointName = '${productIac}-${environmentIac}-${regionIac}-${inst
 // Required model deployments for Azure AI Foundry.
 param modelDeployments = [
   {
-    deploymentName: 'openai-chat'
-    modelName: 'gpt-5.4'
-    modelFormat: 'OpenAI'
-    modelVersion: '2026-03-05'
+    deploymentName: 'ms-thinking'
+    modelName: 'MAI-Thinking-1'
+    modelFormat: 'Microsoft'
+    modelVersion: '2026-06-01'
     skuName: 'GlobalStandard'
     tokensPerMinute: 20000
   }
   {
     deploymentName: 'ms-fast'
-    modelName: 'mai-code-1.1-flash'
+    modelName: 'Phi-4-mini-instruct'
     modelFormat: 'Microsoft'
+    modelVersion: '1'
     skuName: 'GlobalStandard'
     tokensPerMinute: 20000
   }
