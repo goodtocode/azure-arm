@@ -48,6 +48,7 @@ param modelDeployments = [
     modelFormat: 'Cohere'
     modelVersion: '1'
     skuName: 'GlobalStandard'
+    capacity: 1
     tokensPerMinute: 10000
   }
   {

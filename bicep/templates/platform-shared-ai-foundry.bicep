@@ -73,6 +73,9 @@ type FoundryDeploymentConfig = {
   modelProviderData: FoundryModelProviderData?
   raiPolicyName: string?
   skuName: 'Standard' | 'GlobalStandard'
+  @description('Optional fixed deployment capacity that overrides the tokensPerMinute conversion, for models capped at a small capacity such as Cohere.')
+  @minValue(1)
+  capacity: int?
   @minValue(1000)
   tokensPerMinute: int
 }

@@ -71,6 +71,9 @@ type FoundryDeploymentConfig = {
   modelProviderData: FoundryModelProviderData?
   raiPolicyName: string?
   skuName: 'Standard' | 'GlobalStandard'
+  @description('Optional fixed deployment capacity that overrides the tokensPerMinute conversion, for models capped at a small capacity such as Cohere.')
+  @minValue(1)
+  capacity: int?
   @minValue(1000)
   tokensPerMinute: int
 }
@@ -150,7 +153,7 @@ resource modelDeploymentsResource 'Microsoft.CognitiveServices/accounts/deployme
   ]
   sku: {
     name: model.skuName
-    capacity: int((model.tokensPerMinute + tokensPerMinutePerCapacityUnit - 1) / tokensPerMinutePerCapacityUnit)
+    capacity: model.?capacity ?? int((model.tokensPerMinute + tokensPerMinutePerCapacityUnit - 1) / tokensPerMinutePerCapacityUnit)
   }
   properties: union({
     model: union({
