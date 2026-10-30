@@ -35,10 +35,9 @@ param modelDeployments = [
     tokensPerMinute: 20000
   }
   {
-    deploymentName: 'openai-fast'
-    modelName: 'gpt-4.1-mini'
-    modelFormat: 'OpenAI'
-    modelVersion: '2025-04-14'
+    deploymentName: 'ms-fast'
+    modelName: 'mai-code-1.1-flash'
+    modelFormat: 'Microsoft'
     skuName: 'GlobalStandard'
     tokensPerMinute: 20000
   }
