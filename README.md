@@ -184,16 +184,17 @@ az bicep build-params --stdout --file bicep/variables/workload-digitalproduct-sh
 
 ## Scripts
 
-PowerShell scripts under `scripts/` automate the work around the templates. Paths inside the hub-and-spoke scripts are relative to the `scripts/hub-and-spoke` folder.
+PowerShell scripts under `scripts/` automate the work around the templates. The hub-and-spoke scripts locate templates and variables themselves (`bicep/` here, `.azure/` in consumer repos), so they run from any folder. In a consumer repo the same folders live under `.azure/scripts/`.
 
 | Folder | Purpose |
 | --- | --- |
-| `scripts/validation/` | `Test-IacConventions.ps1` checks the slot system and compiles every template and variables file. Run it before every commit and in CI. |
-| `scripts/hub-and-spoke/` | `New-PlatformHub.ps1` deploys the hub mgmt and network templates, `New-PlatformSpoke.ps1` deploys the spoke mgmt and network templates, and `New-VnetPeering.ps1` peers a spoke VNet with the hub. Each runs what-if first. |
+| `scripts/validation/` | `Test-IacConventions.ps1` checks the slot system and compiles every template and variables file; run it before every commit and in CI. `Sync-TemplateScripts.ps1` compares a consumer repo's scripts folder with this one and, with `-Apply`, updates it and removes retired scripts. |
+| `scripts/hub-and-spoke/` | `New-PlatformHub.ps1` deploys the hub mgmt and network templates, `New-PlatformSpoke.ps1` deploys a spoke's network and mgmt templates (and AI with `-IncludeAi`), and `New-VnetPeering.ps1` peers a spoke VNet with the hub. Each runs what-if first (`-WhatIfOnly` stops there) and reads region and instance from the variables files, so names match the templates. |
 | `scripts/New-EntraDotnetSolution.ps1` | Orchestrator for a .NET solution: calls `entra/New-EntraAppRegistration.ps1` for the API, Web and optional E2E registrations, then writes each project's dotnet user-secrets. |
 | `scripts/entra/` | Microsoft Entra only (no dotnet, no Key Vault): `New-EntraAppRegistration.ps1` creates or reconciles one registration idempotently, `Grant-EntraConsent.ps1` grants admin consent, `Test-EntraAppRegistration.ps1` checks redirect URIs, scopes and consent. |
 | `scripts/dotnet/` | Local project configuration: `Set-DotnetUserSecret.ps1` writes user-secrets, `Sync-DotnetUserSecretKeyVault.ps1` copies them to or from Key Vault. |
-| `scripts/lib/` | Helpers the scripts above dot-source (`Entra.Common.ps1`, `Dotnet.Common.ps1`). |
+| `scripts/lib/` | Helpers the scripts above dot-source (`Entra.Common.ps1`, `Dotnet.Common.ps1`, `Platform.Common.ps1`). |
+| `scripts/tests/` | Pester tests for the helper functions and script conventions. Run `Invoke-Pester ./scripts/tests` (Pester 5 or later). |
 
 ---
 

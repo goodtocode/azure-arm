@@ -1,55 +1,49 @@
-# Log in to Azure
-az login
+<#
+.SYNOPSIS
+Peers a spoke VNet with the hub VNet in both directions.
 
-# Login
-az login
+.DESCRIPTION
+Run it after the hub and spoke networks exist. VNet and resource group names follow {product}-{env}-{region}-{instance}-{type}, with region and instance read from the hub and spoke network parameter files.
 
-# Variables for resource groups, templates, and parameters
-$mgmtRg = "can-hub-mgmt-plat-wus2-001-rg"
-$mgmtTemplate = "bicep/templates/platform-hub-mgmt.bicep"
-$mgmtParams = "bicep/variables/platform-hub-mgmt-plat.bicepparam"
-$networkRg = "can-hub-network-plat-wus2-001-rg"
-$networkTemplate = "bicep/templates/platform-hub-network-publicroute.bicep"
-$networkParams = "bicep/variables/platform-hub-network-publicroute-plat.bicepparam"
-$hubSubId = "<HubSubID>"
-$spokeSubId = "<SpokeSubID>"
-$spokeRg = "<spoke-rg>"
-$hubVnetName = "<hub-vnet-name>"
-$spokeVnetName = "<spoke-vnet-name>"
-$hubVnetResourceId = "/subscriptions/$hubSubId/resourceGroups/$networkRg/providers/Microsoft.Network/virtualNetworks/$hubVnetName"
-$spokeVnetResourceId = "/subscriptions/$spokeSubId/resourceGroups/$spokeRg/providers/Microsoft.Network/virtualNetworks/$spokeVnetName"
-$spokeToHubPeeringName = "spoke-to-hub"
-$hubToSpokePeeringName = "hub-to-spoke"
-$peeringTemplate = "bicep/modules/vnetpeer-virtualnetworkpeering.bicep"
+.EXAMPLE
+# Peer the dev spoke (single line, safe to paste):
+pwsh -File ./hub-and-spoke/New-VnetPeering.ps1 -HubSubscriptionId "<hub-subscription-id>" -SpokeSubscriptionId "<spoke-subscription-id>" -Environment dev
 
-# Create resource groups if not exist
-az group create --name $mgmtRg --location westus2
-az group create --name $networkRg --location westus2
-az group create --name $spokeRg --location westus2
+.NOTES
+- Requires the Azure CLI and network permissions in both subscriptions.
+- Finds the peering module under bicep/ (template repo) or .azure/ (consumer repos); run it from any folder.
+#>
+param(
+    [Parameter(Mandatory)][string]$HubSubscriptionId,
+    [Parameter(Mandatory)][string]$SpokeSubscriptionId,
+    [ValidateSet('dev', 'prod')][string]$Environment = 'dev'
+)
 
-# Management group deployment: what-if, then deploy if OK
-az account set --subscription $hubSubId
-az deployment group what-if --resource-group $mgmtRg --template-file $mgmtTemplate --parameters @$mgmtParams
-if ($LASTEXITCODE -eq 0) {
-   az deployment group create --resource-group $mgmtRg --template-file $mgmtTemplate --parameters @$mgmtParams
-}
+$ErrorActionPreference = 'Stop'
+. "$PSScriptRoot\..\lib\Platform.Common.ps1"
 
-# Network group deployment: what-if, then deploy if OK
-az deployment group what-if --resource-group $networkRg --template-file $networkTemplate --parameters @$networkParams
-if ($LASTEXITCODE -eq 0) {
-   az deployment group create --resource-group $networkRg --template-file $networkTemplate --parameters @$networkParams
-}
+$root = Get-BicepRoot
+$peeringModule = Join-Path $root 'modules\vnetpeer-virtualnetworkpeering.bicep'
+$hubParams = Join-Path $root 'variables\platform-hub-network-publicroute-plat.bicepparam'
+$spokeParams = Join-Path $root "variables\platform-spoke-network-publicroute-$Environment.bicepparam"
+$hubSlots = "$(Get-BicepParamValue $hubParams 'regionIac')-$(Get-BicepParamValue $hubParams 'instanceIac')"
+$spokeSlots = "$(Get-BicepParamValue $spokeParams 'regionIac')-$(Get-BicepParamValue $spokeParams 'instanceIac')"
 
-# Spoke to Hub Peering
-az account set --subscription $spokeSubId
-az deployment group create `
-   --resource-group $spokeRg `
-   --template-file $peeringTemplate `
-   --parameters localVnetName=$spokeVnetName peeringName=$spokeToHubPeeringName remoteVnetId=$hubVnetResourceId allowGatewayTransit=false useRemoteGateways=true allowVnetAccess=true allowForwardedTraffic=false
+$hubRg = "network-plat-$hubSlots-rg"
+$hubVnet = "network-plat-$hubSlots-vnet"
+$spokeRg = "network-$Environment-$spokeSlots-rg"
+$spokeVnet = "network-$Environment-$spokeSlots-vnet"
+$hubVnetId = "/subscriptions/$HubSubscriptionId/resourceGroups/$hubRg/providers/Microsoft.Network/virtualNetworks/$hubVnet"
+$spokeVnetId = "/subscriptions/$SpokeSubscriptionId/resourceGroups/$spokeRg/providers/Microsoft.Network/virtualNetworks/$spokeVnet"
 
-# Hub to Spoke Peering
-az account set --subscription $hubSubId
-az deployment group create `
-   --resource-group $networkRg `
-   --template-file $peeringTemplate `
-   --parameters localVnetName=$hubVnetName peeringName=$hubToSpokePeeringName remoteVnetId=$spokeVnetResourceId allowGatewayTransit=true useRemoteGateways=false allowVnetAccess=true allowForwardedTraffic=false
+az login | Out-Null
+
+az deployment group create --subscription $SpokeSubscriptionId --resource-group $spokeRg `
+    --template-file $peeringModule `
+    --parameters localVnetName=$spokeVnet peeringName=spoke-to-hub remoteVnetId=$hubVnetId
+if ($LASTEXITCODE -ne 0) { throw "Spoke-to-hub peering failed." }
+
+az deployment group create --subscription $HubSubscriptionId --resource-group $hubRg `
+    --template-file $peeringModule `
+    --parameters localVnetName=$hubVnet peeringName="hub-to-$spokeVnet" remoteVnetId=$spokeVnetId
+if ($LASTEXITCODE -ne 0) { throw "Hub-to-spoke peering failed." }
