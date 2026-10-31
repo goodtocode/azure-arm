@@ -4,11 +4,11 @@ Creates or reconciles exactly one Entra app registration (Api, Web or E2E) and r
 
 .DESCRIPTION
 Idempotent and additive: finds the registration by display name, creates it when missing, and otherwise only adds what is missing (scopes, roles, claims, redirect URIs, permissions). It never deletes or narrows existing settings and fails when the display name is ambiguous.
-It does not write .NET user-secrets. New-EntraSolution.ps1 does that from the returned object, so every type is configured the same way.
+It talks to Entra only and does not write .NET user-secrets. New-EntraDotnetSolution.ps1 and dotnet/Set-DotnetUserSecret.ps1 do that from the returned object.
 Api: resource server with an identifier URI, delegated scopes, app roles, access token version and access token claims.
-Web: Auth Code + PKCE sign-in with redirect URIs, Microsoft Graph and API delegated permissions, and ID token claims.
+Web: Auth Code + PKCE sign-in with redirect URIs, Microsoft Graph delegated permissions, ID token claims, and API delegated permissions when -ApiAppId is given.
 E2E: client credentials identity with an application permission on the API and the matching role assignment.
-A client secret is created only with -GenerateSecret, and only for a new registration or with -RotateSecret.
+A client secret is created only with -GenerateSecret, and only for a new registration or with -RotateSecret. -SecretOnly adds a secret to an existing registration and changes nothing else.
 
 .EXAMPLE
 # API (resource server):
@@ -19,8 +19,16 @@ pwsh -File ./New-EntraAppRegistration.ps1 -Type Api -TenantId "<your-tenant-id>"
 pwsh -File ./New-EntraAppRegistration.ps1 -Type Web -TenantId "<your-tenant-id>" -AppRegistrationName "myproduct-web-dev-001" -ApiAppId "<api-app-client-id>" -RedirectUris "https://localhost:7175/signin-oidc" -LogoutUri "https://localhost:7175/signout-callback-oidc" -GenerateSecret -ProjectName "Presentation.Web"
 
 .EXAMPLE
+# Add a redirect URI to an existing Web registration:
+pwsh -File ./New-EntraAppRegistration.ps1 -Type Web -TenantId "<your-tenant-id>" -AppRegistrationName "myproduct-web-dev-001" -RedirectUris "https://myproduct.example.com/signin-oidc"
+
+.EXAMPLE
 # E2E / CI identity that calls the API as an application:
 pwsh -File ./New-EntraAppRegistration.ps1 -Type E2E -TenantId "<your-tenant-id>" -AppRegistrationName "myproduct-e2e-dev-001" -ApiAppId "<api-app-client-id>" -GenerateSecret -SecretMonths 12 -ProjectName "Tests.Endtoend"
+
+.EXAMPLE
+# Rotate the client secret of an existing registration (the secret is returned once):
+pwsh -File ./New-EntraAppRegistration.ps1 -Type Web -TenantId "<your-tenant-id>" -AppRegistrationName "myproduct-web-dev-001" -SecretOnly -ProjectName "Presentation.Web"
 
 .EXAMPLE
 # Add an extra scope and claim to an existing API registration:
@@ -32,7 +40,7 @@ pwsh -File ./New-EntraAppRegistration.ps1 -Type Api -TenantId "<your-tenant-id>"
 .NOTES
 - Requires PowerShell modules Az.Accounts, Az.Resources, Microsoft.Graph.Applications.
 - Defaults per type apply only to parameters you do not pass. Passing an empty array leaves that setting untouched.
-- A returned Secret cannot be retrieved later; capture it or let New-EntraSolution.ps1 store it.
+- A returned Secret cannot be retrieved later; capture it or let New-EntraDotnetSolution.ps1 store it.
 #>
 [CmdletBinding()]
 param(
@@ -40,7 +48,7 @@ param(
     [Parameter(Mandatory)][string]$TenantId,
     [Parameter(Mandatory)][string]$AppRegistrationName,
 
-    # Web and E2E: the API registration they call.
+    # Web and E2E: the API registration they call. Required for E2E, optional for Web.
     [string]$ApiAppId,
     [string[]]$ApiScopes = @('access_as_user', 'assets.read', 'assets.edit', 'assets.delete'),
     [string]$ApiRole = 'Asset.Automation',
@@ -63,6 +71,7 @@ param(
     # Secrets.
     [switch]$GenerateSecret,
     [switch]$RotateSecret,
+    [switch]$SecretOnly,
     [int]$SecretMonths = 24,
     [string]$ProjectName = '',
 
@@ -70,6 +79,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. "$PSScriptRoot\..\lib\Entra.Common.ps1"
 $graphAppId = '00000003-0000-0000-c000-000000000000'
 
 # ── Defaults that depend on -Type ─────────────────────────────────────────────
@@ -90,8 +100,15 @@ if (-not $PSBoundParameters.ContainsKey('AccessTokenClaims')) {
     $AccessTokenClaims = if ($Type -eq 'Api') { @('email', 'family_name', 'given_name', 'upn') } else { @() }
 }
 
-if ($Type -ne 'Api' -and [string]::IsNullOrWhiteSpace($ApiAppId)) {
-    throw "-ApiAppId is required for -Type $Type."
+if ($Type -eq 'E2E' -and [string]::IsNullOrWhiteSpace($ApiAppId)) {
+    throw "-ApiAppId is required for -Type E2E."
+}
+if ($Type -eq 'Api' -and $SecretOnly) {
+    throw "A resource server does not need a client secret; -SecretOnly is not valid for -Type Api."
+}
+if ($SecretOnly) {
+    $GenerateSecret = $true
+    $RotateSecret = $true
 }
 if ($Type -eq 'Api' -and ($GenerateSecret -or $RotateSecret)) {
     Write-Warning "A resource server does not need a client secret; ignoring -GenerateSecret/-RotateSecret for -Type Api."
@@ -100,44 +117,10 @@ if ($Type -eq 'Api' -and ($GenerateSecret -or $RotateSecret)) {
 }
 
 # ── Prerequisites and sign-in ─────────────────────────────────────────────────
-function Install-Prerequisites {
-    foreach ($module in @('Az.Accounts', 'Az.Resources', 'Microsoft.Graph.Applications')) {
-        if (-not (Get-Module -ListAvailable -Name $module)) {
-            Write-Host "Installing PowerShell module: $module"
-            Install-Module $module -Scope CurrentUser -Force
-        }
-    }
-    Import-Module Az.Accounts -ErrorAction Stop
-    Import-Module Az.Resources -ErrorAction Stop
-    Import-Module Microsoft.Graph.Applications -ErrorAction Stop
-}
-
-function Connect-EntraSession {
-    param([string]$TenantId, [string[]]$RequiredScopes)
-
-    $azContext = Get-AzContext -ErrorAction SilentlyContinue
-    if (-not $azContext -or $azContext.Tenant.Id -ne $TenantId) {
-        Write-Host "Logging into Azure tenant $TenantId..."
-        Connect-AzAccount -Tenant $TenantId | Out-Null
-    }
-
-    $mgContext = $null
-    try { $mgContext = Get-MgContext -ErrorAction Stop } catch {}
-    $hasScopes = $mgContext -and $mgContext.Scopes -and (@($RequiredScopes | Where-Object { $_ -notin $mgContext.Scopes }).Count -eq 0)
-    if (-not $mgContext -or $mgContext.TenantId -ne $TenantId -or -not $hasScopes) {
-        Write-Host "Connecting to Microsoft Graph..."
-        Connect-MgGraph -TenantId $TenantId -Scopes $RequiredScopes -NoWelcome | Out-Null
-        $mgContext = Get-MgContext -ErrorAction Stop
-        if (-not $mgContext -or $mgContext.TenantId -ne $TenantId) {
-            throw "Microsoft Graph sign-in did not produce a context for tenant $TenantId."
-        }
-    }
-}
-
-if (-not $SkipPrerequisites) { Install-Prerequisites }
+if (-not $SkipPrerequisites) { Install-EntraPrerequisites }
 $graphScopesNeeded = @('Application.ReadWrite.All', 'Directory.ReadWrite.All')
 if ($Type -eq 'E2E') { $graphScopesNeeded += 'AppRoleAssignment.ReadWrite.All' }
-Connect-EntraSession -TenantId $TenantId -RequiredScopes $graphScopesNeeded
+Connect-EntraSession -TenantId $TenantId -GraphScopes $graphScopesNeeded
 
 # ── Graph helpers ─────────────────────────────────────────────────────────────
 function Get-AppByName([string]$Name) {
@@ -263,7 +246,7 @@ function Get-MergedResourceAccess($app, [string]$ResourceAppId, [object[]]$Wante
 
 # ── Resolve the API this registration depends on ──────────────────────────────
 $apiReg = $null
-if ($Type -ne 'Api') {
+if ($Type -ne 'Api' -and -not [string]::IsNullOrWhiteSpace($ApiAppId)) {
     $apiReg = Get-AppByAppId $ApiAppId
     if (-not $apiReg) { throw "API app registration '$ApiAppId' not found. Create it first with -Type Api." }
 }
@@ -274,6 +257,7 @@ Write-Host "=== $Type app registration: $AppRegistrationName ==="
 $app = Get-AppByName $AppRegistrationName
 $created = $false
 if (-not $app) {
+    if ($SecretOnly) { throw "App registration '$AppRegistrationName' not found; -SecretOnly needs an existing registration." }
     Write-Host "Not found. Creating..."
     $app = New-MgApplication -DisplayName $AppRegistrationName -SignInAudience AzureADMyOrg
     if (-not $app -or -not $app.AppId) { throw "App registration '$AppRegistrationName' was not created." }
@@ -282,108 +266,117 @@ if (-not $app) {
     Write-Host "Created: $($app.AppId)"
 }
 else {
-    Write-Host "Already exists: $($app.AppId). Adding anything missing."
+    Write-Host "Already exists: $($app.AppId)."
 }
 
-# ── Type-specific configuration ───────────────────────────────────────────────
-$identifierUri = ''
-if ($Type -eq 'Api') {
-    $identifierUri = "api://$($app.AppId)"
-    if (@($app.IdentifierUris).Count -eq 0) {
-        Update-MgApplication -ApplicationId $app.Id -IdentifierUris @($identifierUri)
-        Write-Host "Set identifier URI: $identifierUri"
-    }
-    else {
-        $identifierUri = @($app.IdentifierUris)[0]
+$identifierUri = @($app.IdentifierUris)[0]
+$sp = $null
+
+if (-not $SecretOnly) {
+    # ── Type-specific configuration ───────────────────────────────────────────
+    if ($Type -eq 'Api') {
+        if (@($app.IdentifierUris).Count -eq 0) {
+            $identifierUri = "api://$($app.AppId)"
+            Update-MgApplication -ApplicationId $app.Id -IdentifierUris @($identifierUri)
+            Write-Host "Set identifier URI: $identifierUri"
+        }
+
+        $apiUpdate = @{}
+        $existingScopes = @(@($app.Api.Oauth2PermissionScopes) | Where-Object { $_ } | ForEach-Object { ConvertTo-ScopeSpec $_ })
+        $existingScopeValues = @($existingScopes | ForEach-Object { $_.Value })
+        $newScopes = @($Scopes | Where-Object { $_ -and $_ -notin $existingScopeValues } | ForEach-Object { New-ScopeSpec $_ })
+        if ($newScopes.Count -gt 0) {
+            $apiUpdate.OAuth2PermissionScopes = @($existingScopes + $newScopes)
+            Write-Host "Adding scopes: $(($newScopes | ForEach-Object { $_.Value }) -join ', ')"
+        }
+        if ($app.Api.RequestedAccessTokenVersion -ne $AccessTokenVersion) {
+            $apiUpdate.RequestedAccessTokenVersion = $AccessTokenVersion
+            Write-Host "Setting access token version to $AccessTokenVersion."
+        }
+        if ($apiUpdate.Count -gt 0) { Update-MgApplication -ApplicationId $app.Id -Api $apiUpdate }
     }
 
-    $apiUpdate = @{}
-    $existingScopes = @(@($app.Api.Oauth2PermissionScopes) | Where-Object { $_ } | ForEach-Object { ConvertTo-ScopeSpec $_ })
-    $existingScopeValues = @($existingScopes | ForEach-Object { $_.Value })
-    $newScopes = @($Scopes | Where-Object { $_ -and $_ -notin $existingScopeValues } | ForEach-Object { New-ScopeSpec $_ })
-    if ($newScopes.Count -gt 0) {
-        $apiUpdate.OAuth2PermissionScopes = @($existingScopes + $newScopes)
-        Write-Host "Adding scopes: $(($newScopes | ForEach-Object { $_.Value }) -join ', ')"
+    if ($Type -in 'Api', 'Web') {
+        $existingRoles = @(@($app.AppRoles) | Where-Object { $_ } | ForEach-Object { ConvertTo-RoleSpec $_ })
+        $existingRoleValues = @($existingRoles | ForEach-Object { $_.Value })
+        $newRoles = @()
+        $newRoles += @($UserRoles | Where-Object { $_ -and $_ -notin $existingRoleValues } | ForEach-Object { New-RoleSpec $_ 'User' })
+        $newRoles += @($ApplicationRoles | Where-Object { $_ -and $_ -notin $existingRoleValues } | ForEach-Object { New-RoleSpec $_ 'Application' })
+        if ($newRoles.Count -gt 0) {
+            Update-MgApplication -ApplicationId $app.Id -AppRoles @($existingRoles + $newRoles)
+            Write-Host "Adding app roles: $(($newRoles | ForEach-Object { $_.Value }) -join ', ')"
+        }
     }
-    if ($app.Api.RequestedAccessTokenVersion -ne $AccessTokenVersion) {
-        $apiUpdate.RequestedAccessTokenVersion = $AccessTokenVersion
-        Write-Host "Setting access token version to $AccessTokenVersion."
+
+    if ($Type -eq 'Web') {
+        $webUpdate = @{}
+        $existingUris = @($app.Web.RedirectUris)
+        $missingUris = @($RedirectUris | Where-Object { $_ -and $_ -notin $existingUris })
+        if ($missingUris.Count -gt 0) {
+            $webUpdate.RedirectUris = @($existingUris + $missingUris)
+            Write-Host "Adding redirect URIs: $($missingUris -join ', ')"
+        }
+        if ($LogoutUri -and [string]::IsNullOrWhiteSpace($app.Web.LogoutUrl)) { $webUpdate.LogoutUrl = $LogoutUri }
+        if ($created) {
+            # Auth Code + PKCE: implicit grant stays off, per Microsoft.Identity.Web defaults.
+            $webUpdate.ImplicitGrantSettings = @{ EnableIdTokenIssuance = $false; EnableAccessTokenIssuance = $false }
+        }
+        if ($webUpdate.Count -gt 0) { Update-MgApplication -ApplicationId $app.Id -Web $webUpdate }
+
+        $graphSp = Get-MgServicePrincipal -Filter "appId eq '$graphAppId'" -ErrorAction Stop | Select-Object -First 1
+        $graphWanted = foreach ($perm in $GraphPermissions) {
+            $s = $graphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq $perm }
+            if (-not $s) { throw "Microsoft Graph permission '$perm' not found." }
+            @{ Id = $s.Id; Type = 'Scope' }
+        }
+        $merged = Get-MergedResourceAccess $app $graphAppId @($graphWanted)
+        if ($merged) { Update-MgApplication -ApplicationId $app.Id -RequiredResourceAccess $merged; $app = Wait-ForApplication $app.Id }
+
+        if ($apiReg) {
+            $apiWanted = foreach ($name in $ApiScopes) {
+                $s = $apiReg.Api.Oauth2PermissionScopes | Where-Object { $_.Value -eq $name }
+                if (-not $s) { throw "API scope '$name' not found on '$ApiAppId'. Add it to the API registration first." }
+                @{ Id = $s.Id; Type = 'Scope' }
+            }
+            $merged = Get-MergedResourceAccess $app $ApiAppId @($apiWanted)
+            if ($merged) { Update-MgApplication -ApplicationId $app.Id -RequiredResourceAccess $merged; $app = Wait-ForApplication $app.Id }
+        }
+        else {
+            Write-Host "No -ApiAppId given: skipping API delegated permissions."
+        }
     }
-    if ($apiUpdate.Count -gt 0) { Update-MgApplication -ApplicationId $app.Id -Api $apiUpdate }
+
+    if ($Type -eq 'E2E') {
+        $role = $apiReg.AppRoles | Where-Object { $_.Value -eq $ApiRole -and $_.AllowedMemberTypes -contains 'Application' } | Select-Object -First 1
+        if (-not $role) { throw "Application role '$ApiRole' not found on API '$ApiAppId'. Create the API with -ApplicationRoles '$ApiRole' first." }
+        $merged = Get-MergedResourceAccess $app $ApiAppId @(@{ Id = $role.Id; Type = 'Role' })
+        if ($merged) { Update-MgApplication -ApplicationId $app.Id -RequiredResourceAccess $merged; $app = Wait-ForApplication $app.Id }
+    }
+
+    if ($IdTokenClaims.Count -gt 0 -or $AccessTokenClaims.Count -gt 0) {
+        $claims = Get-MergedOptionalClaims $app $IdTokenClaims $AccessTokenClaims
+        if ($claims) {
+            Update-MgApplication -ApplicationId $app.Id -OptionalClaims $claims
+            Write-Host "Updated optional claims."
+        }
+    }
+
+    # ── Service principal and E2E role assignment ─────────────────────────────
+    $app = Wait-ForApplication $app.Id
+    $sp = Get-OrNew-ServicePrincipal $app.AppId
+
+    if ($Type -eq 'E2E') {
+        $apiSp = Get-OrNew-ServicePrincipal $ApiAppId
+        $assigned = Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $sp.Id -ErrorAction SilentlyContinue |
+            Where-Object { $_.AppRoleId -eq $role.Id -and $_.ResourceId -eq $apiSp.Id }
+        if (-not $assigned) {
+            Write-Host "Granting '$ApiRole' to the E2E service principal..."
+            New-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $sp.Id -PrincipalId $sp.Id -ResourceId $apiSp.Id -AppRoleId $role.Id | Out-Null
+        }
+    }
 }
-
-if ($Type -in 'Api', 'Web') {
-    $existingRoles = @(@($app.AppRoles) | Where-Object { $_ } | ForEach-Object { ConvertTo-RoleSpec $_ })
-    $existingRoleValues = @($existingRoles | ForEach-Object { $_.Value })
-    $newRoles = @()
-    $newRoles += @($UserRoles | Where-Object { $_ -and $_ -notin $existingRoleValues } | ForEach-Object { New-RoleSpec $_ 'User' })
-    $newRoles += @($ApplicationRoles | Where-Object { $_ -and $_ -notin $existingRoleValues } | ForEach-Object { New-RoleSpec $_ 'Application' })
-    if ($newRoles.Count -gt 0) {
-        Update-MgApplication -ApplicationId $app.Id -AppRoles @($existingRoles + $newRoles)
-        Write-Host "Adding app roles: $(($newRoles | ForEach-Object { $_.Value }) -join ', ')"
-    }
-}
-
-if ($Type -eq 'Web') {
-    $webUpdate = @{}
-    $existingUris = @($app.Web.RedirectUris)
-    $missingUris = @($RedirectUris | Where-Object { $_ -and $_ -notin $existingUris })
-    if ($missingUris.Count -gt 0) {
-        $webUpdate.RedirectUris = @($existingUris + $missingUris)
-        Write-Host "Adding redirect URIs: $($missingUris -join ', ')"
-    }
-    if ($LogoutUri -and [string]::IsNullOrWhiteSpace($app.Web.LogoutUrl)) { $webUpdate.LogoutUrl = $LogoutUri }
-    if ($created) {
-        # Auth Code + PKCE: implicit grant stays off, per Microsoft.Identity.Web defaults.
-        $webUpdate.ImplicitGrantSettings = @{ EnableIdTokenIssuance = $false; EnableAccessTokenIssuance = $false }
-    }
-    if ($webUpdate.Count -gt 0) { Update-MgApplication -ApplicationId $app.Id -Web $webUpdate }
-
-    $graphSp = Get-MgServicePrincipal -Filter "appId eq '$graphAppId'" -ErrorAction Stop | Select-Object -First 1
-    $graphWanted = foreach ($perm in $GraphPermissions) {
-        $s = $graphSp.Oauth2PermissionScopes | Where-Object { $_.Value -eq $perm }
-        if (-not $s) { throw "Microsoft Graph permission '$perm' not found." }
-        @{ Id = $s.Id; Type = 'Scope' }
-    }
-    $merged = Get-MergedResourceAccess $app $graphAppId @($graphWanted)
-    if ($merged) { Update-MgApplication -ApplicationId $app.Id -RequiredResourceAccess $merged; $app = Wait-ForApplication $app.Id }
-
-    $apiWanted = foreach ($name in $ApiScopes) {
-        $s = $apiReg.Api.Oauth2PermissionScopes | Where-Object { $_.Value -eq $name }
-        if (-not $s) { throw "API scope '$name' not found on '$ApiAppId'. Add it to the API registration first." }
-        @{ Id = $s.Id; Type = 'Scope' }
-    }
-    $merged = Get-MergedResourceAccess $app $ApiAppId @($apiWanted)
-    if ($merged) { Update-MgApplication -ApplicationId $app.Id -RequiredResourceAccess $merged; $app = Wait-ForApplication $app.Id }
-}
-
-if ($Type -eq 'E2E') {
-    $role = $apiReg.AppRoles | Where-Object { $_.Value -eq $ApiRole -and $_.AllowedMemberTypes -contains 'Application' } | Select-Object -First 1
-    if (-not $role) { throw "Application role '$ApiRole' not found on API '$ApiAppId'. Create the API with -ApplicationRoles '$ApiRole' first." }
-    $merged = Get-MergedResourceAccess $app $ApiAppId @(@{ Id = $role.Id; Type = 'Role' })
-    if ($merged) { Update-MgApplication -ApplicationId $app.Id -RequiredResourceAccess $merged; $app = Wait-ForApplication $app.Id }
-}
-
-if ($IdTokenClaims.Count -gt 0 -or $AccessTokenClaims.Count -gt 0) {
-    $claims = Get-MergedOptionalClaims $app $IdTokenClaims $AccessTokenClaims
-    if ($claims) {
-        Update-MgApplication -ApplicationId $app.Id -OptionalClaims $claims
-        Write-Host "Updated optional claims."
-    }
-}
-
-# ── Service principal and E2E role assignment ─────────────────────────────────
-$app = Wait-ForApplication $app.Id
-$sp = Get-OrNew-ServicePrincipal $app.AppId
-
-if ($Type -eq 'E2E') {
-    $apiSp = Get-OrNew-ServicePrincipal $ApiAppId
-    $assigned = Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $sp.Id -ErrorAction SilentlyContinue |
-        Where-Object { $_.AppRoleId -eq $role.Id -and $_.ResourceId -eq $apiSp.Id }
-    if (-not $assigned) {
-        Write-Host "Granting '$ApiRole' to the E2E service principal..."
-        New-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $sp.Id -PrincipalId $sp.Id -ResourceId $apiSp.Id -AppRoleId $role.Id | Out-Null
-    }
+else {
+    $sp = Get-MgServicePrincipal -Filter "appId eq '$($app.AppId)'" -ErrorAction SilentlyContinue | Select-Object -First 1
 }
 
 # ── Client secret ─────────────────────────────────────────────────────────────
@@ -414,10 +407,10 @@ $capabilities = switch ($Type) {
 return [PSCustomObject]@{
     AppId              = $app.AppId
     ObjectId           = $app.Id
-    ServicePrincipalId = $sp.Id
+    ServicePrincipalId = if ($sp) { $sp.Id } else { '' }
     Type               = $Type
     Created            = $created
-    IdentifierUri      = $identifierUri
+    IdentifierUri      = if ($identifierUri) { $identifierUri } else { '' }
     Scopes             = if ($Type -eq 'Api') { @($Scopes) } else { @() }
     Roles              = @($UserRoles) + @($ApplicationRoles)
     Secret             = $secret

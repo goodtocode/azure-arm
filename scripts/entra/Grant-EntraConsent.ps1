@@ -26,7 +26,7 @@ pwsh -File ./Grant-EntraConsent.ps1 -TenantId "<your-tenant-id>" -ApiAppId "<api
 Example (called from orchestrator):
   $consentApps = @($api, $web)
   if ($IncludeE2E) { $consentApps += $e2e }
-  & "$PSScriptRoot\auth\Grant-EntraConsent.ps1" `
+  & "$PSScriptRoot\entra\Grant-EntraConsent.ps1" `
       -TenantId $TenantId `
       -ApiAppId $api.AppId `
       -WebAppId $web.AppId `
@@ -41,76 +41,7 @@ param(
     [switch]$AutoConsent
 )
 
-# ── Shared helpers ────────────────────────────────────────────────────────────
-
-function Install-Prerequisites {
-    $modules = @(
-        "Az.Accounts",
-        "Microsoft.Graph.Applications",
-        "Microsoft.Graph.Identity.SignIns"
-    )
-    foreach ($module in $modules) {
-        if (-not (Get-Module -ListAvailable -Name $module)) {
-            Write-Host "Installing PowerShell module: $module"
-            Install-Module $module -Scope CurrentUser -Force
-        }
-        else {
-            Write-Host "PowerShell module $module is already installed."
-        }
-    }
-    Import-Module Az.Accounts                    -ErrorAction Stop
-    Import-Module Microsoft.Graph.Applications   -ErrorAction Stop
-    Import-Module Microsoft.Graph.Identity.SignIns -ErrorAction Stop
-}
-
-function Connect-EntraSession {
-    param([string]$TenantId)
-
-    $azContext = Get-AzContext -ErrorAction SilentlyContinue
-    if (-not $azContext -or $azContext.Tenant.Id -ne $TenantId) {
-        Write-Host "Logging into Azure tenant $TenantId..."
-        Connect-AzAccount -Tenant $TenantId | Out-Null
-    }
-    else {
-        Write-Host "Already authenticated to Azure tenant $TenantId."
-    }
-
-    $mgContext = $null
-    try { $mgContext = Get-MgContext -ErrorAction Stop } catch {}
-
-    # AutoConsent requires elevated Graph scopes
-    $scopes = if ($AutoConsent) {
-        @("Application.ReadWrite.All", "DelegatedPermissionGrant.ReadWrite.All", "AppRoleAssignment.ReadWrite.All")
-    } else {
-        @("Application.Read.All")
-    }
-
-    $hasRequiredScopes = $false
-    if ($mgContext -and $mgContext.Scopes) {
-        $hasRequiredScopes = ($scopes | Where-Object { $_ -notin $mgContext.Scopes }).Count -eq 0
-    }
-
-    if (-not $mgContext -or $mgContext.TenantId -ne $TenantId -or -not $hasRequiredScopes) {
-        Write-Host "Connecting to Microsoft Graph..."
-        try {
-            Connect-MgGraph -TenantId $TenantId -Scopes $scopes -NoWelcome | Out-Null
-            $mgContext = Get-MgContext -ErrorAction Stop
-        }
-        catch {
-            Write-Error "FATAL: Microsoft Graph authentication failed. $($_.Exception.Message)"
-            exit 1
-        }
-
-        if (-not $mgContext -or $mgContext.TenantId -ne $TenantId) {
-            Write-Error "FATAL: Microsoft Graph authentication did not produce a valid tenant context."
-            exit 1
-        }
-        Write-Host "Connected to Microsoft Graph."
-    }
-    else {
-        Write-Host "Already connected to Microsoft Graph for tenant $TenantId."
-    }
-}
+. "$PSScriptRoot\..\lib\Entra.Common.ps1"
 
 function Get-ConsentUrl {
     param([string]$AppId)
@@ -152,8 +83,10 @@ function Grant-DelegatedConsent {
 }
 
 # ── Prerequisites & authentication ───────────────────────────────────────────
-Install-Prerequisites
-Connect-EntraSession -TenantId $TenantId
+Install-EntraPrerequisites -Modules @('Az.Accounts', 'Microsoft.Graph.Applications', 'Microsoft.Graph.Identity.SignIns')
+# AutoConsent needs elevated Graph scopes
+$graphScopes = if ($AutoConsent) { @('Application.ReadWrite.All', 'DelegatedPermissionGrant.ReadWrite.All', 'AppRoleAssignment.ReadWrite.All') } else { @('Application.Read.All') }
+Connect-EntraSession -TenantId $TenantId -GraphScopes $graphScopes
 
 # ── Resolve service principals ────────────────────────────────────────────────
 Write-Host ""

@@ -190,8 +190,10 @@ PowerShell scripts under `scripts/` automate the work around the templates. Path
 | --- | --- |
 | `scripts/validation/` | `Test-IacConventions.ps1` checks the slot system and compiles every template and variables file. Run it before every commit and in CI. |
 | `scripts/hub-and-spoke/` | `New-PlatformHub.ps1` deploys the hub mgmt and network templates, `New-PlatformSpoke.ps1` deploys the spoke mgmt and network templates, and `New-VnetPeering.ps1` peers a spoke VNet with the hub. Each runs what-if first. |
-| `scripts/entra/` | Microsoft Entra External ID setup for .NET solutions. `New-EntraSolution.ps1` orchestrates API, Web, and optional E2E app registrations (helpers in `entra/auth/`); `Set-*UserSecrets.ps1` write the values to dotnet user-secrets or Key Vault; `Verify-EntraSetup.ps1` checks redirect URIs and scopes. |
-| `scripts/System.psm1` | Shared PowerShell helper functions. |
+| `scripts/New-EntraDotnetSolution.ps1` | Orchestrator for a .NET solution: calls `entra/New-EntraAppRegistration.ps1` for the API, Web and optional E2E registrations, then writes each project's dotnet user-secrets. |
+| `scripts/entra/` | Microsoft Entra only (no dotnet, no Key Vault): `New-EntraAppRegistration.ps1` creates or reconciles one registration idempotently, `Grant-EntraConsent.ps1` grants admin consent, `Test-EntraAppRegistration.ps1` checks redirect URIs, scopes and consent. |
+| `scripts/dotnet/` | Local project configuration: `Set-DotnetUserSecret.ps1` writes user-secrets, `Sync-DotnetUserSecretKeyVault.ps1` copies them to or from Key Vault. |
+| `scripts/lib/` | Helpers the scripts above dot-source (`Entra.Common.ps1`, `Dotnet.Common.ps1`). |
 
 ---
 

@@ -4,7 +4,7 @@ Verifies common Entra setup prerequisites for local .NET Web -> API delegated au
 
 .EXAMPLE
 # Single line, safe to paste:
-pwsh -File ./.azure/scripts/entra/Verify-EntraSetup.ps1 -TenantId "<your-tenant-id>" -WebAppRegistrationName "myproduct-web-dev-001" -ApiAppRegistrationName "myproduct-api-dev-001"
+pwsh -File ./.azure/scripts/entra/Test-EntraAppRegistration.ps1 -TenantId "<your-tenant-id>" -WebAppRegistrationName "myproduct-web-dev-001" -ApiAppRegistrationName "myproduct-api-dev-001"
 #>
 
 param(
@@ -45,33 +45,7 @@ function Add-CheckResult {
     $failedChecks.Add($Name) | Out-Null
 }
 
-function Install-Prerequisites {
-    $modules = @("Az.Accounts", "Microsoft.Graph.Applications")
-    foreach ($module in $modules) {
-        if (-not (Get-Module -ListAvailable -Name $module)) {
-            Write-Host "Installing PowerShell module: $module"
-            Install-Module $module -Scope CurrentUser -Force
-        }
-    }
-
-    Import-Module Az.Accounts -ErrorAction Stop
-    Import-Module Microsoft.Graph.Applications -ErrorAction Stop
-}
-
-function New-Auth {
-    param([string]$TenantId)
-
-    $azContext = Get-AzContext -ErrorAction SilentlyContinue
-    if (-not $azContext -or $azContext.Tenant.Id -ne $TenantId) {
-        Connect-AzAccount -Tenant $TenantId | Out-Null
-    }
-
-    $mgContext = $null
-    try { $mgContext = Get-MgContext -ErrorAction Stop } catch {}
-    if (-not $mgContext -or $mgContext.TenantId -ne $TenantId -or -not $mgContext.Account) {
-        Connect-MgGraph -TenantId $TenantId -Scopes "Application.Read.All", "Directory.Read.All", "DelegatedPermissionGrant.Read.All" -NoWelcome | Out-Null
-    }
-}
+. "$PSScriptRoot\..\lib\Entra.Common.ps1"
 
 function Get-ConsentGrantsForWebToApi {
     param(
@@ -93,8 +67,8 @@ function Get-ConsentGrantsForWebToApi {
     return $null
 }
 
-Install-Prerequisites
-New-Auth -TenantId $TenantId
+Install-EntraPrerequisites -Modules @('Az.Accounts', 'Microsoft.Graph.Applications')
+Connect-EntraSession -TenantId $TenantId -GraphScopes @('Application.Read.All', 'Directory.Read.All', 'DelegatedPermissionGrant.Read.All')
 
 Write-Host ""
 Write-Host "=== Verifying Entra setup for local Web -> API delegated auth ===" -ForegroundColor Cyan
