@@ -113,7 +113,7 @@ A bundle is the set of templates, variables and pipelines deployed together for 
 
 ### Resource group slot
 
-Resource groups are named `{product/purpose}-{env}-{region}-{instance}-rg`, for example `crucible-dev-wus2-001-rg`, `mgmt-dev-wus2-001-rg` and `edge-plat-wus2-001-rg`. There is no tenant prefix. Use `plat` for platform-subscription groups and `dev`, `prod` for environments. Resource names inside follow `{product/purpose}-{env}-{region}-{instance}-{abbreviation}`.
+Resource groups are named `{product}-{env}-{region}-{instance}-rg`, for example `crucible-dev-wus2-001-rg`, `mgmt-dev-wus2-001-rg` and `edge-plat-wus2-001-rg`. There is no tenant prefix. Use `plat` for platform-subscription groups and `dev`, `prod` for environments. Resource names inside follow `{product}-{env}-{region}-{instance}-{type}`.
 
 | Phase | Goal | Subscriptions | Resource groups | Templates deployed | Pipelines |
 | --- | --- | --- | --- | --- | --- |
@@ -258,23 +258,17 @@ Standalone is a resource-group ownership boundary, not a synonym for private net
 
 #### Core Conventions
 
-Use five naming slots in order:
+Resource group and resource names use five slots, in order, joined by hyphens: `{product}-{env}-{region}-{instance}-{type}`.
 
-| Slot | Purpose | Example | RG | Resources |
-| --- | --- | --- | --- | --- |
-| 1 | Scope Owner | platform, prod, devtest, shared, nursing, certification | Platform RG Slots Convention | Platform Resources Slots Convention |
-| 2 | Workload Scope | hub, spoke, education | `{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg` | `{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}` |
-| 3 | Service Domain / Product | connectivity, identity, management, security, beacon |  |  |
-| 4 | Region or Environment | Platform: region (westus2, eastus2); Business product: env (prod, dev) |  |  |
-| 5 | Instance | 100 |  |  |
+| Slot | Meaning | Example |
+| --- | --- | --- |
+| `product` | The product or platform service (`mgmt`, `ai`, `network`, `edge`, or a product name) | `mgmt` |
+| `env` | `dev`, `test`, `stage`, `prod`, or `plat` for the platform subscription | `dev` |
+| `region` | Short region code | `wus2` |
+| `instance` | Three-digit instance number, constant within a repository | `100` |
+| `type` | Short resource type abbreviation, based on the CAF abbreviation; `rg` for resource groups | `appi` |
 
-**Platform RG Slots Convention**: `{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg`  
-**Platform Resources Slots Convention**: `{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}`  
-**Business Product RG Slots Convention**: `{scopeOwner}-{businessUnit/familyLine}-{product}-{env}-{instance}-rg`  
-**Business Product Resources Slots Convention**: `{businessUnit/familyLine}-{product}-{env}-{instance}-{resourceAbbreviation}`
-
-Platform resource-group examples include `platform-hub-connectivity-westus2-100-rg` and `devtest-spoke-network-westus2-100-rg`. Business product examples include `devtest-nursing-beacon-dev-100-rg` and `nursing-beacon-prod-100-web`.
-
+There is no tenant, owner or scope prefix. `hub`, `spoke` and `shared` appear only in template and variables file names. Examples: `mgmt-dev-wus2-100-rg`, `network-plat-wus2-100-vnet`, `crucible-prod-wus2-100-web`. See [Azure CAF IaC Conventions](docs/governance/azure-caf-iac-conventions.md#core-conventions) for the exceptions (Key Vault, Front Door, storage).
 Template and variables file names follow the slot system described in [Slot system](#slot-system):
 
 ```text
@@ -282,21 +276,6 @@ workload-{archetype}[-zerotrust].bicep
 platform-(hub|spoke|shared)-{capability}[-{variant}].bicep
 workload-{archetype}-{mode}-{env}.bicepparam
 platform-{template name}-{env}.bicepparam
-```
-
-Resource groups follow this format:
-
-```text
-{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg
-```
-
-Examples:
-
-```text
-platform-hub-connectivity-westus2-100-rg
-platform-hub-identity-westus2-100-rg
-devtest-spoke-network-westus2-100-rg
-production-nursing-beacon-prod-100-rg
 ```
 
 The workload archetype describes what the product is (`digitalproduct`), and the mode describes how it is hosted (`standalone`, `shared`, `network`, `zerotrust`). Components such as web, API, SQL, and Function App are switched on by supplying their object in the variables file, never by creating another template.

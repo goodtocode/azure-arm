@@ -18,7 +18,7 @@ param environmentApp = 'Development'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 param shared = {
-  resourceGroupName: '${scopeOwner}-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
+  resourceGroupName: 'mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
 }
 
 param hosting = {

@@ -4,7 +4,7 @@ using '../templates/platform-shared-ai-foundry.bicep'
 // Common
 // =====================
 var scopeOwner = 'ScopeOrTenant'
-var productIac = 'spoke-ai'
+var productIac = 'ai'
 var environmentIac = 'dev'
 var regionIac = 'wus'
 var instanceIac = '100'
@@ -17,7 +17,7 @@ param tags = {
 }
 
 // =====================
-// Platform Spoke AI RG: ${scopeOwner}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// Platform Spoke AI RG: ${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
 // =====================
 param foundryName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif'
 param projectName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-proj'

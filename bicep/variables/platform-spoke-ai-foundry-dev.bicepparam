@@ -4,7 +4,7 @@ using '../templates/platform-spoke-ai-foundry.bicep'
 // Common
 // =====================
 var scopeOwner = 'ScopeOrTenant'
-var productIac = 'spoke-ai'
+var productIac = 'ai'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
@@ -62,5 +62,5 @@ param modelDeployments = [
 ]
 
 // Replace these with the subnet and Private DNS zone in this spoke's subscription.
-param privateEndpointSubnetResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/spoke-network-dev-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/spoke-dev-wus2-001-vnet/subnets/private-endpoints-snet'
+param privateEndpointSubnetResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/network-dev-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/spoke-dev-wus2-001-vnet/subnets/private-endpoints-snet'
 param privateDnsZoneResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/platform-dns-dev-wus2-001-rg/providers/Microsoft.Network/privateDnsZones/privatelink.cognitiveservices.azure.com'

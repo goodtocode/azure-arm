@@ -2,14 +2,17 @@
 
 ## Core Conventions
 
-| Slot | Purpose | Example | RG | Resources |
-|----------|----------|----------|----------|----------|
-| 1 | Scope Owner | platform, prod, devtest, shared, nursing, certification | Platform RG Slots Convention | Platform Resources Slots Convention |
-| 2 | Workload Scope | hub, spoke, education | `{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg` | `{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}` |
-| 3 | Service Domain / Product | connectivity, identity, management, security, beacon |  |  |
-| 4 | Region or Environment | Platform: westus2, eastus2; Business: prod, dev |  |  |
-| 5 | Instance | 100 |  |  |
+Resource group and resource names use five slots, in order, joined by hyphens: `{product}-{env}-{region}-{instance}-{type}`.
 
+| Slot | Meaning | Example |
+| --- | --- | --- |
+| `product` | The product or platform service (`mgmt`, `ai`, `network`, `edge`, or a product name) | `mgmt` |
+| `env` | `dev`, `test`, `stage`, `prod`, or `plat` for the platform subscription | `dev` |
+| `region` | Short region code | `wus2` |
+| `instance` | Three-digit instance number, constant within a repository | `100` |
+| `type` | Short resource type abbreviation, based on the CAF abbreviation; `rg` for resource groups | `appi` |
+
+There is no tenant, owner or scope prefix. `hub`, `spoke` and `shared` appear only in template and variables file names. Examples: `mgmt-dev-wus2-100-rg`, `network-plat-wus2-100-vnet`, `crucible-prod-wus2-100-web`. See [Azure CAF IaC Conventions](../governance/azure-caf-iac-conventions.md#core-conventions) for the exceptions (Key Vault, Front Door, storage).
 | Domain Resource Group | Usage |
 |----------|----------|
 | connectivity | ExpressRoute, VPN, DNS, Routing |
@@ -17,42 +20,6 @@
 | security | Firewall, Sentinel, DDoS |
 | identity | Entra, PIM, Domain Services |
 | management | Monitoring, Backup, Automation |
-
-### Platform Slots
-
-**Platform RG Slots Convention**
-
-`{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg`
-
-**Platform Resources Slots Convention**
-
-`{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}`
-
-| Platform RG Examples | Platform Resource Examples |
-|----------|----------|
-| `platform-hub-connectivity-westus2-100-rg` | `hub-network-westus2-100-vnet` |
-| `platform-hub-identity-westus2-100-rg` | `hub-identity-westus2-100-rg` |
-| `devtest-spoke-network-westus2-100-rg` | `hub-vpngateway-westus2-100-pip` |
-| `production-spoke-network-westus2-100-rg` |  |
-
-### Business Product Slots
-
-**Business Product RG Slots Convention**
-
-`{scopeOwner}-{businessUnit/familyLine}-{product}-{env}-{instance}-rg`
-
-**Business Product Resources Slots Convention**
-
-`{businessUnit/familyLine}-{product}-{env}-{instance}-{resourceAbbreviation}`
-
-| Business Product RG Examples | Business Product Resource Examples |
-|----------|----------|
-| `devtest-nursing-beacon-dev-100-rg` | `nursing-beacon-prod-100-appi` |
-| `production-nursing-beacon-prod-100-rg` | `nursing-beacon-prod-100-web` |
-|  | `nursing-beacon-prod-100-func` |
-|  | `nursingbeaconprod001st` |
-
-Platform hub and spoke resource groups and resources use `region` in slot 4. Business product resource groups and resources use `env` in slot 4; they do not include a platform region slot.
 
 The rows remain grouped by deployment domain. A shared or workload deployment can reference an existing management or network resource group; that reference does not move the deployment into another domain group.
 
@@ -74,9 +41,9 @@ The zero-trust hub network template is a work in progress: its private DNS zones
 
 | Bicep Template | Parameter File | Resource Group Example | Resource Type | Resource Name Example |
 |----------|----------|----------|----------|----------|
-| platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | spoke-network-dev-wus2-001-rg | VNet | spoke-network-dev-wus2-001-vnet |
-| platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | spoke-network-dev-wus2-001-rg | Subnet | spoke-network-hub-management-001-snet |
-| platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | spoke-network-dev-wus2-001-rg | Apps subnet (optional: `snetNameApps`/`snetCidrApps`; delegated to Microsoft.Web/serverFarms, Microsoft.Storage service endpoint) | spoke-network-apps-001-snet |
+| platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | network-dev-wus2-001-rg | VNet | network-dev-wus2-001-vnet |
+| platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | network-dev-wus2-001-rg | Subnet | network-hub-management-001-snet |
+| platform-spoke-network-publicroute.bicep | platform-spoke-network-publicroute-dev.bicepparam | network-dev-wus2-001-rg | Apps subnet (optional: `snetNameApps`/`snetCidrApps`; delegated to Microsoft.Web/serverFarms, Microsoft.Storage service endpoint) | network-apps-001-snet |
 | platform-shared-mgmt.bicep | platform-shared-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | Application Insights | spoke-management-dev-wus2-001-appi |
 | platform-shared-mgmt.bicep | platform-shared-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Configuration | spoke-management-dev-wus2-001-appcs |
 | platform-shared-mgmt.bicep | platform-shared-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | Key Vault | spoke-management-dev-001-kv |
@@ -119,7 +86,7 @@ One template serves modes 1-3. The mode and the component objects (web, api, sql
 | workload-digitalproduct.bicep | any of the above | any | devtest-nursing-beacon-dev-001-rg | Function App and Storage | nursing-beacon-dev-001-func |
 | workload-digitalproduct-zerotrust.bicep | workload-digitalproduct-zerotrust-dev.bicepparam | zerotrust | devtest-nursing-beacon-dev-001-rg | Private endpoints | nursing-beacon-dev-001-web-pe / -api-pe / -sql-pe |
 
-Shared and network modes reuse the plan and App Insights in `spoke-management-dev-wus2-001-rg`. Network mode also integrates the apps with a subnet in `spoke-network-dev-wus2-001-rg`.
+Shared and network modes reuse the plan and App Insights in `management-dev-wus2-001-rg`. Network mode also integrates the apps with a subnet in `network-dev-wus2-001-rg`.
 
 ## Workload User Machines
 
@@ -132,7 +99,7 @@ Machines for people (developer boxes, desktops, VDI-style VMs). This archetype i
 | workload-usermachines.bicep | workload-usermachines-network-dev.bicepparam | network | devtest-devboxes-dev-001-rg | VM, NIC (subnet in the spoke network RG) | devboxes-dev-vm01 / -nic |
 | workload-usermachines-zerotrust.bicep | workload-usermachines-zerotrust-dev.bicepparam | zerotrust | devtest-devboxes-dev-001-rg | VM (Trusted Launch, encryption at host, Entra login), NIC | devboxes-dev-vm01 / -nic |
 
-Network and zerotrust modes attach to a subnet in `spoke-network-dev-wus2-001-rg`. Zero trust never attaches a public IP; reach machines through Bastion.
+Network and zerotrust modes attach to a subnet in `network-dev-wus2-001-rg`. Zero trust never attaches a public IP; reach machines through Bastion.
 
 ## Public Endpoint Variant
 

@@ -13,7 +13,7 @@ var planSku = 'P1'
 var prefix = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}'
 var storagePrefix = toLower('${productIac}${environmentIac}${regionIac}${instanceIac}')
 var networkSubscriptionId = '00000000-0000-0000-0000-000000000000'
-var dnsResourceGroup = '${scopeOwner}-hub-network-${regionIac}-${instanceIac}-rg'
+var dnsResourceGroup = 'network-${regionIac}-${instanceIac}-rg'
 var dnsPrefix = '/subscriptions/${networkSubscriptionId}/resourceGroups/${dnsResourceGroup}/providers/Microsoft.Network/privateDnsZones'
 
 param location = 'westus2'
@@ -21,7 +21,7 @@ param environmentApp = 'Development'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 param shared = {
-  resourceGroupName: '${scopeOwner}-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
+  resourceGroupName: 'mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
 }
 
 param hosting = {
@@ -31,13 +31,13 @@ param hosting = {
 
 param vnet = {
   subscriptionId: networkSubscriptionId
-  resourceGroupName: 'spoke-network-${environmentIac}-${regionIac}-${instanceIac}-rg'
-  vnetName: 'spoke-${environmentIac}-${regionIac}-${instanceIac}-vnet'
-  subnetName: 'spoke-${environmentIac}-apps-snet'
+  resourceGroupName: 'network-${environmentIac}-${regionIac}-${instanceIac}-rg'
+  vnetName: 'network-${environmentIac}-${regionIac}-${instanceIac}-vnet'
+  subnetName: 'network-${environmentIac}-apps-snet'
 }
 
 param privateEndpoints = {
-  subnetName: 'spoke-${environmentIac}-pe-snet'
+  subnetName: 'network-${environmentIac}-pe-snet'
   dnsZones: {
     sites: '${dnsPrefix}/privatelink.azurewebsites.net'
     sql: '${dnsPrefix}/privatelink.database.windows.net'
