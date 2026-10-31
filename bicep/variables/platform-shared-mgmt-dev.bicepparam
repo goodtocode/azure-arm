@@ -1,9 +1,9 @@
-using '../templates/platform-mgmt.bicep'
+using '../templates/platform-shared-mgmt.bicep'
 
-// Phase 2: shared management for the production subscription. Public endpoints, no VNet.
-// RG: {product/purpose}-{env}-{region}-{instance}-rg, i.e. mgmt-prod-wus2-001-rg
+// Phase 2: shared management for the development subscription. Public endpoints, no VNet.
+// RG: {product/purpose}-{env}-{region}-{instance}-rg, i.e. mgmt-dev-wus2-001-rg
 var productIac = 'mgmt'
-var environmentIac = 'prod'
+var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
 var planSkuIac = 'B1'

@@ -18,7 +18,7 @@ param tags = {
 // Edge RG: {product/purpose}-{env}-{region}-{instance}-rg
 // rg: edge-plat-wus2-001-rg
 // =====================
-param afdName = '${tenantIac}-${productIac}-${environmentIac}-${instanceIac}-afd'
+param afdName = '${productIac}-${environmentIac}-${instanceIac}-afd'
 param afdSku = 'Premium_AzureFrontDoor'
 param wafMode = 'Prevention'
 param wafRateLimitThreshold = 0

@@ -27,50 +27,33 @@ The conventions align with the Azure Cloud Adoption Framework (CAF) and Enterpri
 
 ## Core Conventions
 
-Use five naming slots in order:
+Resource group and resource names use five slots, in order, joined by hyphens:
 
-| Slot | Purpose | Example | RG | Resources |
-| --- | --- | --- | --- | --- |
-| 1 | Scope Owner | platform, prod, devtest, shared, nursing, certification | Platform RG Slots Convention | Platform Resources Slots Convention |
-| 2 | Workload Scope | hub, spoke, education | `{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg` | `{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}` |
-| 3 | Service Domain / Product | connectivity, identity, management, security, beacon |  |  |
-| 4 | Region or Environment | Platform: region (westus2, eastus2); Business product: env (prod, dev) |  |  |
-| 5 | Instance | 100 |  |  |
+```text
+{product}-{env}-{region}-{instance}-{type}
+```
 
-### Platform Slots
+| Slot | Meaning | Values | Example |
+| --- | --- | --- | --- |
+| 1. `product` | The product or platform service the resource belongs to | `mgmt`, `ai`, `network`, `edge`, or the product name | `mgmt` |
+| 2. `env` | Environment | `dev`, `test`, `stage`, `prod`; `plat` for the platform subscription | `dev` |
+| 3. `region` | Short region code | `wus2`, `eus2` | `wus2` |
+| 4. `instance` | Three-digit instance number, constant within a repository | `100` | `100` |
+| 5. `type` | Short resource type abbreviation. Start from the CAF abbreviation and use a shorter one when it is clearer. `rg` for resource groups | `rg`, `vnet`, `snet`, `law`, `appi`, `kv`, `plan`, `aif` | `appi` |
 
-**Platform RG Slots Convention**
+Rules:
 
-`{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg`
+- There is no tenant, owner or scope prefix. `hub`, `spoke` and `shared` belong to template and variables file names, never to resource names. A hub network group is `network-plat-wus2-100-rg`; a spoke network group is `network-dev-wus2-100-rg`.
+- Names are built in the variables file from `productIac`, `environmentIac`, `regionIac` and `instanceIac`, and in pipelines from `PRODUCT`, `REGION` and `INSTANCE`.
+- Resource types with naming limits drop hyphens or a slot. Storage accounts and Fabric capacities join the slots without hyphens in lower case. Key Vault omits `region` to stay within 24 characters. Azure Front Door is global and omits `region`.
 
-**Platform Resources Slots Convention**
-
-`{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}`
-
-| Platform RG Examples | Platform Resource Examples |
+| Resource group | Resources |
 | --- | --- |
-| `platform-hub-connectivity-westus2-100-rg` | `hub-network-westus2-100-vnet` |
-| `platform-hub-identity-westus2-100-rg` | `hub-identity-westus2-100-rg` |
-| `devtest-spoke-network-westus2-100-rg` | `hub-vpngateway-westus2-100-pip` |
-| `production-spoke-network-westus2-100-rg` |  |
-
-### Business Product Slots
-
-**Business Product RG Slots Convention**
-
-`{scopeOwner}-{businessUnit/familyLine}-{product}-{env}-{instance}-rg`
-
-**Business Product Resources Slots Convention**
-
-`{businessUnit/familyLine}-{product}-{env}-{instance}-{resourceAbbreviation}`
-
-| Business Product RG Examples | Business Product Resource Examples |
-| --- | --- |
-| `devtest-nursing-beacon-dev-100-rg` | `nursing-beacon-prod-100-appi` |
-| `production-nursing-beacon-prod-100-rg` | `nursing-beacon-prod-100-web` |
-|  | `nursing-beacon-prod-100-func` |
-|  | `nursingbeaconprod001st` |
-
+| `mgmt-dev-wus2-100-rg` | `mgmt-dev-wus2-100-law`, `mgmt-dev-wus2-100-appi`, `mgmt-dev-100-kv` |
+| `network-plat-wus2-100-rg` | `network-plat-wus2-100-vnet` |
+| `ai-dev-wus2-100-rg` | `ai-dev-wus2-100-aif`, `ai-dev-wus2-100-proj` |
+| `edge-plat-wus2-100-rg` | `edge-plat-100-afd` |
+| `crucible-prod-wus2-100-rg` | `crucible-prod-wus2-100-web`, `crucible-prod-wus2-100-func` |
 ### Domain Resource Groups
 
 | Domain Resource Group | Usage |
@@ -220,7 +203,7 @@ platform-shared-ai-foundry
 platform-shared-ai-ollama
 platform-spoke-ai-foundry
 platform-spoke-ai-ollama
-platform-mgmt
+platform-shared-mgmt
 workload-digitalproduct
 workload-digitalproduct-zerotrust
 workload-usermachines
@@ -245,20 +228,7 @@ workload-usermachines-zerotrust-dev.bicepparam
 
 ## Resource Group Naming
 
-Use the suffix convention:
-
-```text
-{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg
-```
-
-Examples:
-
-```text
-platform-hub-connectivity-westus2-100-rg
-platform-hub-identity-westus2-100-rg
-devtest-spoke-network-westus2-100-rg
-production-nursing-beacon-prod-100-rg
-```
+Resource groups use the slot convention with the `rg` type: `{product}-{env}-{region}-{instance}-rg`, for example `mgmt-dev-wus2-100-rg` and `network-plat-wus2-100-rg`.
 
 The resource group is a lifecycle and ownership boundary. A shared workload may have product resources in its home resource group and consume platform resources from a separate management resource group. A standalone workload owns all resources in its home resource group.
 
@@ -295,10 +265,10 @@ A template must not disable public access without providing or requiring a suppo
 
 The repository currently applies restricted settings in these compositions:
 
-- `platform-spoke-ai-foundry`: public access disabled, network default action denied, local authentication disabled, private endpoint required, and Private DNS zone required.
-- `platform-spoke-ai-ollama`: VNet-integrated Container Apps environment and internal ingress.
-- `platform-mgmt`: restricted Application Insights, Key Vault subnet rules, and disabled App Configuration public access/local authentication.
-- `platform-hub-mgmt`: restricted Application Insights and optional Key Vault subnet rules.
+- `ai-foundry`: public access disabled, network default action denied, local authentication disabled, private endpoint required, and Private DNS zone required.
+- `ai-ollama`: VNet-integrated Container Apps environment and internal ingress.
+- `platform-shared-mgmt`: restricted Application Insights, Key Vault subnet rules, and disabled App Configuration public access/local authentication.
+- `mgmt`: restricted Application Insights and optional Key Vault subnet rules.
 - `workload-digitalproduct` in network mode: Function App storage restricted to the integration subnet (default action `Deny`).
 - `workload-digitalproduct-zerotrust`: public access disabled on apps, SQL, and Function storage, with private endpoints and Private DNS records for each.
 - `workload-usermachines` in network mode: no public IP is ever attached; machines join an existing subnet whose NSG is owned by the platform.

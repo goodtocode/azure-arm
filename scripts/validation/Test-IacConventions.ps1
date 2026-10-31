@@ -1,20 +1,26 @@
-# ============================================================================
-# Script Name:   Test-IacConventions.ps1
-# Description:   Enforces the repo slot system and compiles every template
-#                and parameter file. Exits 1 on any violation.
-# -----------------------------------------------------------------------------
-# Slots (see README "Slot system"):
-#   Template  : workload-{archetype}[-zerotrust].bicep
-#               platform-[(hub|spoke|shared)-]{capability}[-{variant}].bicep
-#   Variables : workload-{archetype}-{mode}-{env}.bicepparam
-#               platform-{template slots}-{env}.bicepparam
-#   mode      : standalone | shared | network | zerotrust
-#   env       : dev | test | stage | prod      (platform also allows plat)
-# -----------------------------------------------------------------------------
-# Example:
-#   pwsh -File ./scripts/validation/Test-IacConventions.ps1
-#   pwsh -File ./scripts/validation/Test-IacConventions.ps1 -SkipCompile
-# ============================================================================
+<#
+.SYNOPSIS
+Enforces the repo slot system and compiles every template and parameter file.
+
+.DESCRIPTION
+Exits 1 on any violation.
+
+Slots (see README "Slot system"):
+  Template  : workload-{archetype}[-zerotrust].bicep
+              platform-(hub|spoke|shared)-{capability}[-{variant}].bicep
+  Variables : workload-{archetype}-{mode}-{env}.bicepparam
+              platform-{template slots}-{env}.bicepparam
+  mode      : standalone | shared | network | zerotrust
+  env       : dev | test | stage | prod      (platform also allows plat)
+
+.EXAMPLE
+# Single line, safe to paste:
+pwsh -File ./scripts/validation/Test-IacConventions.ps1
+
+.EXAMPLE
+# Single line, safe to paste:
+pwsh -File ./scripts/validation/Test-IacConventions.ps1 -SkipCompile
+#>
 [CmdletBinding()]
 param(
     [string]$BicepRoot = (Join-Path $PSScriptRoot '../../bicep'),
@@ -51,8 +57,8 @@ foreach ($t in $templates) {
         }
     }
     elseif ($base -match '^platform-') {
-        if ($base -notmatch '^platform-((hub|spoke|shared)-)?[a-z0-9]+(-[a-z0-9]+)*$') {
-            Add-Violation "Template '$($t.Name)' must match platform-[(hub|spoke|shared)-]{capability}[-{variant}].bicep"
+        if ($base -notmatch '^platform-(hub|spoke|shared)-[a-z0-9]+(-[a-z0-9]+)*$') {
+            Add-Violation "Template '$($t.Name)' must match platform-(hub|spoke|shared)-{capability}[-{variant}].bicep"
         }
     }
     else {

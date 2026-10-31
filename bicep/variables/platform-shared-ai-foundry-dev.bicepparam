@@ -4,7 +4,7 @@ using '../templates/platform-shared-ai-foundry.bicep'
 // Common
 // =====================
 var scopeOwner = 'ScopeOrTenant'
-var productIac = 'spoke-ai'
+var productIac = 'ai'
 var environmentIac = 'dev'
 var regionIac = 'wus'
 var instanceIac = '100'
@@ -17,7 +17,7 @@ param tags = {
 }
 
 // =====================
-// Platform Spoke AI RG: ${scopeOwner}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// Platform Spoke AI RG: ${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
 // =====================
 param foundryName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif'
 param projectName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-proj'
@@ -26,26 +26,28 @@ param projectDescription = 'Development spoke AI project.'
 // Required model deployments for Azure AI Foundry.
 param modelDeployments = [
   {
-    deploymentName: 'openai-chat'
-    modelName: 'gpt-5.4'
-    modelFormat: 'OpenAI'
-    modelVersion: '2026-03-05'
+    deploymentName: 'ms-thinking'
+    modelName: 'MAI-Thinking-1'
+    modelFormat: 'Microsoft'
+    modelVersion: '2026-06-01'
     skuName: 'GlobalStandard'
     tokensPerMinute: 20000
   }
   {
-    deploymentName: 'openai-fast'
-    modelName: 'gpt-4.1-mini'
-    modelFormat: 'OpenAI'
-    modelVersion: '2025-04-14'
+    deploymentName: 'ms-fast'
+    modelName: 'Phi-4-mini-instruct'
+    modelFormat: 'Microsoft'
+    modelVersion: '1'
     skuName: 'GlobalStandard'
     tokensPerMinute: 20000
   }
   {
     deploymentName: 'embedding-fast'
-    modelName: 'text-embedding-3-small'
-    modelFormat: 'OpenAI'
+    modelName: 'Cohere-embed-v3-multilingual'
+    modelFormat: 'Cohere'
+    modelVersion: '1'
     skuName: 'GlobalStandard'
+    capacity: 1
     tokensPerMinute: 20000
   }
   {

@@ -127,8 +127,8 @@
         }
     },
     "variables": {
-        "SpokePeerHubName": "[concat(parameters('SpokeVnetName'), '-peer-to-hub')]",
-        "HubPeerSpokeName": "[concat(parameters('HubVnetName'), '-peer-to-spoke')]",
+        "SpokePeerHubName": "[concat(parameters('SpokeVnetName'), 'network-peer-to-hub')]",
+        "HubPeerSpokeName": "[concat(parameters('HubVnetName'), 'hub-peer-to-spoke')]",
         "CurrentSubscription": "[subscription().subscriptionId]",
         "CurrentResourceGroup": "[resourceGroup().name]"
     },

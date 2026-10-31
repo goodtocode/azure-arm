@@ -21,27 +21,61 @@ param projectName string
 param projectDescription string = 'Spoke Azure AI Foundry project.'
 
 type FoundryModelName =
-  | 'claude-opus'
-  | 'claude-sonnet'
+  | 'claude-opus-5-5'
+  | 'claude-sonnet-5-5'
+  | 'gpt-chat-latest'
+  | 'gpt-6.1-sol'
+  | 'gpt-6.1-terra'
+  | 'gpt-6-astra'
+  | 'gpt-6-luna'
+  | 'gpt-6-sol'
+  | 'gpt-5.6-sol'
+  | 'gpt-5.6-terra'
+  | 'gpt-5.6-luna'
+  | 'gpt-5.5'
   | 'gpt-5.4'
-  | 'gpt-5.3-chat'
+  | 'gpt-5.4-pro'
+  | 'gpt-5.4-mini'
+  | 'gpt-5.4-nano'
   | 'gpt-5.3-codex'
   | 'gpt-4.1'
   | 'gpt-4.1-mini'
+  | 'gpt-4.1-nano'
   | 'text-embedding-3-small'
+  | 'text-embedding-3-large'
+  | 'Cohere-embed-v3-english'
+  | 'Cohere-embed-v3-multilingual'
   | 'Phi-4'
-  | 'MAI-Image-2'
+  | 'Phi-4-mini-instruct'
+  | 'Phi-4-multimodal-instruct'
+  | 'Phi-4-reasoning'
+  | 'Phi-4-mini-reasoning'
+  | 'MAI-Thinking-1'
+  | 'MAI-Image-2.6'
+  | 'MAI-Image-2.6-Flash'
   | 'MAI-Image-2.5'
   | 'MAI-Image-2.5-Flash'
   | 'MAI-Image-2.5-Pro'
   | 'MAI-Image-2e'
+  | 'mai-code-1.1-flash'
+
+type FoundryModelProviderData = {
+  organizationName: string
+  countryCode: string
+  industry: 'technology' | 'finance' | 'healthcare' | 'education' | 'retail' | 'manufacturing' | 'government' | 'media' | 'other'
+}
 
 type FoundryDeploymentConfig = {
   deploymentName: string
   modelName: FoundryModelName
-  modelFormat: 'OpenAI' | 'Microsoft'
+  modelFormat: 'OpenAI' | 'Microsoft' | 'Anthropic' | 'Cohere'
   modelVersion: string?
+  modelProviderData: FoundryModelProviderData?
+  raiPolicyName: string?
   skuName: 'Standard' | 'GlobalStandard'
+  @description('Optional fixed deployment capacity that overrides the tokensPerMinute conversion, for models capped at a small capacity such as Cohere.')
+  @minValue(1)
+  capacity: int?
   @minValue(1000)
   tokensPerMinute: int
 }
