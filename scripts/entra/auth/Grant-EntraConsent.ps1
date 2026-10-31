@@ -189,9 +189,9 @@ if ($AutoConsent) {
     Grant-DelegatedConsent -ServicePrincipalId $apiSp.Id -ResourceSpId $msGraphSp.Id `
         -Scopes @("User.Read")
 
-    # E2E — application role assignment already handled by New-EntraE2EApp.ps1
+    # E2E — application role assignment already handled by New-EntraAppRegistration.ps1 (-Type E2E)
     if ($e2eSp) {
-        Write-Host "  E2E app role assignments are managed by New-EntraE2EApp.ps1 (Asset.Automation)."
+        Write-Host "  E2E app role assignments are managed by New-EntraAppRegistration.ps1 (-Type E2E) (Asset.Automation)."
     }
 
     Write-Host "Programmatic admin consent complete." -ForegroundColor Green
