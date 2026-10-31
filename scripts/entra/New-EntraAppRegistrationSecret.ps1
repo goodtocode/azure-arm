@@ -75,7 +75,10 @@ if (-not $app) {
 
 # Create password credential object for secret expiration
 $endDate = (Get-Date).AddMonths($SecretMonths)
-$passwordCredential = @{ EndDateTime = $endDate }
+$projectLeaf = if ([string]::IsNullOrWhiteSpace($DotnetProjectPath)) { 'no-project' } else { Split-Path $DotnetProjectPath.TrimEnd('\', '/') -Leaf }
+if ($projectLeaf -like '*.csproj') { $projectLeaf = [IO.Path]::GetFileNameWithoutExtension($projectLeaf) }
+$secretDescription = "$AppRegistrationName | $projectLeaf | created $((Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm'))Z by $([Environment]::UserName)@$([Environment]::MachineName)"
+$passwordCredential = @{ DisplayName = $secretDescription; EndDateTime = $endDate }
 $secretObj = Add-MgApplicationPassword -ApplicationId $app.Id -PasswordCredential $passwordCredential
 if (-not $secretObj -or -not $secretObj.SecretText) {
     Write-Error "FATAL: Failed to create client secret."
@@ -84,15 +87,17 @@ if (-not $secretObj -or -not $secretObj.SecretText) {
 $secret = $secretObj.SecretText
 Write-Host "Created new client secret for app registration '$AppRegistrationName'."
 
-# Set secret in dotnet user-secrets if project path exists
-if (Test-Path $DotnetProjectPath) {
+# Set secret in dotnet user-secrets if the project exists; otherwise show it, because it cannot be retrieved later
+$secretStored = $false
+if (-not [string]::IsNullOrWhiteSpace($DotnetProjectPath) -and (Test-Path $DotnetProjectPath)) {
     Write-Host "Setting EntraExternalId:ClientSecret in dotnet user-secrets for $DotnetProjectPath"
-    Push-Location $DotnetProjectPath
-    dotnet user-secrets init
-    dotnet user-secrets set "EntraExternalId:ClientSecret" $secret
-    Pop-Location
+    dotnet user-secrets init --project "$DotnetProjectPath"
+    dotnet user-secrets set "EntraExternalId:ClientSecret" $secret --project "$DotnetProjectPath"
+    $secretStored = ($LASTEXITCODE -eq 0)
+}
+if ($secretStored) {
     Write-Host "Secret set in dotnet user-secrets."
 } else {
-    Write-Warning "*** CRITICAL: Project path '$DotnetProjectPath' not found. Skipping dotnet user-secrets. Secret was created in Entra ID. ***"
+    Write-Warning "*** CRITICAL: Could not set dotnet user-secrets for '$DotnetProjectPath'. The secret was created in Entra ID and is shown only once below. Copy it now. ***"
+    Write-Host "EntraExternalId:ClientSecret = $secret" -ForegroundColor Yellow
 }
-

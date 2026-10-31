@@ -132,12 +132,21 @@ function Wait-ForApplicationPropagation {
     return $app
 }
 
+function Show-UnstoredSecrets {
+    param([hashtable]$Secrets)
+    foreach ($key in $Secrets.Keys) {
+        if ($key -match 'Secret|Password' -and -not [string]::IsNullOrWhiteSpace([string]$Secrets[$key])) {
+            Write-Host "  $key = $($Secrets[$key])" -ForegroundColor Yellow
+        }
+    }
+}
 function Set-ProjectUserSecrets {
     param([string]$ProjectPath, [hashtable]$Secrets)
-    if ([string]::IsNullOrWhiteSpace($ProjectPath)) { return }
+    if ([string]::IsNullOrWhiteSpace($ProjectPath)) { Show-UnstoredSecrets -Secrets $Secrets; return }
     $resolvedPath = Resolve-Path -Path $ProjectPath -ErrorAction SilentlyContinue
     if (-not $resolvedPath) {
-        Write-Warning "*** Project path '$ProjectPath' not found. Skipping dotnet user-secrets. ***"
+        Write-Warning "*** Project path '$ProjectPath' not found. Skipping dotnet user-secrets. Secrets below are shown only once; copy them now. ***"
+        Show-UnstoredSecrets -Secrets $Secrets
         return
     }
 
@@ -152,7 +161,8 @@ function Set-ProjectUserSecrets {
     }
 
     if (-not $projectFile) {
-        Write-Warning "*** No .csproj found at '$targetPath'. Skipping dotnet user-secrets. ***"
+        Write-Warning "*** No .csproj found at '$targetPath'. Skipping dotnet user-secrets. Secrets below are shown only once; copy them now. ***"
+        Show-UnstoredSecrets -Secrets $Secrets
         return
     }
 

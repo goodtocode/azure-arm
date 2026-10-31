@@ -198,7 +198,10 @@ function New-WebRegistration {
 		Write-Host "Added Asset.Admin app role to Web app registration."
 
 		try {
-			$passwordCredential = @{ EndDateTime = (Get-Date).AddYears(2) }
+			$webProjectLeaf = if ([string]::IsNullOrWhiteSpace($WebProjectPath)) { 'no-project' } else { Split-Path $WebProjectPath.TrimEnd('\', '/') -Leaf }
+			if ($webProjectLeaf -like '*.csproj') { $webProjectLeaf = [IO.Path]::GetFileNameWithoutExtension($webProjectLeaf) }
+		$secretDescription = "$WebAppRegistrationName | $webProjectLeaf | created $((Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm'))Z by $([Environment]::UserName)@$([Environment]::MachineName)"
+		$passwordCredential = @{ DisplayName = $secretDescription; EndDateTime = (Get-Date).AddYears(2) }
 			$webSecretObj = Add-MgApplicationPassword -ApplicationId $webApp.Id -PasswordCredential $passwordCredential
 		}
 		catch {
@@ -379,6 +382,14 @@ function Install-Prerequisites {
 	Import-Module Microsoft.Graph.Applications -ErrorAction Stop
 }
 
+function Show-UnstoredSecrets {
+	param([hashtable]$Secrets)
+	foreach ($key in $Secrets.Keys) {
+		if ($key -match 'Secret|Password' -and -not [string]::IsNullOrWhiteSpace([string]$Secrets[$key])) {
+			Write-Host "  $key = $($Secrets[$key])" -ForegroundColor Yellow
+		}
+	}
+}
 function Set-ProjectUserSecrets {
 	param(
 		[string]$ProjectPath,
@@ -394,7 +405,8 @@ function Set-ProjectUserSecrets {
 		Pop-Location
 	}
 	else {
-		Write-Warning "*** CRITICAL: Project path '$ProjectPath' not found. Skipping dotnet user-secrets. App registrations will continue, but user-secrets are NOT set. ***"
+		Write-Warning "*** CRITICAL: Project path '$ProjectPath' not found. Skipping dotnet user-secrets. App registrations will continue, but user-secrets are NOT set. Secrets below are shown only once; copy them now. ***"
+		Show-UnstoredSecrets -Secrets $Secrets
 	}
 }
 
