@@ -1,15 +1,16 @@
 
-# ============================================================================
-# Script Name:   New-EntraAppRegistrationSecret.ps1
-# Description:   Creates a new client secret for an existing Entra External ID App Registration and sets it in dotnet user-secrets for a project.
-# -----------------------------------------------------------------------------
-# Example CLI Usage:
-#   pwsh -File ./New-EntraAppRegistrationSecret.ps1 -TenantId "<your-tenant-id>" -AppRegistrationName "<app-registration-name>" -DotnetProjectPath "<path-to-project>"
-# -----------------------------------------------------------------------------
-# Notes:
-#   - Requires PowerShell modules: Az.Accounts, Microsoft.Graph.Applications
-#   - Ensure you are authenticated: Connect-AzAccount and Connect-MgGraph
-# ============================================================================
+<#
+.SYNOPSIS
+Creates a new client secret for an existing Entra External ID App Registration and sets it in dotnet user-secrets for a project.
+
+.EXAMPLE
+# Single line, safe to paste:
+pwsh -File ./New-EntraAppRegistrationSecret.ps1 -TenantId "<your-tenant-id>" -AppRegistrationName "<app-registration-name>" -DotnetProjectPath "<path-to-project>"
+
+.NOTES
+- Requires PowerShell modules: Az.Accounts, Microsoft.Graph.Applications
+- Ensure you are authenticated: Connect-AzAccount and Connect-MgGraph
+#>
 param(
     [string]$TenantId,
     [string]$AppRegistrationName,

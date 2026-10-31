@@ -1,29 +1,21 @@
-# ============================================================================
-# Script Name:   Set-EntraKeyVaultUserSecrets.ps1
-# Description:   Copies .NET user-secrets from API and Web projects to Azure Key Vault, prefixing secrets with product and project names.
-# -----------------------------------------------------------------------------
-# Example CLI Usage:
-#   # Minimal example (uses defaults for project paths, project names, and dotnet version):
-#   pwsh -File ./Set-EntraKeyVaultUserSecrets.ps1  -TenantId "<tenant-id>" -SubscriptionId "<subscription-id>" -KeyVaultName "my-kv" -ProductName "studio"
-#
-#   # Full example:
-#   pwsh -File ./Set-EntraKeyVaultUserSecrets.ps1 `
-#       -ApiProjectPath "../../src/Presentation.WebApi" `
-#       -WebProjectPath "../../src/Presentation.Blazor" `
-#       -KeyVaultName "my-keyvault-name" `
-#       -TenantId "<tenant-id>" `
-#       -ProductName "studio" `
-#       -ApiProjectName "Api" `
-#       -WebProjectName "Web" `
-#       -DotNetVersion "10" `
-#       -SubscriptionId "<subscription-id>"
-# -----------------------------------------------------------------------------
-# Notes:
-#   - Requires Azure CLI and .NET SDK installed.
-#   - Authenticates to the Key Vault tenant only.
-#   - Idempotent: existing secrets in Key Vault will be overwritten with latest values.
-#   - Key Vault secret names will be prefixed as: <ProductName><ProjectName>-<UserSecretKey>
-# ============================================================================
+<#
+.SYNOPSIS
+Copies .NET user-secrets from API and Web projects to Azure Key Vault, prefixing secrets with product and project names.
+
+.EXAMPLE
+# Minimal example (uses defaults for project paths, project names, and dotnet version):
+pwsh -File ./Set-EntraKeyVaultUserSecrets.ps1  -TenantId "<tenant-id>" -SubscriptionId "<subscription-id>" -KeyVaultName "my-kv" -ProductName "studio"
+
+.EXAMPLE
+# Full example:
+pwsh -File ./Set-EntraKeyVaultUserSecrets.ps1 -ApiProjectPath "../../src/Presentation.WebApi" -WebProjectPath "../../src/Presentation.Blazor" -KeyVaultName "my-keyvault-name" -TenantId "<tenant-id>" -ProductName "studio" -ApiProjectName "Api" -WebProjectName "Web" -DotNetVersion "10" -SubscriptionId "<subscription-id>"
+
+.NOTES
+- Requires Azure CLI and .NET SDK installed.
+- Authenticates to the Key Vault tenant only.
+- Idempotent: existing secrets in Key Vault will be overwritten with latest values.
+- Key Vault secret names will be prefixed as: <ProductName><ProjectName>-<UserSecretKey>
+#>
 param(
     [Parameter(Mandatory)][string]$TenantId,       
     [Parameter(Mandatory)][string]$SubscriptionId,

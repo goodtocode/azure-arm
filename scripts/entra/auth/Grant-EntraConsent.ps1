@@ -1,45 +1,38 @@
-# ============================================================================
-# Script Name:   Grant-EntraConsent.ps1
-# Description:   Centralized admin consent for Entra App Registrations.
-#                Prints portal URLs for manual consent (default) or attempts
-#                programmatic grant when -AutoConsent is specified.
-#                Designed to be called after all app registrations are created.
-# -----------------------------------------------------------------------------
-# Why centralized?
-#   Admin consent is environment-dependent, often delayed, and sometimes
-#   automated. Isolating it here prevents duplication and enables deferred
-#   or automated grant without touching registration scripts.
-# -----------------------------------------------------------------------------
-# Example CLI Usage (standalone):
-#   pwsh -File ./Grant-EntraConsent.ps1 `
-#       -TenantId "<your-tenant-id>" `
-#       -ApiAppId "<api-app-client-id>" `
-#       -WebAppId "<web-app-client-id>"
-#
+<#
+.SYNOPSIS
+Centralized admin consent for Entra App Registrations.
+
+.DESCRIPTION
+Prints portal URLs for manual consent (default) or attempts programmatic grant when -AutoConsent is specified. Designed to be called after all app registrations are created.
+
+Why centralized?
+  Admin consent is environment-dependent, often delayed, and sometimes
+  automated. Isolating it here prevents duplication and enables deferred
+  or automated grant without touching registration scripts.
+
+.EXAMPLE
+# Standalone:
+pwsh -File ./Grant-EntraConsent.ps1 -TenantId "<your-tenant-id>" -ApiAppId "<api-app-client-id>" -WebAppId "<web-app-client-id>"
+
+.EXAMPLE
 # With E2E:
-#   pwsh -File ./Grant-EntraConsent.ps1 `
-#       -TenantId "<your-tenant-id>" `
-#       -ApiAppId "<api-app-client-id>" `
-#       -WebAppId "<web-app-client-id>" `
-#       -E2EAppId "<e2e-app-client-id>"
-#
+pwsh -File ./Grant-EntraConsent.ps1 -TenantId "<your-tenant-id>" -ApiAppId "<api-app-client-id>" -WebAppId "<web-app-client-id>" -E2EAppId "<e2e-app-client-id>"
+
+.EXAMPLE
 # Programmatic grant (requires AppRoleAssignment.ReadWrite.All):
-#   pwsh -File ./Grant-EntraConsent.ps1 `
-#       -TenantId "<your-tenant-id>" `
-#       -ApiAppId "<api-app-client-id>" `
-#       -WebAppId "<web-app-client-id>" `
-#       -AutoConsent
-# -----------------------------------------------------------------------------
-# Example (called from orchestrator):
-#   $consentApps = @($api, $web)
-#   if ($IncludeE2E) { $consentApps += $e2e }
-#   & "$PSScriptRoot\auth\Grant-EntraConsent.ps1" `
-#       -TenantId $TenantId `
-#       -ApiAppId $api.AppId `
-#       -WebAppId $web.AppId `
-#       -E2EAppId ($e2e ? $e2e.AppId : $null) `
-#       -AutoConsent:$AutoConsent
-# ============================================================================
+pwsh -File ./Grant-EntraConsent.ps1 -TenantId "<your-tenant-id>" -ApiAppId "<api-app-client-id>" -WebAppId "<web-app-client-id>" -AutoConsent
+
+.NOTES
+Example (called from orchestrator):
+  $consentApps = @($api, $web)
+  if ($IncludeE2E) { $consentApps += $e2e }
+  & "$PSScriptRoot\auth\Grant-EntraConsent.ps1" `
+      -TenantId $TenantId `
+      -ApiAppId $api.AppId `
+      -WebAppId $web.AppId `
+      -E2EAppId ($e2e ? $e2e.AppId : $null) `
+      -AutoConsent:$AutoConsent
+#>
 param(
     [Parameter(Mandatory)][string]$TenantId,
     [Parameter(Mandatory)][string]$ApiAppId,

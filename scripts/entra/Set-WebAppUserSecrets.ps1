@@ -1,22 +1,16 @@
-# ============================================================================
-# Script Name:   Set-WebAppUserSecrets.ps1
-# Description:   Reads an existing Web App Registration and sets .NET user-secrets.
-# -----------------------------------------------------------------------------
-# Example CLI Usage:
-#   pwsh -File ./Set-WebAppUserSecrets.ps1 `
-#       -TenantId "<your-tenant-id>" `
-#       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -ApiClientId "<api-app-client-id>" `
-#       -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" `
-#       -ResetUserFlowName "" `
-#       -WebClientSecret "<web-app-client-secret>" `
-#       -WebProjectPath "../../src/Presentation.Web"
-# -----------------------------------------------------------------------------
-# Notes:
-#   - Requires Azure PowerShell modules (Az.Accounts, Microsoft.Graph.Applications)
-#   - Ensure you are authenticated: Connect-AzAccount
-#   - This script does NOT create or modify app registrations.
-# ============================================================================
+<#
+.SYNOPSIS
+Reads an existing Web App Registration and sets .NET user-secrets.
+
+.EXAMPLE
+# Single line, safe to paste:
+pwsh -File ./Set-WebAppUserSecrets.ps1 -TenantId "<your-tenant-id>" -WebAppRegistrationName "myproduct-web-dev-001" -ApiClientId "<api-app-client-id>" -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" -ResetUserFlowName "" -WebClientSecret "<web-app-client-secret>" -WebProjectPath "../../src/Presentation.Web"
+
+.NOTES
+- Requires Azure PowerShell modules (Az.Accounts, Microsoft.Graph.Applications)
+- Ensure you are authenticated: Connect-AzAccount
+- This script does NOT create or modify app registrations.
+#>
 
 param(
     [string]$TenantId,

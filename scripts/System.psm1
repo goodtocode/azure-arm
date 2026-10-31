@@ -1,9 +1,15 @@
-#-----------------------------------------------------------------------
-# Add-Prefix [-String [<String>]]
-#
-# Example: .\Add-Prefix -String ello -Add H
-#	Result: Hello
-#-----------------------------------------------------------------------
+<#
+.SYNOPSIS
+Adds a prefix to a string.
+
+.DESCRIPTION
+Syntax: Add-Prefix [-String [<String>]]
+
+.EXAMPLE
+# Add a prefix to a string:
+# Result: Hello
+.\Add-Prefix -String ello -Add H
+#>
 function Add-Prefix
 {
 	param (

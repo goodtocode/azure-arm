@@ -1,42 +1,37 @@
-# ============================================================================
-# Script Name:   New-EntraWebApp.ps1
-# Description:   Creates or updates the Entra App Registration for a Web App
-#                (interactive user sign-in). Configures Auth Code + PKCE flow,
-#                Microsoft Graph delegated permissions, and API scopes from the
-#                resource server. Client secret created only when -GenerateSecrets
-#                is specified. Optionally writes .NET user-secrets.
-# -----------------------------------------------------------------------------
-# OAuth Role:    Delegated — human, interactive user (Auth Code + PKCE).
-# Microsoft.Identity.Web defaults: implicit grant OFF, PKCE ON.
-# -----------------------------------------------------------------------------
-# Example CLI Usage (standalone):
-#   pwsh -File ./New-EntraWebApp.ps1 `
-#       -EntraInstanceUrl "https://your-tenant.ciamlogin.com" `
-#       -TenantId "<your-tenant-id>" `
-#       -AppRegistrationName "myproduct-web-dev-001" `
-#       -ApiAppId "<api-app-client-id>" `
-#       -ProjectPath "../../src/Presentation.Blazor" `
-#       -GenerateSecrets
-#
-# Example (called from orchestrator — prereqs/auth already established):
-#   $web = & "$PSScriptRoot\auth\New-EntraWebApp.ps1" `
-#       -EntraInstanceUrl $EntraInstanceUrl -TenantId $TenantId `
-#       -AppRegistrationName $WebAppRegistrationName `
-#       -ApiAppId $api.AppId `
-#       -ProjectPath $WebProjectPath `
-#       -GenerateSecrets:$GenerateSecrets
-# -----------------------------------------------------------------------------
-# Returns:
-#   [PSCustomObject] @{
-#       AppId              = <string>
-#       ObjectId           = <string>
-#       ServicePrincipalId = <string>
-#       Type               = "Web"
-#       Created            = <bool>
-#       Capabilities       = @("delegated")
-#       Secret             = <string|$null>   # $null unless -GenerateSecrets
-#   }
-# ============================================================================
+<#
+.SYNOPSIS
+Creates or updates the Entra App Registration for a Web App (interactive user sign-in).
+
+.DESCRIPTION
+Configures Auth Code + PKCE flow, Microsoft Graph delegated permissions, and API scopes from the resource server. Client secret created only when -GenerateSecrets is specified. Optionally writes .NET user-secrets.
+
+OAuth Role:    Delegated — human, interactive user (Auth Code + PKCE).
+Microsoft.Identity.Web defaults: implicit grant OFF, PKCE ON.
+
+.EXAMPLE
+# Standalone:
+pwsh -File ./New-EntraWebApp.ps1 -EntraInstanceUrl "https://your-tenant.ciamlogin.com" -TenantId "<your-tenant-id>" -AppRegistrationName "myproduct-web-dev-001" -ApiAppId "<api-app-client-id>" -ProjectPath "../../src/Presentation.Blazor" -GenerateSecrets
+
+.OUTPUTS
+[PSCustomObject] @{
+    AppId              = <string>
+    ObjectId           = <string>
+    ServicePrincipalId = <string>
+    Type               = "Web"
+    Created            = <bool>
+    Capabilities       = @("delegated")
+    Secret             = <string|$null>   # $null unless -GenerateSecrets
+}
+
+.NOTES
+Example (called from orchestrator — prereqs/auth already established):
+  $web = & "$PSScriptRoot\auth\New-EntraWebApp.ps1" `
+      -EntraInstanceUrl $EntraInstanceUrl -TenantId $TenantId `
+      -AppRegistrationName $WebAppRegistrationName `
+      -ApiAppId $api.AppId `
+      -ProjectPath $WebProjectPath `
+      -GenerateSecrets:$GenerateSecrets
+#>
 param(
     [Parameter(Mandatory)][string]$EntraInstanceUrl,
     [Parameter(Mandatory)][string]$TenantId,

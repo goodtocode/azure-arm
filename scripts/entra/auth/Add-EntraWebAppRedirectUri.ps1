@@ -1,14 +1,14 @@
-# ============================================================================
-# Script Name:   Add-EntraWebAppRedirectUri.ps1
-# Description:   Idempotently adds a redirect URI to an existing Entra Web
-#                App Registration. Does nothing if the URI is already present.
-# -----------------------------------------------------------------------------
-# Example:
-#   pwsh -File ./Add-EntraWebAppRedirectUri.ps1 `
-#       -TenantId "<your-tenant-id>" `
-#       -AppRegistrationName "myproduct-web-dev-001" `
-#       -RedirectUri "https://localhost:5001/signin-oidc"
-# ============================================================================
+<#
+.SYNOPSIS
+Idempotently adds a redirect URI to an existing Entra Web App Registration.
+
+.DESCRIPTION
+Does nothing if the URI is already present.
+
+.EXAMPLE
+# Single line, safe to paste:
+pwsh -File ./Add-EntraWebAppRedirectUri.ps1 -TenantId "<your-tenant-id>" -AppRegistrationName "myproduct-web-dev-001" -RedirectUri "https://localhost:5001/signin-oidc"
+#>
 param(
     [Parameter(Mandatory)][string]$TenantId,
     [Parameter(Mandatory)][string]$AppRegistrationName,

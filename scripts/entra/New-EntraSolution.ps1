@@ -1,69 +1,39 @@
-# ============================================================================
-# Script Name:   New-EntraSolution.ps1
-# Description:   Orchestrator — sets up Entra App Registrations for a .NET
-#                solution with 1-3 projects: API (resource server), Web App
-#                (interactive user auth), and optional E2E / CI automation.
-# -----------------------------------------------------------------------------
-# Personas:
-#   API  → Resource server: validates bearer tokens (no interactive sign-in)
-#   Web  → Auth Code + PKCE: interactive human sign-in (Microsoft.Identity.Web)
-#   E2E  → Client Credentials: machine/CI identity (opt-in via -IncludeE2E)
-# -----------------------------------------------------------------------------
-# Example — API only (minimal):
-#   pwsh -File ./New-EntraSolution.ps1 `
-#       -EntraInstanceUrl "https://your-tenant.ciamlogin.com" `
-#       -TenantId "<tenant-id>" `
-#       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -ApiProjectPath "../../../src/Presentation.WebApi"
-#
-# Example — API + Web (standard):
-#   pwsh -File ./New-EntraSolution.ps1 `
-#       -EntraInstanceUrl "https://your-tenant.ciamlogin.com" `
-#       -TenantId "<tenant-id>" `
-#       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -ApiProjectPath "../../../src/Presentation.WebApi" `
-#       -WebProjectPath "../../../src/Presentation.Blazor" `
-#       -GenerateSecrets
-#
-# Example — rerun idempotently after interruption (no secret duplication):
-#   pwsh -File ./New-EntraSolution.ps1 `
-#       -EntraInstanceUrl "https://your-tenant.ciamlogin.com" `
-#       -TenantId "<tenant-id>" `
-#       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -IncludeE2E -E2EAppRegistrationName "myproduct-e2e-dev-001" `
-#       -GenerateSecrets
-#
-# Example — intentional secret rotation on existing apps:
-#   pwsh -File ./New-EntraSolution.ps1 `
-#       -EntraInstanceUrl "https://your-tenant.ciamlogin.com" `
-#       -TenantId "<tenant-id>" `
-#       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -IncludeE2E -E2EAppRegistrationName "myproduct-e2e-dev-001" `
-#       -GenerateSecrets -RotateSecrets
-#
-# Example — API + Web + E2E (full, with auto-consent):
-#   pwsh -File ./New-EntraSolution.ps1 `
-#       -EntraInstanceUrl "https://your-tenant.ciamlogin.com" `
-#       -TenantId "<tenant-id>" `
-#       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -E2EAppRegistrationName "myproduct-e2e-dev-001" `
-#       -ApiProjectPath "../../../src/Presentation.Api" `
-#       -WebProjectPath "../../../src/Presentation.Web" `
-#       -E2EProjectPath "../../../src/Tests.Endtoend" `
-#       -WebRedirectUri "https://localhost:7175/signin-oidc" `
-#       -WebLogoutUri "https://localhost:7175/signout-callback-oidc" `
-#       -IncludeE2E -GenerateSecrets -RotateSecrets -AutoConsent
-# -----------------------------------------------------------------------------
-# Notes:
-#   - Requires Az.Accounts, Az.Resources, Microsoft.Graph.Applications
-#   - Each child script is idempotent and can also be run independently
-#   - Secrets are never generated unless -GenerateSecrets is specified
-#   - E2E registration is never created unless -IncludeE2E is specified
-# ============================================================================
+<#
+.SYNOPSIS
+Orchestrator — sets up Entra App Registrations for a .NET solution with 1-3 projects: API (resource server), Web App (interactive user auth), and optional E2E / CI automation.
+
+.DESCRIPTION
+Personas:
+  API  → Resource server: validates bearer tokens (no interactive sign-in)
+  Web  → Auth Code + PKCE: interactive human sign-in (Microsoft.Identity.Web)
+  E2E  → Client Credentials: machine/CI identity (opt-in via -IncludeE2E)
+
+.EXAMPLE
+# API only (minimal):
+pwsh -File ./New-EntraSolution.ps1 -EntraInstanceUrl "https://your-tenant.ciamlogin.com" -TenantId "<tenant-id>" -ApiAppRegistrationName "myproduct-api-dev-001" -ApiProjectPath "../../../src/Presentation.WebApi"
+
+.EXAMPLE
+# API + Web (standard):
+pwsh -File ./New-EntraSolution.ps1 -EntraInstanceUrl "https://your-tenant.ciamlogin.com" -TenantId "<tenant-id>" -ApiAppRegistrationName "myproduct-api-dev-001" -WebAppRegistrationName "myproduct-web-dev-001" -ApiProjectPath "../../../src/Presentation.WebApi" -WebProjectPath "../../../src/Presentation.Blazor" -GenerateSecrets
+
+.EXAMPLE
+# Rerun idempotently after interruption (no secret duplication):
+pwsh -File ./New-EntraSolution.ps1 -EntraInstanceUrl "https://your-tenant.ciamlogin.com" -TenantId "<tenant-id>" -ApiAppRegistrationName "myproduct-api-dev-001" -WebAppRegistrationName "myproduct-web-dev-001" -IncludeE2E -E2EAppRegistrationName "myproduct-e2e-dev-001" -GenerateSecrets
+
+.EXAMPLE
+# Intentional secret rotation on existing apps:
+pwsh -File ./New-EntraSolution.ps1 -EntraInstanceUrl "https://your-tenant.ciamlogin.com" -TenantId "<tenant-id>" -ApiAppRegistrationName "myproduct-api-dev-001" -WebAppRegistrationName "myproduct-web-dev-001" -IncludeE2E -E2EAppRegistrationName "myproduct-e2e-dev-001" -GenerateSecrets -RotateSecrets
+
+.EXAMPLE
+# API + Web + E2E (full, with auto-consent):
+pwsh -File ./New-EntraSolution.ps1 -EntraInstanceUrl "https://your-tenant.ciamlogin.com" -TenantId "<tenant-id>" -ApiAppRegistrationName "myproduct-api-dev-001" -WebAppRegistrationName "myproduct-web-dev-001" -E2EAppRegistrationName "myproduct-e2e-dev-001" -ApiProjectPath "../../../src/Presentation.Api" -WebProjectPath "../../../src/Presentation.Web" -E2EProjectPath "../../../src/Tests.Endtoend" -WebRedirectUri "https://localhost:7175/signin-oidc" -WebLogoutUri "https://localhost:7175/signout-callback-oidc" -IncludeE2E -GenerateSecrets -RotateSecrets -AutoConsent
+
+.NOTES
+- Requires Az.Accounts, Az.Resources, Microsoft.Graph.Applications
+- Each child script is idempotent and can also be run independently
+- Secrets are never generated unless -GenerateSecrets is specified
+- E2E registration is never created unless -IncludeE2E is specified
+#>
 param(
     [Parameter(Mandatory)][string]$EntraInstanceUrl,
     [Parameter(Mandatory)][string]$TenantId,

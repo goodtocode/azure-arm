@@ -1,19 +1,16 @@
-# ============================================================================
-# Script Name:   Set-ApiAppUserSecrets.ps1
-# Description:   Reads an existing API App Registration and sets .NET user-secrets.
-# -----------------------------------------------------------------------------
-# Example CLI Usage:
-#   pwsh -File ./Set-ApiAppUserSecrets.ps1 `
-#       -TenantId "<your-tenant-id>" `
-#       -ApiAppRegistrationName "myproduct-api-dev-001" `
-#       -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" `
-#       -ApiProjectPath "../../src/Presentation.Api"
-# -----------------------------------------------------------------------------
-# Notes:
-#   - Requires Azure PowerShell modules (Az.Accounts, Microsoft.Graph.Applications)
-#   - Ensure you are authenticated: Connect-AzAccount
-#   - This script does NOT create or modify app registrations.
-# ============================================================================
+<#
+.SYNOPSIS
+Reads an existing API App Registration and sets .NET user-secrets.
+
+.EXAMPLE
+# Single line, safe to paste:
+pwsh -File ./Set-ApiAppUserSecrets.ps1 -TenantId "<your-tenant-id>" -ApiAppRegistrationName "myproduct-api-dev-001" -EntraInstanceUrl "https://your-tenant-name.ciamlogin.com" -ApiProjectPath "../../src/Presentation.Api"
+
+.NOTES
+- Requires Azure PowerShell modules (Az.Accounts, Microsoft.Graph.Applications)
+- Ensure you are authenticated: Connect-AzAccount
+- This script does NOT create or modify app registrations.
+#>
 
 param(
     [string]$TenantId,

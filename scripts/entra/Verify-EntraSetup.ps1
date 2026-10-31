@@ -1,15 +1,11 @@
-# ============================================================================
-# Script Name:   Verify-EntraSetup.ps1
-# Description:   Verifies common Entra setup prerequisites for local .NET Web -> API
-#                delegated auth flows (EEID/AAD), including redirect URIs, exposed
-#                API scope, required API permission wiring, and consent grants.
-# -----------------------------------------------------------------------------
-# Example:
-#   pwsh -File ./.azure/scripts/entra/Verify-EntraSetup.ps1 `
-#       -TenantId "<your-tenant-id>" `
-#       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -ApiAppRegistrationName "myproduct-api-dev-001"
-# ============================================================================
+<#
+.SYNOPSIS
+Verifies common Entra setup prerequisites for local .NET Web -> API delegated auth flows (EEID/AAD), including redirect URIs, exposed API scope, required API permission wiring, and consent grants.
+
+.EXAMPLE
+# Single line, safe to paste:
+pwsh -File ./.azure/scripts/entra/Verify-EntraSetup.ps1 -TenantId "<your-tenant-id>" -WebAppRegistrationName "myproduct-web-dev-001" -ApiAppRegistrationName "myproduct-api-dev-001"
+#>
 
 param(
     [Parameter(Mandatory)][string]$TenantId,

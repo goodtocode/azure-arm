@@ -1,44 +1,39 @@
-# ============================================================================
-# Script Name:   New-EntraE2EApp.ps1
-# Description:   Creates or updates the Entra App Registration for automated
-#                E2E testing or CI/CD pipelines (machine identity).
-#                Uses Client Credentials flow — no user sign-in.
-#                Assigns the Asset.Automation application role from the
-#                resource server. Client secret created only when
-#                -GenerateSecrets is specified.
-# -----------------------------------------------------------------------------
-# OAuth Role:    Application — machine / automation (Client Credentials).
-# Audience:      CI pipelines, integration tests, background services.
-# IMPORTANT:     Do NOT add this registration unless you need machine auth.
-#                Use -IncludeE2E on the orchestrator to opt in explicitly.
-# -----------------------------------------------------------------------------
-# Example CLI Usage (standalone):
-#   pwsh -File ./New-EntraE2EApp.ps1 `
-#       -TenantId "<your-tenant-id>" `
-#       -AppRegistrationName "myproduct-e2e-dev-001" `
-#       -ApiAppId "<api-app-client-id>" `
-#       -ProjectPath "../../tests/E2E" `
-#       -GenerateSecrets
-#
-# Example (called from orchestrator):
-#   $e2e = & "$PSScriptRoot\auth\New-EntraE2EApp.ps1" `
-#       -TenantId $TenantId `
-#       -AppRegistrationName $E2EAppRegistrationName `
-#       -ApiAppId $api.AppId `
-#       -ProjectPath $E2EProjectPath `
-#       -GenerateSecrets:$GenerateSecrets
-# -----------------------------------------------------------------------------
-# Returns:
-#   [PSCustomObject] @{
-#       AppId              = <string>
-#       ObjectId           = <string>
-#       ServicePrincipalId = <string>
-#       Type               = "E2E"
-#       Created            = <bool>
-#       Capabilities       = @("application")
-#       Secret             = <string|$null>   # $null unless -GenerateSecrets
-#   }
-# ============================================================================
+<#
+.SYNOPSIS
+Creates or updates the Entra App Registration for automated E2E testing or CI/CD pipelines (machine identity).
+
+.DESCRIPTION
+Uses Client Credentials flow — no user sign-in. Assigns the Asset.Automation application role from the resource server. Client secret created only when -GenerateSecrets is specified.
+
+OAuth Role:    Application — machine / automation (Client Credentials).
+Audience:      CI pipelines, integration tests, background services.
+IMPORTANT:     Do NOT add this registration unless you need machine auth.
+               Use -IncludeE2E on the orchestrator to opt in explicitly.
+
+.EXAMPLE
+# Standalone:
+pwsh -File ./New-EntraE2EApp.ps1 -TenantId "<your-tenant-id>" -AppRegistrationName "myproduct-e2e-dev-001" -ApiAppId "<api-app-client-id>" -ProjectPath "../../tests/E2E" -GenerateSecrets
+
+.OUTPUTS
+[PSCustomObject] @{
+    AppId              = <string>
+    ObjectId           = <string>
+    ServicePrincipalId = <string>
+    Type               = "E2E"
+    Created            = <bool>
+    Capabilities       = @("application")
+    Secret             = <string|$null>   # $null unless -GenerateSecrets
+}
+
+.NOTES
+Example (called from orchestrator):
+  $e2e = & "$PSScriptRoot\auth\New-EntraE2EApp.ps1" `
+      -TenantId $TenantId `
+      -AppRegistrationName $E2EAppRegistrationName `
+      -ApiAppId $api.AppId `
+      -ProjectPath $E2EProjectPath `
+      -GenerateSecrets:$GenerateSecrets
+#>
 param(
     [Parameter(Mandatory)][string]$TenantId,
     [Parameter(Mandatory)][string]$AppRegistrationName,

@@ -1,38 +1,35 @@
-# ============================================================================
-# Script Name:   New-EntraApiApp.ps1
-# Description:   Creates or updates the Entra App Registration for an API
-#                (resource server). Configures OAuth2 delegated scopes, app
-#                roles for both users and machines, and Microsoft Graph
-#                User.Read delegated permission. Optionally writes .NET
-#                user-secrets to the target project.
-# -----------------------------------------------------------------------------
-# OAuth Role:    Resource server — audience for delegated (Web) and
-#                application (E2E / CI) tokens.
-# Flows:         Bearer token validation only; no interactive sign-in.
-# -----------------------------------------------------------------------------
-# Example CLI Usage (standalone):
-#   pwsh -File ./New-EntraApiApp.ps1 `
-#       -EntraInstanceUrl "https://your-tenant.ciamlogin.com" `
-#       -TenantId "<your-tenant-id>" `
-#       -AppRegistrationName "myproduct-api-dev-001" `
-#       -ProjectPath "../../src/Presentation.WebApi"
-#
-# Example (called from orchestrator — prereqs/auth already established):
-#   $api = & "$PSScriptRoot\auth\New-EntraApiApp.ps1" `
-#       -EntraInstanceUrl $EntraInstanceUrl -TenantId $TenantId `
-#       -AppRegistrationName $ApiAppRegistrationName `
-#       -ProjectPath $ApiProjectPath
-# -----------------------------------------------------------------------------
-# Returns:
-#   [PSCustomObject] @{
-#       AppId             = <string>
-#       ObjectId          = <string>
-#       ServicePrincipalId = <string>
-#       Type              = "Api"
-#       Created           = <bool>
-#       Capabilities      = @("delegated","appRoles","application")
-#   }
-# ============================================================================
+<#
+.SYNOPSIS
+Creates or updates the Entra App Registration for an API (resource server).
+
+.DESCRIPTION
+Configures OAuth2 delegated scopes, app roles for both users and machines, and Microsoft Graph User.Read delegated permission. Optionally writes .NET user-secrets to the target project.
+
+OAuth Role:    Resource server — audience for delegated (Web) and
+               application (E2E / CI) tokens.
+Flows:         Bearer token validation only; no interactive sign-in.
+
+.EXAMPLE
+# Standalone:
+pwsh -File ./New-EntraApiApp.ps1 -EntraInstanceUrl "https://your-tenant.ciamlogin.com" -TenantId "<your-tenant-id>" -AppRegistrationName "myproduct-api-dev-001" -ProjectPath "../../src/Presentation.WebApi"
+
+.OUTPUTS
+[PSCustomObject] @{
+    AppId             = <string>
+    ObjectId          = <string>
+    ServicePrincipalId = <string>
+    Type              = "Api"
+    Created           = <bool>
+    Capabilities      = @("delegated","appRoles","application")
+}
+
+.NOTES
+Example (called from orchestrator — prereqs/auth already established):
+  $api = & "$PSScriptRoot\auth\New-EntraApiApp.ps1" `
+      -EntraInstanceUrl $EntraInstanceUrl -TenantId $TenantId `
+      -AppRegistrationName $ApiAppRegistrationName `
+      -ProjectPath $ApiProjectPath
+#>
 param(
     [Parameter(Mandatory)][string]$EntraInstanceUrl,
     [Parameter(Mandatory)][string]$TenantId,
