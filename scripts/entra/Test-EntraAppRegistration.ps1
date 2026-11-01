@@ -18,8 +18,8 @@ param(
     [Parameter(Mandatory)][string]$TenantId,
     [Parameter(Mandatory)][string]$WebAppRegistrationName,
     [Parameter(Mandatory)][string]$ApiAppRegistrationName,
-    [string]$ExpectedRedirectUri = "https://localhost:7195/signin-oidc",
-    [string]$ExpectedLogoutUri = "https://localhost:7195/signout-callback-oidc",
+    [string]$ExpectedRedirectUri = "https://localhost:6195/signin-oidc",
+    [string]$ExpectedLogoutUri = "https://localhost:6195/signout-callback-oidc",
     [string]$RequiredApiScope = "access_as_user",
     [string]$E2EAppRegistrationName = "",
     [string]$ApiRole = "Asset.Automation"
