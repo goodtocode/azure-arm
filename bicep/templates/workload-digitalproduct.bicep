@@ -59,8 +59,8 @@ var sharedSubscriptionId = shared.?subscriptionId ?? subscription().subscription
 var sharedResourceGroupName = shared.?resourceGroupName ?? resourceGroup().name
 var vnetSubscriptionId = vnet.?subscriptionId ?? subscription().subscriptionId
 
-module workModule '../modules/law-loganalyticsworkspace.bicep' = if (isStandalone) {
-  name: 'digitalproduct-work'
+module lawModule '../modules/law-loganalyticsworkspace.bicep' = if (isStandalone) {
+  name: 'digitalproduct-law'
   params: {
     name: hosting.?workspaceName ?? '${hosting.appiName}-work'
     location: location
@@ -74,7 +74,7 @@ module appiModule '../modules/appi-applicationinsights.bicep' = if (isStandalone
     name: hosting.appiName
     location: location
     tags: tags
-    workResourceId: workModule!.outputs.id
+    workResourceId: lawModule!.outputs.id
   }
 }
 

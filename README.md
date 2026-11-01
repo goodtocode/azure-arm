@@ -170,7 +170,7 @@ param api = { name: 'PRODUCT-dev-wus2-001-api' }
 param sql = {
   serverName: 'PRODUCT-dev-wus2-001-sql'
   databaseName: 'PRODUCT-dev-wus2-001-sqldb'
-  adminLogin: 'LocalAdmin'
+  adminLogin: readEnvironmentVariable('SQL_ADMIN_USER', 'LocalAdmin')
   adminPassword: readEnvironmentVariable('SQL_ADMIN_PASSWORD')
 }
 ```
@@ -295,6 +295,7 @@ This repository helps you stand up production-ready Azure foundations faster, wi
 ### High-Value Modules You Can Reuse
 
 - **AI Foundry**: `bicep/modules/aif-foundry.bicep` for Azure AI Foundry hub/project/model deployment with integration-friendly outputs.
+- **Azure OpenAI**: `bicep/modules/aoai-azureopenai.bicep` for a standalone Azure OpenAI account with typed model deployments.
 - **Web and API apps**: `bicep/modules/web-appservice.bicep` and `bicep/modules/api-appservice.bicep` for common App Service hosting patterns.
 - **App Service plans**: `bicep/modules/plan-appserviceplan.bicep` to standardize compute sizing and hosting tiers.
 - **SQL foundation**: `bicep/modules/sql-sqlserver.bicep` and `bicep/modules/sqldb-sqldatabase.bicep` are the server and database atoms; `bicep/modules/sql-sqlserverdatabase.bicep` is the combined server and database module the workload templates use.
@@ -364,6 +365,7 @@ Never store passwords in a variables file. The workload variables files read sec
 
 | Variable | Used by | Parameter |
 | --- | --- | --- |
+| `SQL_ADMIN_USER` | `workload-digitalproduct-*` | `sql.adminLogin` (optional, falls back to `LocalAdmin`) |
 | `SQL_ADMIN_PASSWORD` | `workload-digitalproduct-*` | `sql.adminPassword` |
 | `VM_ADMIN_PASSWORD` | `workload-usermachines-*` | `adminPassword` |
 
@@ -389,7 +391,7 @@ az deployment group create \
 	--parameters bicep/variables/workload-digitalproduct-shared-dev.bicepparam
 ```
 
-In CI, map the variable from the pipeline secret store (for example `SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}` in GitHub Actions). Prefer a Key Vault-backed secret where the pipeline supports it.
+In CI, map the variables from the pipeline secret store (for example `SQL_ADMIN_USER: ${{ secrets.SQL_ADMIN_USER }}` and `SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}` in GitHub Actions). The login must match the one the app pipelines use to connect, so set both. Prefer a Key Vault-backed secret where the pipeline supports it.
 
 To override a top-level parameter for one run, add inline `name=value` pairs after the `.bicepparam` file. Inline values win over the file, and the file must be a `.bicepparam` (do not mix it with a JSON parameters file). This needs a recent Azure CLI and Bicep CLI.
 
