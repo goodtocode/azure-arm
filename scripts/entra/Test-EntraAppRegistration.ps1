@@ -1,15 +1,18 @@
-# ============================================================================
-# Script Name:   Verify-EntraSetup.ps1
-# Description:   Verifies common Entra setup prerequisites for local .NET Web -> API
-#                delegated auth flows (EEID/AAD), including redirect URIs, exposed
-#                API scope, required API permission wiring, and consent grants.
-# -----------------------------------------------------------------------------
-# Example:
-#   pwsh -File ./.azure/scripts/entra/Verify-EntraSetup.ps1 `
-#       -TenantId "<your-tenant-id>" `
-#       -WebAppRegistrationName "myproduct-web-dev-001" `
-#       -ApiAppRegistrationName "myproduct-api-dev-001"
-# ============================================================================
+<#
+.SYNOPSIS
+Verifies the Entra setup for a Web -> API solution (EEID/AAD): redirect URIs, exposed API scope, token version and claims, permission wiring, consent grants and, optionally, the E2E identity.
+
+.DESCRIPTION
+Reads only. Prints PASS, WARN or FAIL per check and exits 1 when any blocking check fails. Warnings (token version, optional claims, assignment required) do not fail the run.
+
+.EXAMPLE
+# Single line, safe to paste:
+pwsh -File ./.azure/scripts/entra/Test-EntraAppRegistration.ps1 -TenantId "<your-tenant-id>" -WebAppRegistrationName "myproduct-web-dev-001" -ApiAppRegistrationName "myproduct-api-dev-001"
+
+.EXAMPLE
+# Also check the E2E identity (single line, safe to paste):
+pwsh -File ./.azure/scripts/entra/Test-EntraAppRegistration.ps1 -TenantId "<your-tenant-id>" -WebAppRegistrationName "myproduct-web-dev-001" -ApiAppRegistrationName "myproduct-api-dev-001" -E2EAppRegistrationName "myproduct-e2e-dev-001"
+#>
 
 param(
     [Parameter(Mandatory)][string]$TenantId,
@@ -17,7 +20,9 @@ param(
     [Parameter(Mandatory)][string]$ApiAppRegistrationName,
     [string]$ExpectedRedirectUri = "https://localhost:6195/signin-oidc",
     [string]$ExpectedLogoutUri = "https://localhost:6195/signout-callback-oidc",
-    [string]$RequiredApiScope = "access_as_user"
+    [string]$RequiredApiScope = "access_as_user",
+    [string]$E2EAppRegistrationName = "",
+    [string]$ApiRole = "Asset.Automation"
 )
 
 $failedChecks = New-Object System.Collections.Generic.List[string]
@@ -49,33 +54,7 @@ function Add-CheckResult {
     $failedChecks.Add($Name) | Out-Null
 }
 
-function Install-Prerequisites {
-    $modules = @("Az.Accounts", "Microsoft.Graph.Applications")
-    foreach ($module in $modules) {
-        if (-not (Get-Module -ListAvailable -Name $module)) {
-            Write-Host "Installing PowerShell module: $module"
-            Install-Module $module -Scope CurrentUser -Force
-        }
-    }
-
-    Import-Module Az.Accounts -ErrorAction Stop
-    Import-Module Microsoft.Graph.Applications -ErrorAction Stop
-}
-
-function New-Auth {
-    param([string]$TenantId)
-
-    $azContext = Get-AzContext -ErrorAction SilentlyContinue
-    if (-not $azContext -or $azContext.Tenant.Id -ne $TenantId) {
-        Connect-AzAccount -Tenant $TenantId | Out-Null
-    }
-
-    $mgContext = $null
-    try { $mgContext = Get-MgContext -ErrorAction Stop } catch {}
-    if (-not $mgContext -or $mgContext.TenantId -ne $TenantId -or -not $mgContext.Account) {
-        Connect-MgGraph -TenantId $TenantId -Scopes "Application.Read.All", "Directory.Read.All", "DelegatedPermissionGrant.Read.All" -NoWelcome | Out-Null
-    }
-}
+. "$PSScriptRoot\..\lib\Entra.Common.ps1"
 
 function Get-ConsentGrantsForWebToApi {
     param(
@@ -97,11 +76,11 @@ function Get-ConsentGrantsForWebToApi {
     return $null
 }
 
-Install-Prerequisites
-New-Auth -TenantId $TenantId
+Install-EntraPrerequisites -Modules @('Az.Accounts', 'Microsoft.Graph.Applications')
+Connect-EntraSession -TenantId $TenantId -GraphScopes @('Application.Read.All', 'Directory.Read.All', 'DelegatedPermissionGrant.Read.All')
 
 Write-Host ""
-Write-Host "=== Verifying Entra setup for local Web -> API delegated auth ===" -ForegroundColor Cyan
+Write-Host "=== Verifying Entra setup for Web -> API ===" -ForegroundColor Cyan
 Write-Host "TenantId: $TenantId"
 Write-Host "Web App Registration: $WebAppRegistrationName"
 Write-Host "API App Registration: $ApiAppRegistrationName"
@@ -176,6 +155,60 @@ if ($consentCheckPerformed) {
 }
 else {
     Add-CheckResult -Passed:$false -Name "Consent grant cmdlet availability" -Details "Could not query OAuth2 permission grants. Ensure Microsoft Graph PowerShell is updated and includes grant cmdlets." -Warning
+}
+
+Add-CheckResult -Passed:(@($apiApp.IdentifierUris).Count -gt 0) -Name "API identifier URI set" -Details "Identifier URIs: $(@($apiApp.IdentifierUris) -join ', ')"
+
+Add-CheckResult -Passed:($apiApp.Api.RequestedAccessTokenVersion -eq 2) -Name "API issues v2 access tokens" -Details "requestedAccessTokenVersion=$($apiApp.Api.RequestedAccessTokenVersion). New-EntraAppRegistration.ps1 -Type Api sets it to 2." -Warning
+
+
+
+$apiTokenClaims = @($apiApp.OptionalClaims.AccessToken | Where-Object { $_ } | ForEach-Object { $_.Name })
+
+$missingApiClaims = @('given_name', 'family_name', 'upn') | Where-Object { $_ -notin $apiTokenClaims }
+
+Add-CheckResult -Passed:($missingApiClaims.Count -eq 0) -Name "API access token carries user name and UPN claims" -Details "Missing access token claims: $($missingApiClaims -join ', ')" -Warning
+
+
+
+$webIdClaims = @($webApp.OptionalClaims.IdToken | Where-Object { $_ } | ForEach-Object { $_.Name })
+
+$missingWebClaims = @('email', 'given_name', 'family_name') | Where-Object { $_ -notin $webIdClaims }
+
+Add-CheckResult -Passed:($missingWebClaims.Count -eq 0) -Name "Web ID token carries email and name claims" -Details "Missing ID token claims: $($missingWebClaims -join ', ')" -Warning
+
+
+
+if ($E2EAppRegistrationName) {
+
+    $e2eApp = Get-MgApplication -Filter "displayName eq '$E2EAppRegistrationName'" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+    Add-CheckResult -Passed:([bool]$e2eApp) -Name "E2E app registration exists" -Details "DisplayName '$E2EAppRegistrationName'"
+
+    if ($e2eApp) {
+
+        $e2eSp = Get-MgServicePrincipal -Filter "appId eq '$($e2eApp.AppId)'" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+        Add-CheckResult -Passed:([bool]$e2eSp) -Name "E2E service principal exists" -Details "appId $($e2eApp.AppId)"
+
+        $role = $apiApp.AppRoles | Where-Object { $_.Value -eq $ApiRole -and $_.AllowedMemberTypes -contains 'Application' } | Select-Object -First 1
+
+        Add-CheckResult -Passed:([bool]$role) -Name "API defines the application role" -Details "Expected application role '$ApiRole'"
+
+        $assigned = $false
+
+        if ($e2eSp -and $apiSp -and $role) {
+
+            $assigned = @(Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $e2eSp.Id -ErrorAction SilentlyContinue |
+
+                Where-Object { $_.AppRoleId -eq $role.Id -and $_.ResourceId -eq $apiSp.Id }).Count -gt 0
+
+        }
+
+        Add-CheckResult -Passed:$assigned -Name "E2E identity has the API application role" -Details "Role '$ApiRole' assigned to the E2E service principal"
+
+    }
+
 }
 
 if ($webSp) {

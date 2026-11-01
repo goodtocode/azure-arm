@@ -4,7 +4,7 @@ using '../templates/platform-spoke-ai-foundry.bicep'
 // Common
 // =====================
 var scopeOwner = 'ScopeOrTenant'
-var productIac = 'spoke-ai'
+var productIac = 'ai'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'
@@ -27,27 +27,28 @@ param privateEndpointName = '${productIac}-${environmentIac}-${regionIac}-${inst
 // Required model deployments for Azure AI Foundry.
 param modelDeployments = [
   {
-    deploymentName: 'openai-chat'
-    modelName: 'gpt-5.4'
-    modelFormat: 'OpenAI'
-    modelVersion: '2026-03-05'
+    deploymentName: 'ms-thinking'
+    modelName: 'MAI-Thinking-1'
+    modelFormat: 'Microsoft'
+    modelVersion: '2026-06-01'
     skuName: 'GlobalStandard'
     tokensPerMinute: 20000
   }
   {
-    deploymentName: 'openai-fast'
-    modelName: 'gpt-4.1-mini'
-    modelFormat: 'OpenAI'
-    modelVersion: '2025-04-14'
+    deploymentName: 'ms-fast'
+    modelName: 'Phi-4-mini-instruct'
+    modelFormat: 'Microsoft'
+    modelVersion: '1'
     skuName: 'GlobalStandard'
     tokensPerMinute: 20000
   }
   {
     deploymentName: 'embedding-fast'
-    modelName: 'text-embedding-3-small'
-    modelFormat: 'OpenAI'
+    modelName: 'Cohere-embed-v3-multilingual'
+    modelFormat: 'Cohere'
     modelVersion: '1'
     skuName: 'GlobalStandard'
+    capacity: 1
     tokensPerMinute: 10000
   }
   {
@@ -61,5 +62,5 @@ param modelDeployments = [
 ]
 
 // Replace these with the subnet and Private DNS zone in this spoke's subscription.
-param privateEndpointSubnetResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/spoke-network-dev-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/spoke-dev-wus2-001-vnet/subnets/private-endpoints-snet'
+param privateEndpointSubnetResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/network-dev-wus2-001-rg/providers/Microsoft.Network/virtualNetworks/spoke-dev-wus2-001-vnet/subnets/private-endpoints-snet'
 param privateDnsZoneResourceId = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/platform-dns-dev-wus2-001-rg/providers/Microsoft.Network/privateDnsZones/privatelink.cognitiveservices.azure.com'

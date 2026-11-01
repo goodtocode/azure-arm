@@ -4,7 +4,7 @@ using '../templates/platform-hub-edge-appgateway.bicep'
 // Common
 // =====================
 var tenantIac = 'ScopeOrTenant'
-var productIac = 'hub-edge'
+var productIac = 'edge'
 var environmentIac = 'plat'
 var regionIac = 'wus2'
 var instanceIac = '001'
@@ -17,21 +17,21 @@ param tags = {
 }
 
 // =====================
-// Edge RG: ${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
+// Edge RG: ${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
 // rg: ScopeOrTenant-hub-edge-plat-wus2-001
 // =====================
-param hubNetworkResourceGroupName = '${tenantIac}-hub-network-${environmentIac}-${regionIac}-${instanceIac}-rg'
-param vnetName = 'hub-network-${environmentIac}-${regionIac}-${instanceIac}-vnet'
+param hubNetworkResourceGroupName = 'network-${environmentIac}-${regionIac}-${instanceIac}-rg'
+param vnetName = 'network-${environmentIac}-${regionIac}-${instanceIac}-vnet'
 param snetNameAppGateway = '${productIac}-appgateway-${instanceIac}-snet'
 param snetCidrAppGateway = '10.0.3.0/24'
 param snetCidrAzureFirewall = '10.0.4.0/26'
 
-param agwName = '${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-agw'
+param agwName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-agw'
 param agwMinCapacity = 1
 param agwMaxCapacity = 2
 param wafMode = 'Prevention'
 
-param firewallName = '${tenantIac}-${productIac}-${environmentIac}-${regionIac}-${instanceIac}-fw'
+param firewallName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-fw'
 param firewallTier = 'Standard'
 param firewallThreatIntelMode = 'Alert'
 

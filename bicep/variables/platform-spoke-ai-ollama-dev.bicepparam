@@ -4,7 +4,7 @@ using '../templates/platform-spoke-ai-ollama.bicep'
 // Common
 // =====================
 var scopeOwner = 'ScopeOrTenant'
-var productIac = 'spoke-ai'
+var productIac = 'ai'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'

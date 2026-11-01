@@ -4,7 +4,7 @@ using '../templates/platform-spoke-network-publicroute.bicep'
 // Common
 // =====================
 var scopeOwner = 'ScopeOrTenant'
-var productIac = 'spoke-network'
+var productIac = 'network'
 var environmentIac = 'dev'
 var regionIac = 'wus2'
 var instanceIac = '001'

@@ -63,8 +63,8 @@ Template and variables names are built from fixed slots. `scripts/validation/Tes
 | --- | --- | --- |
 | Workload template | `workload-{archetype}[-zerotrust].bicep` | `workload-digitalproduct.bicep` |
 | Workload variables | `workload-{archetype}-{mode}-{env}.bicepparam` | `workload-digitalproduct-shared-dev.bicepparam` |
-| Platform template | `platform-[(hub\|spoke\|shared)-]{capability}[-{variant}].bicep` | `platform-mgmt.bicep`, `platform-shared-edge-frontdoor.bicep` |
-| Platform variables | `platform-{template name}-{env}.bicepparam` | `platform-mgmt-dev.bicepparam` |
+| Platform template | `platform-(hub\|spoke\|shared)-{capability}[-{variant}].bicep` | `platform-shared-mgmt.bicep`, `platform-shared-edge-frontdoor.bicep` |
+| Platform variables | `platform-{template name}-{env}.bicepparam` | `platform-shared-mgmt-dev.bicepparam` |
 
 | Slot | Allowed values |
 | --- | --- |
@@ -94,7 +94,7 @@ The scope slot of a platform template says how it relates to the hub-and-spoke n
 | `spoke` | Part of a spoke: onboarded to a spoke VNet and peered to the hub | Yes, a spoke VNet and subnet | Spoke management group or subscription |
 | `shared` | Not part of hub and spoke. Complements `standalone`: deployable with no hub, no spoke, and no VNet | No | Any subscription |
 
-Use `shared` for capabilities that do not depend on a VNet, such as Azure Front Door and Azure AI Foundry with public access. A capability that has both forms gets two templates, for example `platform-shared-ai-foundry` and `platform-spoke-ai-foundry`. `hub` and `spoke` mean the template is integrated with hub-and-spoke networking, so a repo that has no hub and spoke yet can still use every `shared` template and every `workload-` template in `standalone` mode. The scope can be omitted when a template works the same with or without a network, as `platform-mgmt` does.
+Use `shared` for capabilities that do not depend on a VNet, such as Azure Front Door and Azure AI Foundry with public access. A capability that has both forms gets two templates, for example `platform-shared-ai-foundry` and `platform-spoke-ai-foundry`. `hub` and `spoke` mean the template is integrated with hub-and-spoke networking, so a repo that has no hub and spoke yet can still use every `shared` template and every `workload-` template in `standalone` mode. Shared platform resource groups such as management, AI and edge are `shared` (for example `platform-shared-mgmt`); a standalone product has no platform templates.
 
 This `shared` scope is about topology. It is not the workload `shared` mode, which is about where the App Service plan and App Insights come from.
 
@@ -113,13 +113,13 @@ A bundle is the set of templates, variables and pipelines deployed together for 
 
 ### Resource group slot
 
-Resource groups are named `{product/purpose}-{env}-{region}-{instance}-rg`, for example `crucible-dev-wus2-001-rg`, `mgmt-dev-wus2-001-rg` and `edge-plat-wus2-001-rg`. There is no tenant prefix. Use `plat` for platform-subscription groups and `dev`, `prod` for environments. Resource names inside follow `{product/purpose}-{env}-{region}-{instance}-{abbreviation}`.
+Resource groups are named `{product}-{env}-{region}-{instance}-rg`, for example `crucible-dev-wus2-001-rg`, `mgmt-dev-wus2-001-rg` and `edge-plat-wus2-001-rg`. There is no tenant prefix. Use `plat` for platform-subscription groups and `dev`, `prod` for environments. Resource names inside follow `{product}-{env}-{region}-{instance}-{type}`.
 
 | Phase | Goal | Subscriptions | Resource groups | Templates deployed | Pipelines |
 | --- | --- | --- | --- | --- | --- |
 | 1. Cloud native startup | Ship fast with minimal operations | 1 | `shared-dev-...`, `{product}-dev-...` | `workload-digitalproduct` (`standalone` mode: workspace, App Insights, plan, web, API, SQL); optional `platform-shared-edge-frontdoor`, `platform-shared-ai-foundry` | `PRODUCT-standalone-iac.yml` |
-| 2. Subscription segmentation | Separate platform, development and production | 3 (platform, development, production) | `edge-plat-...`; `mgmt-dev-...`, `{product}-dev-...`; `mgmt-prod-...`, `{product}-prod-...` | `platform-shared-edge-frontdoor` (platform); `platform-mgmt` per environment (workspace created locally); `workload-digitalproduct` in `shared` mode per product | `platform-edge-iac.yml`, `platform-mgmt-iac.yml`, `PRODUCT-iac.yml` |
-| 3. Enterprise network foundation | Network boundaries and shared operations | 3 | Phase 2 plus `network-plat-...`, `mgmt-plat-...`, `network-dev-...`, `network-prod-...` | Phase 2 plus `platform-hub-network-publicroute`, `platform-hub-mgmt`, `platform-spoke-network-publicroute`; `platform-mgmt` points at the hub workspace; workloads move to `network` mode | `platform-hub-iac.yml`, `platform-spoke-iac.yml` |
+| 2. Subscription segmentation | Separate platform, development and production | 3 (platform, development, production) | `edge-plat-...`; `mgmt-dev-...`, `{product}-dev-...`; `mgmt-prod-...`, `{product}-prod-...` | `platform-shared-edge-frontdoor` (platform); `platform-shared-mgmt` per environment (workspace created locally); `workload-digitalproduct` in `shared` mode per product | `platform-shared-edge-iac.yml`, `platform-shared-mgmt-iac.yml`, `PRODUCT-iac.yml` |
+| 3. Enterprise network foundation | Network boundaries and shared operations | 3 | Phase 2 plus `network-plat-...`, `mgmt-plat-...`, `network-dev-...`, `network-prod-...` | Phase 2 plus `platform-hub-network-publicroute`, `platform-hub-mgmt`, `platform-spoke-network-publicroute`; `platform-shared-mgmt` points at the hub workspace; workloads move to `network` mode | `platform-hub-iac.yml`, `platform-spoke-iac.yml` |
 | 4. Zero trust private services | Private endpoints, public access disabled | 3 | Same as Phase 3 | `platform-hub-network-zerotrust`, plus workloads in `zerotrust` mode (`workload-digitalproduct-zerotrust`) | Phase 3 pipelines with the zero-trust templates |
 
 Within a phase, public ingress is one of two routes and they are not mixed: `platform-shared-edge-frontdoor` (default, needs no VNet) or `platform-hub-edge-appgateway` (Application Gateway WAF, Azure Firewall and optional DDoS IP Protection in the hub VNet, Phase 3 and up).
@@ -127,7 +127,7 @@ Within a phase, public ingress is one of two routes and they are not mixed: `pla
 Phase 2 notes:
 
 - AI resources belong to the product that uses them (for example in `crucible-dev-...`), not a shared AI group, unless several products share models or you need central AI governance.
-- Phase 2 and Phase 3 use the same `platform-mgmt` template. Leave `hubMgmtResourceGroupName` empty to create the Log Analytics workspace in the same group (Phase 2). Set it to use the platform workspace (Phase 3).
+- Phase 2 and Phase 3 use the same `platform-shared-mgmt` template. Leave `hubMgmtResourceGroupName` empty to create the Log Analytics workspace in the same group (Phase 2). Set it to use the platform workspace (Phase 3).
 - `platform-hub-mgmt` (Sentinel-enabled workspace) is only needed from Phase 3.
 
 ## Module naming
@@ -184,14 +184,17 @@ az bicep build-params --stdout --file bicep/variables/workload-digitalproduct-sh
 
 ## Scripts
 
-PowerShell scripts under `scripts/` automate the work around the templates. Paths inside the hub-and-spoke scripts are relative to the `scripts/hub-and-spoke` folder.
+PowerShell scripts under `scripts/` automate the work around the templates. The hub-and-spoke scripts locate templates and variables themselves (`bicep/` here, `.azure/` in consumer repos), so they run from any folder. In a consumer repo the same folders live under `.azure/scripts/`.
 
 | Folder | Purpose |
 | --- | --- |
-| `scripts/validation/` | `Test-IacConventions.ps1` checks the slot system and compiles every template and variables file. Run it before every commit and in CI. |
-| `scripts/hub-and-spoke/` | `New-PlatformHub.ps1` deploys the hub mgmt and network templates, `New-PlatformSpoke.ps1` deploys the spoke mgmt and network templates, and `New-VnetPeering.ps1` peers a spoke VNet with the hub. Each runs what-if first. |
-| `scripts/entra/` | Microsoft Entra External ID setup for .NET solutions. `New-EntraSolution.ps1` orchestrates API, Web, and optional E2E app registrations (helpers in `entra/auth/`); `Set-*UserSecrets.ps1` write the values to dotnet user-secrets or Key Vault; `Verify-EntraSetup.ps1` checks redirect URIs and scopes. |
-| `scripts/System.psm1` | Shared PowerShell helper functions. |
+| `scripts/validation/` | `Test-IacConventions.ps1` checks the slot system and compiles every template and variables file; run it before every commit and in CI. `Sync-TemplateScripts.ps1` compares a consumer repo's scripts folder with this one and, with `-Apply`, updates it and removes retired scripts. |
+| `scripts/hub-and-spoke/` | `New-PlatformHub.ps1` deploys the hub mgmt and network templates, `New-PlatformSpoke.ps1` deploys a spoke's network and mgmt templates (and AI with `-IncludeAi`), and `New-VnetPeering.ps1` peers a spoke VNet with the hub. Each runs what-if first (`-WhatIfOnly` stops there) and reads region and instance from the variables files, so names match the templates. |
+| `scripts/New-EntraDotnetSolution.ps1` | Orchestrator for a .NET solution: calls `entra/New-EntraAppRegistration.ps1` for the API, Web and optional E2E registrations, then writes each project's dotnet user-secrets. |
+| `scripts/entra/` | Microsoft Entra only (no dotnet, no Key Vault): `New-EntraAppRegistration.ps1` creates or reconciles one registration idempotently, `Grant-EntraConsent.ps1` grants admin consent, `Test-EntraAppRegistration.ps1` checks redirect URIs, scopes and consent. |
+| `scripts/dotnet/` | Local project configuration: `Set-DotnetUserSecret.ps1` writes user-secrets, `Sync-DotnetUserSecretKeyVault.ps1` copies them to or from Key Vault. |
+| `scripts/lib/` | Helpers the scripts above dot-source (`Entra.Common.ps1`, `Dotnet.Common.ps1`, `Platform.Common.ps1`). |
+| `scripts/tests/` | Pester tests for the helper functions and script conventions. Run `Invoke-Pester ./scripts/tests` (Pester 5 or later). |
 
 ---
 
@@ -258,23 +261,17 @@ Standalone is a resource-group ownership boundary, not a synonym for private net
 
 #### Core Conventions
 
-Use five naming slots in order:
+Resource group and resource names use five slots, in order, joined by hyphens: `{product}-{env}-{region}-{instance}-{type}`.
 
-| Slot | Purpose | Example | RG | Resources |
-| --- | --- | --- | --- | --- |
-| 1 | Scope Owner | platform, prod, devtest, shared, nursing, certification | Platform RG Slots Convention | Platform Resources Slots Convention |
-| 2 | Workload Scope | hub, spoke, education | `{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg` | `{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}` |
-| 3 | Service Domain / Product | connectivity, identity, management, security, beacon |  |  |
-| 4 | Region or Environment | Platform: region (westus2, eastus2); Business product: env (prod, dev) |  |  |
-| 5 | Instance | 100 |  |  |
+| Slot | Meaning | Example |
+| --- | --- | --- |
+| `product` | The product or platform service (`mgmt`, `ai`, `network`, `edge`, or a product name) | `mgmt` |
+| `env` | `dev`, `test`, `stage`, `prod`, or `plat` for the platform subscription | `dev` |
+| `region` | Short region code | `wus2` |
+| `instance` | Three-digit instance number, constant within a repository | `100` |
+| `type` | Short resource type abbreviation, based on the CAF abbreviation; `rg` for resource groups | `appi` |
 
-**Platform RG Slots Convention**: `{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg`  
-**Platform Resources Slots Convention**: `{scopeType}-{service}-{region}-{instance}-{resourceAbbreviation}`  
-**Business Product RG Slots Convention**: `{scopeOwner}-{businessUnit/familyLine}-{product}-{env}-{instance}-rg`  
-**Business Product Resources Slots Convention**: `{businessUnit/familyLine}-{product}-{env}-{instance}-{resourceAbbreviation}`
-
-Platform resource-group examples include `platform-hub-connectivity-westus2-100-rg` and `devtest-spoke-network-westus2-100-rg`. Business product examples include `devtest-nursing-beacon-dev-100-rg` and `nursing-beacon-prod-100-web`.
-
+There is no tenant, owner or scope prefix. `hub`, `spoke` and `shared` appear only in template and variables file names. Examples: `mgmt-dev-wus2-100-rg`, `network-plat-wus2-100-vnet`, `crucible-prod-wus2-100-web`. See [Azure CAF IaC Conventions](docs/governance/azure-caf-iac-conventions.md#core-conventions) for the exceptions (Key Vault, Front Door, storage).
 Template and variables file names follow the slot system described in [Slot system](#slot-system):
 
 ```text
@@ -282,21 +279,6 @@ workload-{archetype}[-zerotrust].bicep
 platform-(hub|spoke|shared)-{capability}[-{variant}].bicep
 workload-{archetype}-{mode}-{env}.bicepparam
 platform-{template name}-{env}.bicepparam
-```
-
-Resource groups follow this format:
-
-```text
-{scopeOwner}-{scopeType}-{service}-{region}-{instance}-rg
-```
-
-Examples:
-
-```text
-platform-hub-connectivity-westus2-100-rg
-platform-hub-identity-westus2-100-rg
-devtest-spoke-network-westus2-100-rg
-production-nursing-beacon-prod-100-rg
 ```
 
 The workload archetype describes what the product is (`digitalproduct`), and the mode describes how it is hosted (`standalone`, `shared`, `network`, `zerotrust`). Components such as web, API, SQL, and Function App are switched on by supplying their object in the variables file, never by creating another template.
@@ -332,7 +314,7 @@ This repository helps you stand up production-ready Azure foundations faster, wi
 	`bicep/templates/platform-hub-network-publicroute.bicep`,
 	`bicep/templates/platform-hub-network-zerotrust.bicep` (variables: `platform-hub-network-zerotrust-plat.bicepparam`)
 - **Spoke templates (workload isolation and scale-out)**:
-	`bicep/templates/platform-mgmt.bicep`,
+	`bicep/templates/platform-shared-mgmt.bicep`,
 	`bicep/templates/platform-spoke-network-publicroute.bicep`,
 	`bicep/templates/platform-spoke-ai-ollama.bicep`,
 	`bicep/templates/platform-spoke-ai-foundry.bicep`

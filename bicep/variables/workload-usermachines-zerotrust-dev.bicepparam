@@ -13,9 +13,9 @@ param location = 'westus2'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 param subnet = {
-  resourceGroupName: '${scopeOwner}-spoke-network-${environmentIac}-${regionIac}-${instanceIac}-rg'
-  vnetName: 'spoke-network-${environmentIac}-${regionIac}-${instanceIac}-vnet'
-  subnetName: 'spoke-network-${environmentIac}-${regionIac}-${instanceIac}-machines-snet'
+  resourceGroupName: 'network-${environmentIac}-${regionIac}-${instanceIac}-rg'
+  vnetName: 'network-${environmentIac}-${regionIac}-${instanceIac}-vnet'
+  subnetName: 'network-${environmentIac}-${regionIac}-${instanceIac}-machines-snet'
 }
 
 param machines = [

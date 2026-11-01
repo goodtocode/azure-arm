@@ -18,7 +18,7 @@ param environmentApp = 'Development'
 param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 param shared = {
-  resourceGroupName: '${scopeOwner}-mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
+  resourceGroupName: 'mgmt-${environmentIac}-${regionIac}-${instanceIac}-rg'
 }
 
 param hosting = {
@@ -28,9 +28,9 @@ param hosting = {
 
 param vnet = {
   subscriptionId: '00000000-0000-0000-0000-000000000000'
-  resourceGroupName: 'spoke-network-${environmentIac}-${regionIac}-${instanceIac}-rg'
-  vnetName: 'spoke-${environmentIac}-${regionIac}-${instanceIac}-vnet'
-  subnetName: 'spoke-${environmentIac}-apps-snet'
+  resourceGroupName: 'network-${environmentIac}-${regionIac}-${instanceIac}-rg'
+  vnetName: 'network-${environmentIac}-${regionIac}-${instanceIac}-vnet'
+  subnetName: 'network-${environmentIac}-apps-snet'
 }
 
 // Components: delete a line to skip that component.
