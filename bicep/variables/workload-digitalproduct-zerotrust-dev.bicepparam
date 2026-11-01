@@ -55,7 +55,7 @@ param sql = {
   serverName: '${prefix}-sql'
   databaseName: '${prefix}-sqldb'
   databaseSku: 'Basic'
-  adminLogin: 'LocalAdmin'
+  adminLogin: readEnvironmentVariable('SQL_ADMIN_USER', 'LocalAdmin')
   adminPassword: readEnvironmentVariable('SQL_ADMIN_PASSWORD', 'PASS_FROM_CLI_PARAMETERS')
 }
 param func = {
