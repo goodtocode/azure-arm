@@ -31,7 +31,7 @@ param agwMinCapacity = 1
 param agwMaxCapacity = 2
 param wafMode = 'Prevention'
 
-param firewallName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-fw'
+param firewallName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-afw'
 param firewallTier = 'Standard'
 param firewallThreatIntelMode = 'Alert'
 

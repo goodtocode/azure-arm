@@ -139,10 +139,10 @@ module apiModule '../modules/api-appservice.bicep' = if (hasApi) {
   }
 }
 
-module apiEndpoint '../modules/pe-privateendpoint.bicep' = if (hasApi) {
-  name: 'digitalproduct-zt-api-pe'
+module apiEndpoint '../modules/pep-privateendpoint.bicep' = if (hasApi) {
+  name: 'digitalproduct-zt-api-pep'
   params: {
-    name: '${api!.name}-pe'
+    name: '${api!.name}-pep'
     location: location
     tags: tags
     subnetId: endpointSubnet.id
@@ -171,10 +171,10 @@ module webModule '../modules/web-appservice.bicep' = if (hasWeb) {
   }
 }
 
-module webEndpoint '../modules/pe-privateendpoint.bicep' = if (hasWeb) {
-  name: 'digitalproduct-zt-web-pe'
+module webEndpoint '../modules/pep-privateendpoint.bicep' = if (hasWeb) {
+  name: 'digitalproduct-zt-web-pep'
   params: {
-    name: '${web!.name}-pe'
+    name: '${web!.name}-pep'
     location: location
     tags: tags
     subnetId: endpointSubnet.id
@@ -199,10 +199,10 @@ module sqlModule '../modules/sql-sqlserverdatabase.bicep' = if (hasSql) {
   }
 }
 
-module sqlEndpoint '../modules/pe-privateendpoint.bicep' = if (hasSql) {
-  name: 'digitalproduct-zt-sql-pe'
+module sqlEndpoint '../modules/pep-privateendpoint.bicep' = if (hasSql) {
+  name: 'digitalproduct-zt-sql-pep'
   params: {
-    name: '${sql!.serverName}-pe'
+    name: '${sql!.serverName}-pep'
     location: location
     tags: tags
     subnetId: endpointSubnet.id
@@ -231,10 +231,10 @@ var storageGroups = [
   { groupId: 'table', zone: privateEndpoints.dnsZones.?table }
 ]
 
-module storageEndpoints '../modules/pe-privateendpoint.bicep' = [for g in storageGroups: if (hasFunc) {
-  name: 'digitalproduct-zt-st-${g.groupId}-pe'
+module storageEndpoints '../modules/pep-privateendpoint.bicep' = [for g in storageGroups: if (hasFunc) {
+  name: 'digitalproduct-zt-st-${g.groupId}-pep'
   params: {
-    name: '${func!.storageName}-${g.groupId}-pe'
+    name: '${func!.storageName}-${g.groupId}-pep'
     location: location
     tags: tags
     subnetId: endpointSubnet.id
@@ -269,10 +269,10 @@ module funcModule '../modules/func-functionsapp.bicep' = if (hasFunc) {
   dependsOn: [storageEndpoints]
 }
 
-module funcEndpoint '../modules/pe-privateendpoint.bicep' = if (hasFunc) {
-  name: 'digitalproduct-zt-func-pe'
+module funcEndpoint '../modules/pep-privateendpoint.bicep' = if (hasFunc) {
+  name: 'digitalproduct-zt-func-pep'
   params: {
-    name: '${func!.name}-pe'
+    name: '${func!.name}-pep'
     location: location
     tags: tags
     subnetId: endpointSubnet.id

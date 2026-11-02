@@ -9,7 +9,7 @@ param tags object
 @minLength(4)
 @maxLength(63)
 @description('Specifies the name of the Log Analytics workspace. 4-63 characters, letters, numbers, and -')
-param sentName string
+param logName string
 
 @minLength(4)
 @maxLength(20)
@@ -19,7 +19,7 @@ param sentName string
   'PerGB2018'
   'CapacityReservation'
 ])
-param sentSku string
+param logSku string
 
 @minLength(1)
 @maxLength(255)
@@ -55,13 +55,13 @@ var restricted = networkAccess == 'restricted'
 //
 // Management
 //
-module sentModule '../modules/sent-loganalyticsworkspace.bicep' = {
-  name: 'sentName'
+module logModule '../modules/log-sentinelworkspace.bicep' = {
+  name: 'logName'
   params: {
-    name: sentName
+    name: logName
     location: location
     tags: tags
-    sku: sentSku
+    sku: logSku
   }
 }
 
@@ -71,7 +71,7 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
     location: location
     tags: tags
     name: appiName
-    workResourceId: sentModule.outputs.id
+    logResourceId: logModule.outputs.id
     publicNetworkAccessForIngestion: restricted ? 'Disabled' : 'Enabled'
     publicNetworkAccessForQuery: restricted ? 'Disabled' : 'Enabled'
   }

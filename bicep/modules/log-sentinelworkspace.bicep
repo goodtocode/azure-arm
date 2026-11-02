@@ -22,16 +22,33 @@ param tags object = {}
 @minValue(30)
 param retentionInDays int = 30
 
-resource workResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
-  name: name
-  location: location
-  tags: empty(tags) ? null : tags
-  properties: {
-    sku: {
-      name: sku
-    }
+// Sentinel = the plain Log Analytics workspace (log-loganalyticsworkspace) plus onboarding
+module workspace 'log-loganalyticsworkspace.bicep' = {
+  name: 'log-sentinel-${name}'
+  params: {
+    name: name
+    location: location
+    sku: sku
+    tags: tags
     retentionInDays: retentionInDays
   }
 }
 
-output id string  = workResource.id
+resource logResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
+  name: name
+  dependsOn: [
+    workspace
+  ]
+}
+
+resource onboarding 'Microsoft.SecurityInsights/onboardingStates@2021-03-01-preview' = {
+  name: 'default'
+  scope: logResource
+  properties: {}
+}
+
+@description('Resource ID of the Log Analytics workspace.')
+output id string = workspace.outputs.id
+
+@description('Resource ID of the Sentinel onboarding state.')
+output onboardingId string = onboarding.id

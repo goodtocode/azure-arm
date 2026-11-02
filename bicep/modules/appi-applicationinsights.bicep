@@ -20,7 +20,7 @@ param name string
 
 @description('The resource ID of the Log Analytics workspace to link to Application Insights. Must be a valid resourceId string.')
 @minLength(1)
-param workResourceId string
+param logResourceId string
 
 @description('Controls whether Application Insights accepts public telemetry ingestion.')
 @allowed([
@@ -44,7 +44,7 @@ resource appiResource 'Microsoft.Insights/components@2020-02-02' = {
   properties: {
     Application_Type: 'web'
     Flow_Type: 'Bluefield'
-    WorkspaceResourceId: workResourceId
+    WorkspaceResourceId: logResourceId
     publicNetworkAccessForIngestion: publicNetworkAccessForIngestion
     publicNetworkAccessForQuery: publicNetworkAccessForQuery
   }

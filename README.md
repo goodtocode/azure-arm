@@ -132,7 +132,7 @@ Phase 2 notes:
 
 ## Module naming
 
-Modules are named `{abbreviation}-{resource}.bicep`. Abbreviations follow the Cloud Adoption Framework (CAF) resource abbreviations where one exists, for example `law-loganalyticsworkspace`, `appi-applicationinsights` and `kv-keyvault`. `sent-loganalyticsworkspace` is kept for the Sentinel-enabled workspace, which composes `law-loganalyticsworkspace`.
+Modules are named `{abbreviation}-{resource}.bicep`. Abbreviations follow the Cloud Adoption Framework (CAF) resource abbreviations where one exists, for example `log-loganalyticsworkspace`, `appi-applicationinsights` and `kv-keyvault`. `log-sentinelworkspace` is the Sentinel-enabled workspace, which composes `log-loganalyticsworkspace`.
 
 ## Bicep folder
 
@@ -164,7 +164,7 @@ param tags = { Environment: 'dev', CostCenter: '0000' }
 param shared = { resourceGroupName: 'ScopeOrTenant-mgmt-dev-wus2-001-rg' }
 param hosting = {
   appiName: 'mgmt-dev-wus2-001-appi'
-  planName: 'mgmt-dev-wus2-F1-001-plan'
+  planName: 'mgmt-dev-wus2-F1-001-asp'
 }
 param api = { name: 'PRODUCT-dev-wus2-001-api' }
 param sql = {
@@ -295,11 +295,11 @@ This repository helps you stand up production-ready Azure foundations faster, wi
 ### High-Value Modules You Can Reuse
 
 - **AI Foundry**: `bicep/modules/aif-foundry.bicep` for Azure AI Foundry hub/project/model deployment with integration-friendly outputs.
-- **Azure OpenAI**: `bicep/modules/aoai-azureopenai.bicep` for a standalone Azure OpenAI account with typed model deployments.
+- **Azure OpenAI**: `bicep/modules/oai-azureopenai.bicep` for a standalone Azure OpenAI account with typed model deployments.
 - **Web and API apps**: `bicep/modules/web-appservice.bicep` and `bicep/modules/api-appservice.bicep` for common App Service hosting patterns.
-- **App Service plans**: `bicep/modules/plan-appserviceplan.bicep` to standardize compute sizing and hosting tiers.
+- **App Service plans**: `bicep/modules/asp-appserviceplan.bicep` to standardize compute sizing and hosting tiers.
 - **SQL foundation**: `bicep/modules/sql-sqlserver.bicep` and `bicep/modules/sqldb-sqldatabase.bicep` are the server and database atoms; `bicep/modules/sql-sqlserverdatabase.bicep` is the combined server and database module the workload templates use.
-- **Operational baseline**: `bicep/modules/appi-applicationinsights.bicep`, `bicep/modules/work-loganalyticsworkspace.bicep` (`sent-loganalyticsworkspace.bicep` wraps it and adds Sentinel onboarding), and `bicep/modules/kv-keyvault.bicep` for observability and secrets.
+- **Operational baseline**: `bicep/modules/appi-applicationinsights.bicep`, `bicep/modules/log-loganalyticsworkspace.bicep` (`log-sentinelworkspace.bicep` wraps it and adds Sentinel onboarding), and `bicep/modules/kv-keyvault.bicep` for observability and secrets.
 - **Virtual machines**: `bicep/modules/vm-virtualmachine.bicep`, `nic-networkinterface.bicep`, and `pip-publicipaddress.bicep` for user machines.
 
 ### Template Tracks by Architecture Style
@@ -523,7 +523,7 @@ This repository includes a shared Ollama deployment path using Azure Container A
 
 ### New Assets
 
-- Module: `bicep/modules/aca-ollama.bicep`
+- Module: `bicep/modules/ca-ollama.bicep`
 - Template: `bicep/templates/platform-shared-ai-ollama.bicep`
 - Variables: `bicep/variables/platform-shared-ai-ollama-dev.bicepparam`
 

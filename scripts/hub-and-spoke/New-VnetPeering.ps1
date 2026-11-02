@@ -23,7 +23,7 @@ $ErrorActionPreference = 'Stop'
 . "$PSScriptRoot\..\lib\Platform.Common.ps1"
 
 $root = Get-BicepRoot
-$peeringModule = Join-Path $root 'modules\vnetpeer-virtualnetworkpeering.bicep'
+$peeringModule = Join-Path $root 'modules\peer-virtualnetworkpeering.bicep'
 $hubParams = Join-Path $root 'variables\platform-hub-network-publicroute-plat.bicepparam'
 $spokeParams = Join-Path $root "variables\platform-spoke-network-publicroute-$Environment.bicepparam"
 $hubSlots = "$(Get-BicepParamValue $hubParams 'regionIac')-$(Get-BicepParamValue $hubParams 'instanceIac')"

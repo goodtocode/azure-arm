@@ -20,10 +20,10 @@ param tags = {
 // =====================
 // Spoke AI in SPOKE_MGMT_RG_NAME
 // =====================
-param environmentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-acaenv'
-param containerAppName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-ollama'
+param environmentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-cae'
+param containerAppName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-ca-ollama'
 param stAccountName = '${storageAccountProductIac}${environmentIac}${regionIac}${instanceIac}oll'
-param storageShareName = 'ollama-models'
+param storageShareName = 'share-ollamamodels'
 
 param modelName = 'phi4'
 param containerImage = 'ollama/ollama:latest'

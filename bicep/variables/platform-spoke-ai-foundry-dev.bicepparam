@@ -22,7 +22,7 @@ param tags = {
 param foundryName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif'
 param projectName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-proj'
 param projectDescription = 'Development spoke AI project.'
-param privateEndpointName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif-pe'
+param privateEndpointName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-aif-pep'
 
 // Required model deployments for Azure AI Foundry.
 param modelDeployments = [

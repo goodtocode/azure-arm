@@ -23,7 +23,7 @@ param shared = {
 
 param hosting = {
   appiName: 'mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
-  planName: 'mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
+  planName: 'mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-asp'
 }
 
 // Components: delete a line to skip that component.

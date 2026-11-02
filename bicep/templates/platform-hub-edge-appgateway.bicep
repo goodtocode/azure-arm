@@ -207,7 +207,7 @@ module pipFirewall '../modules/pip-publicipaddress.bicep' = {
   }
 }
 
-module waf '../modules/agwwaf-applicationgatewaywafpolicy.bicep' = {
+module waf '../modules/waf-applicationgatewaywafpolicy.bicep' = {
   name: 'wafPolicyName'
   params: {
     name: wafPolicyName
@@ -232,7 +232,7 @@ module agw '../modules/agw-applicationgateway.bicep' = if (!empty(backends)) {
   }
 }
 
-module firewall '../modules/fw-azurefirewall.bicep' = {
+module firewall '../modules/afw-azurefirewall.bicep' = {
   name: 'firewallName'
   params: {
     name: firewallName

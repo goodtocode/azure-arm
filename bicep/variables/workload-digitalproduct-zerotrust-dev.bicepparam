@@ -26,7 +26,7 @@ param shared = {
 
 param hosting = {
   appiName: 'mgmt-${environmentIac}-${regionIac}-${instanceIac}-appi'
-  planName: 'mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-plan'
+  planName: 'mgmt-${environmentIac}-${regionIac}-${planSku}-${instanceIac}-asp'
 }
 
 param vnet = {
@@ -37,7 +37,7 @@ param vnet = {
 }
 
 param privateEndpoints = {
-  subnetName: 'network-${environmentIac}-pe-snet'
+  subnetName: 'network-${environmentIac}-pep-snet'
   dnsZones: {
     sites: '${dnsPrefix}/privatelink.azurewebsites.net'
     sql: '${dnsPrefix}/privatelink.database.windows.net'

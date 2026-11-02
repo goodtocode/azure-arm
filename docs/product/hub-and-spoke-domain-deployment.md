@@ -31,7 +31,7 @@ The rows remain grouped by deployment domain. A shared or workload deployment ca
 | platform-hub-network-publicroute.bicep | platform-hub-network-publicroute-plat.bicepparam | hub-network-plat-wus2-001-rg | Subnet | hub-network-hub-management-001-snet |
 | platform-hub-network-zerotrust.bicep | platform-hub-network-zerotrust-plat.bicepparam | hub-network-plat-wus2-001-rg | VNet | hub-network-plat-wus2-001-vnet |
 | platform-hub-network-zerotrust.bicep | platform-hub-network-zerotrust-plat.bicepparam | hub-network-plat-wus2-001-rg | Front Door Premium, API Management | (see template) |
-| platform-hub-mgmt.bicep | platform-hub-mgmt-plat.bicepparam | hub-management-plat-wus2-001-rg | Sentinel Workspace | hub-management-plat-wus2-001-sent |
+| platform-hub-mgmt.bicep | platform-hub-mgmt-plat.bicepparam | hub-management-plat-wus2-001-rg | Sentinel Workspace | hub-management-plat-wus2-001-log |
 | platform-hub-mgmt.bicep | platform-hub-mgmt-plat.bicepparam | hub-management-plat-wus2-001-rg | Application Insights | hub-management-plat-wus2-001-appi |
 | platform-hub-mgmt.bicep | platform-hub-mgmt-plat.bicepparam | hub-management-plat-wus2-001-rg | Key Vault | hub-management-plat-001-kv |
 
@@ -47,8 +47,8 @@ The zero-trust hub network template is a work in progress: its private DNS zones
 | platform-shared-mgmt.bicep | platform-shared-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | Application Insights | spoke-management-dev-wus2-001-appi |
 | platform-shared-mgmt.bicep | platform-shared-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Configuration | spoke-management-dev-wus2-001-appcs |
 | platform-shared-mgmt.bicep | platform-shared-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | Key Vault | spoke-management-dev-001-kv |
-| platform-shared-mgmt.bicep | platform-shared-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Service Plan | spoke-management-dev-wus2-f1-001-plan |
-| platform-shared-mgmt.bicep | platform-shared-mgmt-dev.bicepparam | hub-management-plat-wus2-001-rg | Sentinel Workspace | hub-management-plat-wus2-001-sent |
+| platform-shared-mgmt.bicep | platform-shared-mgmt-dev.bicepparam | spoke-management-dev-wus2-001-rg | App Service Plan | spoke-management-dev-wus2-f1-001-asp |
+| platform-shared-mgmt.bicep | platform-shared-mgmt-dev.bicepparam | hub-management-plat-wus2-001-rg | Sentinel Workspace | hub-management-plat-wus2-001-log |
 
 ## Platform Spoke Analytics
 
@@ -62,8 +62,8 @@ The zero-trust hub network template is a work in progress: its private DNS zones
 |----------|----------|----------|----------|----------|
 | platform-shared-ai-foundry.bicep | platform-shared-ai-foundry-dev.bicepparam | spoke-ai-dev-wus-100-rg | Azure AI Foundry | spoke-ai-dev-wus-100-aif |
 | platform-shared-ai-foundry.bicep | platform-shared-ai-foundry-dev.bicepparam | spoke-ai-dev-wus-100-rg | Azure AI Foundry Project | spoke-ai-dev-wus-100-proj |
-| platform-shared-ai-ollama.bicep | platform-shared-ai-ollama-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Container App Environment | spoke-ai-dev-wus2-001-acaenv |
-| platform-shared-ai-ollama.bicep | platform-shared-ai-ollama-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Container App | spoke-ai-dev-wus2-001-ollama |
+| platform-shared-ai-ollama.bicep | platform-shared-ai-ollama-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Container App Environment | spoke-ai-dev-wus2-001-cae |
+| platform-shared-ai-ollama.bicep | platform-shared-ai-ollama-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Container App | spoke-ai-dev-wus2-001-ca-ollama |
 | platform-shared-ai-ollama.bicep | platform-shared-ai-ollama-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Storage Account | spokeaidevwus2001oll |
 
 ## Platform Spoke AI
@@ -72,7 +72,7 @@ The zero-trust hub network template is a work in progress: its private DNS zones
 |----------|----------|----------|----------|----------|
 | platform-spoke-ai-foundry.bicep | platform-spoke-ai-foundry-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Azure AI Foundry | spoke-ai-dev-wus2-001-aif |
 | platform-spoke-ai-foundry.bicep | platform-spoke-ai-foundry-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Azure AI Foundry Project | spoke-ai-dev-wus2-001-proj |
-| platform-spoke-ai-foundry.bicep | platform-spoke-ai-foundry-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Private Endpoint | spoke-ai-dev-wus2-001-aif-pe |
+| platform-spoke-ai-foundry.bicep | platform-spoke-ai-foundry-dev.bicepparam | spoke-ai-dev-wus2-001-rg | Private Endpoint | spoke-ai-dev-wus2-001-aif-pep |
 
 ## Workload Digital Product
 
@@ -80,11 +80,11 @@ One template serves modes 1-3. The mode and the component objects (web, api, sql
 
 | Bicep Template | Parameter File | Mode | Resource Group Example | Resource Type | Resource Name Example |
 |----------|----------|----------|----------|----------|----------|
-| workload-digitalproduct.bicep | workload-digitalproduct-standalone-dev.bicepparam | standalone | devtest-nursing-beacon-dev-001-rg | Log Analytics, App Insights, App Service Plan | nursing-beacon-dev-001-work / -appi / -plan |
+| workload-digitalproduct.bicep | workload-digitalproduct-standalone-dev.bicepparam | standalone | devtest-nursing-beacon-dev-001-rg | Log Analytics, App Insights, App Service Plan | nursing-beacon-dev-001-log / -appi / -asp |
 | workload-digitalproduct.bicep | workload-digitalproduct-shared-dev.bicepparam | shared | devtest-nursing-beacon-dev-001-rg | Web App, API App | nursing-beacon-dev-001-web / -api |
 | workload-digitalproduct.bicep | workload-digitalproduct-network-dev.bicepparam | network | devtest-nursing-beacon-dev-001-rg | SQL Server, SQL Database | nursing-beacon-dev-001-sql / -sqldb |
 | workload-digitalproduct.bicep | any of the above | any | devtest-nursing-beacon-dev-001-rg | Function App and Storage | nursing-beacon-dev-001-func |
-| workload-digitalproduct-zerotrust.bicep | workload-digitalproduct-zerotrust-dev.bicepparam | zerotrust | devtest-nursing-beacon-dev-001-rg | Private endpoints | nursing-beacon-dev-001-web-pe / -api-pe / -sql-pe |
+| workload-digitalproduct-zerotrust.bicep | workload-digitalproduct-zerotrust-dev.bicepparam | zerotrust | devtest-nursing-beacon-dev-001-rg | Private endpoints | nursing-beacon-dev-001-web-pep / -api-pep / -sql-pep |
 
 Shared and network modes reuse the plan and App Insights in `management-dev-wus2-001-rg`. Network mode also integrates the apps with a subnet in `network-dev-wus2-001-rg`.
 

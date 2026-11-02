@@ -20,8 +20,8 @@ param tags = {
 // Management RG: ${productIac}-${environmentIac}-${regionIac}-${instanceIac}-rg
 // rg: gtc-hub-mgmt-plat-wus2-001
 // =====================
-param sentName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-sent'
-param sentSku = 'PerGB2018'
+param logName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-log'
+param logSku = 'PerGB2018'
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 param kvName = '${productIac}-${environmentIac}-${instanceIac}-kv'
 param kvSku = 'standard'
