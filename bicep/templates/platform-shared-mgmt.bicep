@@ -16,7 +16,7 @@ param hubMgmtResourceGroupName string = ''
 @minLength(4)
 @maxLength(63)
 @description('Specifies the name of the Log Analytics workspace, created here or existing in the hub resource group. 4-63 characters, letters, numbers, and -')
-param workName string
+param logName string
 
 @minLength(1)
 @maxLength(255)
@@ -95,16 +95,16 @@ var kvNameResolved = empty(kvName) ? kvNameDefault : kvName
 
 var useSharedWorkspace = !empty(hubMgmtResourceGroupName)
 
-module lawModule '../modules/law-loganalyticsworkspace.bicep' = if (!useSharedWorkspace) {
-  name: 'workName'
+module logModule '../modules/log-loganalyticsworkspace.bicep' = if (!useSharedWorkspace) {
+  name: 'logName'
   params: {
-    name: workName
+    name: logName
     location: location
     tags: tags
   }
 }
 
-var workResourceId = useSharedWorkspace ? resourceId(hubMgmtSubscriptionId, hubMgmtResourceGroupName, 'Microsoft.OperationalInsights/workspaces', workName) : lawModule!.outputs.id
+var logResourceId = useSharedWorkspace ? resourceId(hubMgmtSubscriptionId, hubMgmtResourceGroupName, 'Microsoft.OperationalInsights/workspaces', logName) : logModule!.outputs.id
 
 module appiModule '../modules/appi-applicationinsights.bicep' = {
   name: 'appiName'
@@ -112,7 +112,7 @@ module appiModule '../modules/appi-applicationinsights.bicep' = {
     location: location
     tags: tags
     name: appiName
-    workResourceId: workResourceId
+    logResourceId: logResourceId
     publicNetworkAccessForIngestion: restricted ? 'Disabled' : 'Enabled'
     publicNetworkAccessForQuery: restricted ? 'Disabled' : 'Enabled'
   }
@@ -143,7 +143,7 @@ module appcsModule '../modules/appcs-appconfigurationstore.bicep' = {
   }
 }
 
-module planModule '../modules/plan-appserviceplan.bicep' = {
+module planModule '../modules/asp-appserviceplan.bicep' = {
   name: 'planModule'
   params: {
     name: planName

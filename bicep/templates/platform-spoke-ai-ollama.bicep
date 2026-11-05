@@ -24,7 +24,7 @@ param stAccountName string
 @minLength(3)
 @maxLength(63)
 @description('Name of the Azure Files share used for persistent Ollama model storage.')
-param storageShareName string = 'ollama-models'
+param storageShareName string = 'share-ollamamodels'
 
 @description('Ollama model to pull and serve on startup.')
 @allowed([
@@ -87,7 +87,7 @@ resource managedEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   }
 }
 
-module ollamaModule '../modules/aca-ollama.bicep' = {
+module ollamaModule '../modules/ca-ollama.bicep' = {
   name: 'ollamaModule'
   dependsOn: [
     managedEnvironment

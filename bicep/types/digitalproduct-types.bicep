@@ -20,7 +20,7 @@ type hostingConfig = {
 
   @minLength(4)
   @maxLength(63)
-  @description('Standalone only. Log Analytics workspace name backing Application Insights.')
+  @description('Required in standalone mode. Log Analytics workspace name backing Application Insights.')
   workspaceName: string?
 }
 

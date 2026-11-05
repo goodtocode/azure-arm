@@ -31,7 +31,7 @@ param capacitySkuName string = 'F2'
 @description('User identities or object IDs to assign as Fabric capacity administrators.')
 param capacityAdminMembers array
 
-module fabricCapacityModule '../modules/fabric-capacity.bicep' = {
+module fabricCapacityModule '../modules/fc-fabriccapacity.bicep' = {
   name: 'fabricCapacityModule'
   params: {
     name: capacityName

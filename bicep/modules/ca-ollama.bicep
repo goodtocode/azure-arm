@@ -22,7 +22,7 @@ param stAccountName string
 @minLength(3)
 @maxLength(63)
 @description('Name of the Azure Files share mounted into Ollama for persistent model data.')
-param storageShareName string = 'ollama-models'
+param storageShareName string = 'share-ollamamodels'
 
 @description('Ollama model to pull and serve on startup.')
 @allowed([

@@ -17,9 +17,9 @@ param tags = { Environment: environmentIac, CostCenter: '0000' }
 
 param hosting = {
   appiName: '${prefix}-appi'
-  planName: '${prefix}-F1-plan'
+  planName: '${prefix}-F1-asp'
   planSku: 'F1'
-  workspaceName: '${prefix}-work'
+  workspaceName: '${prefix}-log'
 }
 
 // Components: delete a line to skip that component.

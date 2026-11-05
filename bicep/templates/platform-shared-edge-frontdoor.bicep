@@ -60,10 +60,10 @@ module afd '../modules/afd-azurefrontdoor.bicep' = {
   }
 }
 
-module waf '../modules/afdwaf-frontdoorwafpolicy.bicep' = {
+module waf '../modules/fdfp-frontdoorwafpolicy.bicep' = {
   name: 'wafName'
   params: {
-    name: '${replace(afdName, '-', '')}waf'
+    name: '${replace(replace(afdName, '-afd', ''), '-', '')}fdfp'
     tags: tags
     sku: afdSku
     mode: wafMode

@@ -39,7 +39,7 @@ Resource group and resource names use five slots, in order, joined by hyphens:
 | 2. `env` | Environment | `dev`, `test`, `stage`, `prod`; `plat` for the platform subscription | `dev` |
 | 3. `region` | Short region code | `wus2`, `eus2` | `wus2` |
 | 4. `instance` | Three-digit instance number, constant within a repository | `100` | `100` |
-| 5. `type` | Short resource type abbreviation. Start from the CAF abbreviation and use a shorter one when it is clearer. `rg` for resource groups | `rg`, `vnet`, `snet`, `law`, `appi`, `kv`, `plan`, `aif` | `appi` |
+| 5. `type` | Short resource type abbreviation. Start from the CAF abbreviation and use a shorter one when it is clearer. `rg` for resource groups | `rg`, `vnet`, `snet`, `log`, `appi`, `kv`, `asp`, `aif` | `appi` |
 
 Rules:
 
@@ -49,7 +49,7 @@ Rules:
 
 | Resource group | Resources |
 | --- | --- |
-| `mgmt-dev-wus2-100-rg` | `mgmt-dev-wus2-100-law`, `mgmt-dev-wus2-100-appi`, `mgmt-dev-100-kv` |
+| `mgmt-dev-wus2-100-rg` | `mgmt-dev-wus2-100-log`, `mgmt-dev-wus2-100-appi`, `mgmt-dev-100-kv` |
 | `network-plat-wus2-100-rg` | `network-plat-wus2-100-vnet` |
 | `ai-dev-wus2-100-rg` | `ai-dev-wus2-100-aif`, `ai-dev-wus2-100-proj` |
 | `edge-plat-wus2-100-rg` | `edge-plat-100-afd` |
@@ -191,7 +191,7 @@ platform-{template name}-{env}.bicepparam        env:  dev | test | stage | prod
 
 Workload archetypes currently defined: `digitalproduct` (modes standalone, shared, network, zerotrust) and `usermachines` (modes standalone, network, zerotrust; `shared` is excluded because a VM always needs a subnet). Do not use `landingzone-` as a deployment prefix. `scripts/validation/Test-IacConventions.ps1` enforces these rules, including the modes each archetype supports, and compiles every template and parameter file.
 
-Module names use `{abbreviation}-{resource}` in lower case, for example `vm-virtualmachine` or `pe-privateendpoint`. Where two modules cover the same resource, one must be the atom and the other must compose it rather than copy it (for example `sent-loganalyticsworkspace` composes `work-loganalyticsworkspace` and adds Sentinel onboarding).
+Module names use `{abbreviation}-{resource}` in lower case, for example `vm-virtualmachine` or `pep-privateendpoint`. Where two modules cover the same resource, one must be the atom and the other must compose it rather than copy it (for example `log-sentinelworkspace` composes `log-loganalyticsworkspace` and adds Sentinel onboarding).
 
 Examples:
 

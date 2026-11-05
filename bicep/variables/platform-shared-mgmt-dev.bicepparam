@@ -16,11 +16,11 @@ param tags = {
 }
 
 // Phase 3: set hubMgmtSubscriptionId and hubMgmtResourceGroupName to use the platform workspace instead.
-param workName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-law'
+param logName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-log'
 param appiName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appi'
 param appcsName = '${productIac}-${environmentIac}-${regionIac}-${instanceIac}-appcs'
 param appcsSku = 'free'
 param kvName = '${productIac}-${environmentIac}-${instanceIac}-kv'
 param planSku = planSkuIac
-param planName = '${productIac}-${environmentIac}-${regionIac}-${planSkuIac}-${instanceIac}-plan'
+param planName = '${productIac}-${environmentIac}-${regionIac}-${planSkuIac}-${instanceIac}-asp'
 param networkAccess = 'public'
