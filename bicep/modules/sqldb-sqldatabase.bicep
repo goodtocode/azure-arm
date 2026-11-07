@@ -44,8 +44,15 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-08-01-preview' = {
     //family: 'skuFamily' // (e.g., Gen4, Gen5)
     capacity: sqlCapacity // (e.g., 1, 2, 4)
   }
-  properties: {
+
+    properties: {
     collation: collation
     maxSizeBytes: maxSizeBytes
   }
 }
+
+@description('SQL database resource ID.')
+output id string = sqlDatabase.id
+
+@description('SQL database name.')
+output name string = name

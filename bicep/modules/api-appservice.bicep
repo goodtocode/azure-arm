@@ -74,6 +74,9 @@ param vnetBackupRestoreEnabled bool = false
 @allowed(['Enabled', 'Disabled'])
 param publicNetworkAccess string = 'Enabled'
 
+@description('User-assigned identity resource ID. Empty preserves the existing system-assigned identity.')
+param userAssignedIdentityId string = ''
+
 resource apiAppResource 'Microsoft.Web/sites@2023-12-01' = {
   name: name
   location: location
@@ -112,9 +115,21 @@ resource apiAppResource 'Microsoft.Web/sites@2023-12-01' = {
       ]
     }
   }
-  identity: {
+  identity: empty(userAssignedIdentityId) ? {
     type: 'SystemAssigned'
+  } : {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${userAssignedIdentityId}': {}
+    }
   }
 }
 
+@description('API app resource ID.')
 output id string = apiAppResource.id
+
+@description('Actual App Service default host name; consumers must not reconstruct it from the app name.')
+output defaultHostName string = apiAppResource.properties.defaultHostName
+
+@description('System-assigned managed identity object ID for resource grants and SQL contained users.')
+output principalId string = empty(userAssignedIdentityId) ? apiAppResource.identity.principalId : ''

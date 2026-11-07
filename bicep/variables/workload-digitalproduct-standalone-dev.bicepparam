@@ -1,7 +1,8 @@
 using '../templates/workload-digitalproduct.bicep'
 
 // Mode 1 - Standalone: plan, Log Analytics, App Insights and every component live in this RG.
-// Deploy: az deployment group create -g <rg> -f bicep/templates/workload-digitalproduct.bicep -p bicep/variables/workload-digitalproduct-standalone-dev.bicepparam   (set $env:SQL_ADMIN_PASSWORD first)
+// Set SQL_ENTRA_ADMIN_GROUP_OBJECT_ID and AZURE_TENANT_ID to the workload tenant's administrator group and tenant.
+// Placeholder IDs permit offline compilation only; replace them before deployment.
 
 var productIac = 'PRODUCT'
 var environmentIac = 'dev'
@@ -24,13 +25,19 @@ param hosting = {
 
 // Components: delete a line to skip that component.
 param web = { name: '${prefix}-web' }
-param api = { name: '${prefix}-api' }
+param api = { name: '${prefix}-api', userAssignedIdentityName: '${prefix}-api-id' }
 param sql = {
   serverName: '${prefix}-sql'
   databaseName: '${prefix}-sqldb'
   databaseSku: 'Basic'
-  adminLogin: readEnvironmentVariable('SQL_ADMIN_USER', 'LocalAdmin')
-  adminPassword: readEnvironmentVariable('SQL_ADMIN_PASSWORD', 'PASS_FROM_CLI_PARAMETERS')
+  server: {
+    kind: 'EntraOnly'
+    administrator: {
+      login: 'SQL Administrators'
+      objectId: readEnvironmentVariable('SQL_ENTRA_ADMIN_GROUP_OBJECT_ID', '00000000-0000-0000-0000-000000000000')
+      tenantId: readEnvironmentVariable('AZURE_TENANT_ID', '00000000-0000-0000-0000-000000000000')
+    }
+  }
 }
 param func = {
   name: '${prefix}-func'

@@ -10,16 +10,19 @@ param location string = resourceGroup().location
 @description('Tags to apply to the SQL Server resource.')
 param tags object = {}
 
-@description('The administrator login name for the SQL Server. Must be 1-60 characters.')
-@minLength(1)
-@maxLength(60)
-param adminLogin string
+@description('Deployment-owner-selected administrator group in the workload tenant.')
+param entraAdministrator {
+  login: string
+  objectId: string
+  tenantId: string
+}
 
-@description('The administrator password for the SQL Server. Must be 1-128 characters.')
-@minLength(1)
-@maxLength(128)
-@secure()
-param adminPassword string
+@description('Public network access. Private-only compositions explicitly disable it.')
+@allowed(['Enabled', 'Disabled'])
+param publicNetworkAccess string = 'Enabled'
+
+@description('Allow connections from Azure IP addresses. Does not authorize database access.')
+param allowAzureServices bool = true
 
 @description('The starting IP address for the SQL Server firewall rule. Default is 0.0.0.0.')
 param startIpAddress string = '0.0.0.0'
@@ -35,12 +38,19 @@ resource sqlServer 'Microsoft.Sql/servers@2023-08-01-preview' = {
   location: location  
   tags: empty(tags) ? null : tags  
   properties: {
-    administratorLogin: adminLogin
-    administratorLoginPassword: adminPassword
+    publicNetworkAccess: publicNetworkAccess
+    administrators: {
+      administratorType: 'ActiveDirectory'
+      principalType: 'Group'
+      login: entraAdministrator.login
+      sid: entraAdministrator.objectId
+      tenantId: entraAdministrator.tenantId
+      azureADOnlyAuthentication: true
+    }
   }
 }
 
-resource sqlServerFirewall 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = {
+resource sqlServerFirewall 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = if (allowAzureServices) {
   parent: sqlServer
   name: 'AllowAllWindowsAzureIps'
   properties: {
@@ -49,5 +59,11 @@ resource sqlServerFirewall 'Microsoft.Sql/servers/firewallRules@2023-08-01-previ
   }
 }
 
-output id string  = sqlServer.id
-output name string  = sqlServer.name
+@description('SQL logical server resource ID.')
+output id string = sqlServer.id
+
+@description('SQL logical server name.')
+output name string = sqlServer.name
+
+@description('SQL server fully qualified domain name.')
+output fullyQualifiedDomainName string = sqlServer.properties.fullyQualifiedDomainName
