@@ -6,7 +6,7 @@ var productIac = 'mgmt'
 var environmentIac = 'prod'
 var regionIac = 'wus2'
 var instanceIac = '001'
-var planSkuIac = 'B1'
+var planSkuIac = 'F1'
 param location = 'westus2'
 param tags = {
   Environment: environmentIac

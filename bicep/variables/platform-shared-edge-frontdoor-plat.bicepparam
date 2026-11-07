@@ -19,9 +19,9 @@ param tags = {
 // rg: edge-plat-wus2-001-rg
 // =====================
 param afdName = '${productIac}-${environmentIac}-${instanceIac}-afd'
-param afdSku = 'Premium_AzureFrontDoor'
+param afdSku = 'Standard_AzureFrontDoor'
 param wafMode = 'Prevention'
-param wafRateLimitThreshold = 0
+param wafRateLimitThreshold = 300
 
 // One entry per product. Use a separate hostname per product, e.g. compass.censic.cloud.
 param origins = [

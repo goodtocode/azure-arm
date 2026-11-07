@@ -9,7 +9,7 @@ param tags = { Environment: 'test' }
 param hosting = {
   appiName: 'product-test-appi'
   planName: 'product-test-asp'
-  planSku: 'B1'
+  planSku: 'F1'
   workspaceName: 'product-test-log'
 }
 

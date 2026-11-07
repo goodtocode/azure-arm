@@ -367,6 +367,14 @@ az deployment group create \
 
 ### 3. Supply Identity Configuration and Per-Run Overrides
 
+The edge template defaults to Standard Front Door with custom-rule WAF and a configurable
+300 requests/client-IP/minute rate limit. Managed threat/bot rule sets are Premium-only.
+Empty `origins` skips new profile/WAF creation, avoiding the fixed profile base fee; it never
+deletes an existing profile. Standard is approximately USD 35/month and Premium USD 330/month
+before request/transfer and any separate WAF charges. An existing Premium profile cannot be
+downgraded in place. Keep edge disabled until it has a real ingress purpose, and restrict origins
+to the selected Front Door profile before treating WAF as a protection boundary. Retain app auth/TLS.
+
 For the automated consumer setup, copy the complete `bicep/modules`, `bicep/types`,
 `bicep/templates`, and selected `bicep/variables` folders into `.azure/`, and `scripts/`
 into `.azure/scripts/`. The companion `github-actions` repository supplies the root

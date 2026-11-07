@@ -8,12 +8,12 @@ param tags object
 @description('Specifies the name of the Azure Front Door profile. 3-63 characters, lowercase letters, numbers, and -')
 param afdName string
 
-@description('Specifies the SKU for Azure Front Door. Premium adds bot protection and Private Link.')
+@description('Front Door tier. Standard provides custom-rule WAF; Premium adds managed threat/bot rules and Private Link.')
 @allowed([
   'Standard_AzureFrontDoor'
   'Premium_AzureFrontDoor'
 ])
-param afdSku string = 'Premium_AzureFrontDoor'
+param afdSku string = 'Standard_AzureFrontDoor'
 
 @description('Specifies the WAF mode. Prevention blocks matching requests; Detection only logs them.')
 @allowed([
@@ -25,9 +25,9 @@ param wafMode string = 'Prevention'
 @minValue(0)
 @maxValue(100000)
 @description('Specifies the maximum requests per client IP per minute before blocking. 0 disables the rate limit rule.')
-param wafRateLimitThreshold int = 0
+param wafRateLimitThreshold int = 300
 
-@description('Specifies the products served through Front Door, one endpoint per entry.')
+@description('Products served through Front Door, one endpoint per entry. Empty skips edge resource creation and its fixed base fee; it does not delete existing resources.')
 param origins originType[] = []
 
 type originType = {
@@ -50,7 +50,9 @@ type originType = {
   healthProbePath: string?
 }
 
-module afd '../modules/afd-azurefrontdoor.bicep' = {
+var hasOrigins = !empty(origins)
+
+module afd '../modules/afd-azurefrontdoor.bicep' = if (hasOrigins) {
   name: 'afdName'
   params: {
     name: afdName
@@ -60,7 +62,7 @@ module afd '../modules/afd-azurefrontdoor.bicep' = {
   }
 }
 
-module waf '../modules/fdfp-frontdoorwafpolicy.bicep' = {
+module waf '../modules/fdfp-frontdoorwafpolicy.bicep' = if (hasOrigins) {
   name: 'wafName'
   params: {
     name: '${replace(replace(afdName, '-afd', ''), '-', '')}fdfp'
@@ -90,7 +92,7 @@ module security '../modules/afdsec-frontdoorsecuritypolicy.bicep' = if (!empty(o
   params: {
     profileName: afdName
     name: '${afdName}-waf'
-    wafPolicyId: waf.outputs.id
+    wafPolicyId: waf!.outputs.id
     domainIds: [for (o, i) in origins: origin[i].outputs.endpointId]
     customDomainIds: [for (o, i) in origins: origin[i].outputs.customDomainId]
   }
@@ -103,4 +105,4 @@ output endpointHostNames array = [for (o, i) in origins: origin[i].outputs.endpo
 output customDomainValidationTokens array = [for (o, i) in origins: origin[i].outputs.customDomainValidationToken]
 
 @description('Resource ID of the Front Door profile.')
-output resourceId string = afd.outputs.id
+output resourceId string = hasOrigins ? afd!.outputs.id : ''

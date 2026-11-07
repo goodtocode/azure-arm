@@ -8,12 +8,12 @@ param name string
 @description('Tags to apply to the WAF policy.')
 param tags object = {}
 
-@description('SKU of the Front Door profile the policy attaches to. Bot protection requires Premium_AzureFrontDoor.')
+@description('SKU of the Front Door profile. Standard supports custom rules only; managed threat and bot rule sets require Premium.')
 @allowed([
   'Standard_AzureFrontDoor'
   'Premium_AzureFrontDoor'
 ])
-param sku string = 'Premium_AzureFrontDoor'
+param sku string = 'Standard_AzureFrontDoor'
 
 @description('Policy mode. Prevention blocks matching requests; Detection only logs them.')
 @allowed([
@@ -35,7 +35,7 @@ param botManagerRuleSetVersion string = '1.1'
 @description('Maximum requests per client IP per minute before blocking. 0 disables the rate limit rule.')
 @minValue(0)
 @maxValue(100000)
-param rateLimitThreshold int = 0
+param rateLimitThreshold int = 300
 
 var defaultRuleSet = {
   ruleSetType: 'Microsoft_DefaultRuleSet'
@@ -85,9 +85,7 @@ resource waf 'Microsoft.Network/frontdoorWebApplicationFirewallPolicies@2024-02-
       managedRuleSets: sku == 'Premium_AzureFrontDoor' ? [
         defaultRuleSet
         botManagerRuleSet
-      ] : [
-        defaultRuleSet
-      ]
+      ] : []
     }
     customRules: {
       rules: rateLimitThreshold > 0 ? [
