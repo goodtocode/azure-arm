@@ -120,4 +120,11 @@ resource webAppResource 'Microsoft.Web/sites@2023-12-01' = {
   }
 }
 
+@description('Web app resource ID.')
 output id string = webAppResource.id
+
+@description('Actual App Service default host name; consumers must not reconstruct it from the app name.')
+output defaultHostName string = webAppResource.properties.defaultHostName
+
+@description('System-assigned managed identity object ID. Independent of the sign-in app registration.')
+output principalId string = webAppResource.identity.principalId
