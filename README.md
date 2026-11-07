@@ -390,8 +390,9 @@ az deployment group create `
 
 `sql.server.kind` is a discriminated choice:
 
-- `EntraOnly`: create a server using `administrator: { login, objectId, tenantId }`; no SQL password is accepted.
-- `Existing`: reference `resourceGroupName` and optional `subscriptionId`, creating only the product database there. Its region comes from the existing server. Do not modify server administrator, firewall, or authentication; the owner must authorize database provisioning and Entra access. Do not point this at an existing product database without an explicit adoption/migration review.
+- `EntraOnly`: create a server using `administrator: { login, objectId, tenantId }`, without a SQL administrator password.
+- `SqlAuth`: create a server using `administratorLogin`; supply the top-level secure `sqlAdministratorPassword` separately. Never put passwords inside `sql` or deployment outputs.
+- `Existing`: reference `resourceGroupName`, optional `subscriptionId`, and optional `authentication` (`EntraOnly` by default or `SqlAuth`), creating only the product database there. Its region comes from the existing server. The owner must authorize database provisioning and access; the workload never changes server settings. Adopting an existing product database requires an explicit review.
 
 `api.userAssignedIdentityName` is optional. Omit it to retain the existing system-assigned identity; set it to create a dedicated workload-owned UAMI with a stable client ID. No identity is shared between products by default. `apiPrincipalId` is for Azure RBAC; `apiManagedIdentityClientId` is for SqlClient identity selection and service-principal SQL SID, and is empty for system-assigned identity.
 
@@ -410,11 +411,21 @@ The output contract includes app names, Application Insights resource ID, SQL ho
 
 LocalDB/SQL Server Windows authentication and local clone/debug scripts are unchanged. A laptop does not require an Azure managed identity, and this resource/bootstrap slice does not remove AI keys or web confidential-client secrets.
 
-Owned SQL servers always enforce Entra-only authentication; neither password inputs nor
-authentication-transition overrides are supported. Applying the template to an owned server
-enforces that policy immediately for every database. Plan installation/maintenance accordingly.
-The `Existing` branch requires an already Entra-only server and never changes its authentication,
-administrator or firewall. The workflow validates that prerequisite.
+Owned SQL servers select authentication at creation. Changing authentication or the immutable SQL
+administrator login requires operator-managed replacement; pipelines never convert or delete servers.
+For ordinary redeployments, pass `sqlCreateServer=false`: creation-only administrator and authentication
+properties are omitted while tags, public network access, firewall IP ranges and databases remain managed.
+The module-level equivalent is `createServer=false`. Manual deployments must select this explicitly;
+the GitHub Actions helper selects it through read-only lookups and rejects mismatched authentication.
+New servers default to `sqlCreateServer=true`. Repeated same-mode deployments must preserve data.
+
+For `SqlAuth`, configure `SQL_ADMIN_USER`, `SQL_ADMIN_PASSWORD`, `SQL_MIGRATION_USER`, and
+`SQL_MIGRATION_PASSWORD` environment secrets before deployment. The workflows pass the administrator
+username/password to creation and automatically provision contained users after IaC and before migrations.
+The administrator is used only for provisioning; migrations use the separate migration credential.
+Runtime credentials are generated and retained in the API App Service connection string, not additional
+GitHub secrets. The helper never changes server authentication or removes existing data.
+Entra-only examples and managed-identity bootstrap remain the default.
 
 The deployment owner chooses an existing administrator group in the workload tenant.
 Censic may select its internal operations group; customer installations select a customer-owned

@@ -86,6 +86,20 @@ param api apiConfig?
 @description('SQL Server and Database. Omit to skip.')
 param sql sqlConfig?
 
+@description('Create an owned SQL server. Set false on subsequent deployments to preserve its creation-time authentication.')
+param sqlCreateServer bool = true
+
+@secure()
+@description('Password required only when creating a SqlAuth server. Supply through an approved secret store.')
+param sqlAdministratorPassword string = ''
+
+@description('SQL administrator login override for SqlAuth creation. The pipeline supplies SQL_ADMIN_USER.')
+param sqlAdministratorLogin string = ''
+
+@description('Optional owned-server authentication choice supplied by setup. Existing servers retain their declared authentication.')
+@allowed(['', 'EntraOnly', 'SqlAuth'])
+param sqlAuthentication string = ''
+
 @description('Function App and its storage account. Omit to skip.')
 param func funcConfig?
 
@@ -200,6 +214,10 @@ module sqlModule '../modules/sqldb-workloaddatabase.bicep' = if (hasSql) {
     location: location
     tags: tags
     sql: sql!
+    createServer: sqlCreateServer
+    sqlAdministratorPassword: sqlAdministratorPassword
+    sqlAdministratorLogin: sqlAdministratorLogin
+    sqlAuthentication: sqlAuthentication
     publicNetworkAccess: 'Disabled'
     allowAzureServices: false
   }

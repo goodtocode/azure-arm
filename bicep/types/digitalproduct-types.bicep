@@ -73,8 +73,21 @@ type sqlEntraServer = {
 }
 
 @sealed()
+type sqlPasswordServer = {
+  kind: 'SqlAuth'
+
+  @minLength(1)
+  @maxLength(128)
+  @description('SQL administrator login selected at creation. Password is supplied separately as a secure parameter.')
+  administratorLogin: string
+}
+
+@sealed()
 type sqlExistingServer = {
   kind: 'Existing'
+
+  @description('Expected authentication on the independently owned server. Defaults to EntraOnly; never modified by this deployment.')
+  authentication: 'EntraOnly' | 'SqlAuth'?
 
   @minLength(1)
   @maxLength(90)
@@ -87,7 +100,7 @@ type sqlExistingServer = {
 
 @export()
 @discriminator('kind')
-type sqlServerDeployment = sqlEntraServer | sqlExistingServer
+type sqlServerDeployment = sqlEntraServer | sqlPasswordServer | sqlExistingServer
 
 @export()
 @sealed()
@@ -105,7 +118,23 @@ type sqlConfig = {
   @description('SQL Database SKU.')
   databaseSku: 'Basic' | 'Standard' | 'Premium'?
 
-  @description('Create an Entra-only server, or create a database on an independently owned Entra-only server.')
+  @description('Owned server public network access in standard compositions. Zero-trust compositions force Disabled.')
+  publicNetworkAccess: 'Enabled' | 'Disabled'?
+
+  @description('Manage the owned server firewall rule. Zero-trust compositions disable it; referenced servers are untouched.')
+  allowAzureServices: bool?
+
+  @minLength(7)
+  @maxLength(15)
+  @description('Start IPv4 address of the owned server firewall rule. Defaults to 0.0.0.0.')
+  startIpAddress: string?
+
+  @minLength(7)
+  @maxLength(15)
+  @description('End IPv4 address of the owned server firewall rule. Defaults to 0.0.0.0.')
+  endIpAddress: string?
+
+  @description('Create an Entra-only or SQL-authentication server, or reference an independently owned server. Owned-server authentication is fixed at creation.')
   server: sqlServerDeployment
 }
 

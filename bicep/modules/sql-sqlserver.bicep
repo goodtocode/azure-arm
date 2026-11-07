@@ -15,7 +15,21 @@ param entraAdministrator {
   login: string
   objectId: string
   tenantId: string
-}
+}?
+
+@description('Authentication selected at creation. Changing modes requires a replacement server.')
+@allowed(['EntraOnly', 'SqlAuth'])
+param authentication string = 'EntraOnly'
+
+@description('Create a server with authentication settings. Set false for ordinary updates to an existing server.')
+param createServer bool = true
+
+@description('SQL administrator login. Required when creating a SqlAuth server; immutable afterward.')
+param sqlAdministratorLogin string = ''
+
+@secure()
+@description('SQL administrator password. Required only when creating a SqlAuth server.')
+param sqlAdministratorPassword string = ''
 
 @description('Public network access. Private-only compositions explicitly disable it.')
 @allowed(['Enabled', 'Disabled'])
@@ -37,17 +51,21 @@ resource sqlServer 'Microsoft.Sql/servers@2023-08-01-preview' = {
   name: nameLower
   location: location  
   tags: empty(tags) ? null : tags  
-  properties: {
+  properties: union({
     publicNetworkAccess: publicNetworkAccess
+  }, !createServer ? {} : authentication == 'SqlAuth' ? {
+    administratorLogin: sqlAdministratorLogin
+    administratorLoginPassword: sqlAdministratorPassword
+  } : {
     administrators: {
       administratorType: 'ActiveDirectory'
       principalType: 'Group'
-      login: entraAdministrator.login
-      sid: entraAdministrator.objectId
-      tenantId: entraAdministrator.tenantId
+      login: entraAdministrator!.login
+      sid: entraAdministrator!.objectId
+      tenantId: entraAdministrator!.tenantId
       azureADOnlyAuthentication: true
     }
-  }
+  })
 }
 
 resource sqlServerFirewall 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = if (allowAzureServices) {

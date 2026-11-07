@@ -11,6 +11,20 @@ param location string
 @description('Resource tags for owned resources.')
 param tags object = {}
 
+@description('Create the owned server. Set false for ordinary updates; authentication settings are then left unchanged.')
+param createServer bool = true
+
+@secure()
+@description('Password used only to create a SqlAuth server. Never included in the component configuration or outputs.')
+param sqlAdministratorPassword string = ''
+
+@description('Optional SQL administrator login supplied by the deployment secret. Used only for SqlAuth server creation.')
+param sqlAdministratorLogin string = ''
+
+@description('Optional creation-time authentication override. Empty preserves the typed component choice; existing servers are never converted.')
+@allowed(['', 'EntraOnly', 'SqlAuth'])
+param sqlAuthentication string = ''
+
 @description('Public network access for a newly owned server. An existing server is never modified.')
 @allowed(['Enabled', 'Disabled'])
 param publicNetworkAccess string = 'Enabled'
@@ -19,6 +33,7 @@ param publicNetworkAccess string = 'Enabled'
 param allowAzureServices bool = true
 
 var existing = sql.server.kind == 'Existing'
+var ownedAuthentication = empty(sqlAuthentication) ? sql.server.kind : sqlAuthentication
 var serverSubscriptionId = sql.server.?subscriptionId ?? subscription().subscriptionId
 var serverResourceGroupName = sql.server.?resourceGroupName ?? resourceGroup().name
 
@@ -28,9 +43,15 @@ module serverModule 'sql-sqlserver.bicep' = if (!existing) {
     name: sql.serverName
     location: location
     tags: tags
-    entraAdministrator: sql.server.?administrator!
+    entraAdministrator: sql.server.?administrator
+    authentication: ownedAuthentication == 'SqlAuth' ? 'SqlAuth' : 'EntraOnly'
+    createServer: createServer
+    sqlAdministratorLogin: empty(sqlAdministratorLogin) ? (sql.server.?administratorLogin ?? '') : sqlAdministratorLogin
+    sqlAdministratorPassword: sqlAdministratorPassword
     publicNetworkAccess: publicNetworkAccess
     allowAzureServices: allowAzureServices
+    startIpAddress: sql.?startIpAddress ?? '0.0.0.0'
+    endIpAddress: sql.?endIpAddress ?? '0.0.0.0'
   }
 }
 
@@ -67,4 +88,4 @@ output databaseResourceId string = databaseModule.outputs.id
 output databaseName string = databaseModule.outputs.name
 
 @description('Server authentication/ownership choice. Existing-server authentication must be checked before bootstrap.')
-output serverKind string = sql.server.kind
+output serverKind string = existing ? (sql.server.?authentication ?? 'EntraOnly') : ownedAuthentication

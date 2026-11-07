@@ -35,13 +35,11 @@ function Set-DotnetUserSecrets {
 
     Write-Host "Setting .NET user-secrets for project: $projectFile"
     dotnet user-secrets init --project "$projectFile" | Out-Null
-    foreach ($key in $Secrets.Keys) {
-        dotnet user-secrets set "$key" "$($Secrets[$key])" --project "$projectFile" | Out-Null
-        if ($LASTEXITCODE -ne 0) {
-            Write-Warning "*** Failed to set '$key' in user-secrets. ***"
-            return $false
-        }
-        Write-Host "  Set: $key"
+    if ($LASTEXITCODE -ne 0) { return $false }
+    $Secrets | ConvertTo-Json -Depth 10 -Compress | dotnet user-secrets set --project "$projectFile" | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning 'Failed to persist user-secrets. Values are not logged.'
+        return $false
     }
     return $true
 }
@@ -52,11 +50,14 @@ function Get-DotnetUserSecrets {
     $secrets = @{}
     $projectFile = Resolve-DotnetProjectFile $ProjectPath
     if (-not $projectFile) { return $secrets }
-    foreach ($line in @(dotnet user-secrets list --project "$projectFile" 2>$null)) {
-        $i = "$line".IndexOf(' = ')
-        if ($i -gt 0) { $secrets["$line".Substring(0, $i).Trim()] = "$line".Substring($i + 3) }
-    }
-    return $secrets
+    $secretId = (dotnet msbuild "$projectFile" -getProperty:UserSecretsId -nologo | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to resolve the project user-secrets ID.' }
+    if (-not $secretId) { return $secrets }
+    if ($secretId -match '[\\/]' -or $secretId -in @('.', '..')) { throw 'Invalid project user-secrets ID.' }
+    $root = if ($IsWindows) { Join-Path ([Environment]::GetFolderPath('ApplicationData')) 'Microsoft/UserSecrets' } else { Join-Path $HOME '.microsoft/usersecrets' }
+    $path = Join-Path (Join-Path $root $secretId) 'secrets.json'
+    if (-not (Test-Path -LiteralPath $path)) { return $secrets }
+    return Get-Content -LiteralPath $path -Raw | ConvertFrom-Json -AsHashtable
 }
 
 function Show-UnstoredSecrets {
@@ -68,17 +69,15 @@ function Show-UnstoredSecrets {
     }
 }
 
-# Stores the values in user-secrets, or prints the secret ones once when that is not possible.
+# Stores values in user-secrets without a credential-display fallback.
 function Save-DotnetUserSecrets {
     param([string]$ProjectPath, [hashtable]$Secrets, [string]$Label = 'Project', [switch]$ShowSecrets)
     $stored = Set-DotnetUserSecrets -ProjectPath $ProjectPath -Secrets $Secrets
     if (-not $stored) {
-        Write-Warning "*** $Label secrets were not stored. Secret values are shown only once below; copy them now. ***"
-        Show-UnstoredSecrets -Secrets $Secrets
+        throw "$Label secrets were not stored. Values are not printed; fix storage and rerun."
     }
     elseif ($ShowSecrets) {
-        Write-Host "$Label secrets (shown once, for CI or Key Vault):" -ForegroundColor Yellow
-        Show-UnstoredSecrets -Secrets $Secrets
+        throw 'Secret display is disabled. Use an approved secret store.'
     }
     return $stored
 }
