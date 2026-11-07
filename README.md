@@ -367,6 +367,16 @@ az deployment group create \
 
 ### 3. Supply Identity Configuration and Per-Run Overrides
 
+For the automated consumer setup, copy the complete `bicep/modules`, `bicep/types`,
+`bicep/templates`, and selected `bicep/variables` folders into `.azure/`, and `scripts/`
+into `.azure/scripts/`. The companion `github-actions` repository supplies the root
+`Initialize-Installation.ps1`, `.github/scripts/setup`, CD helpers, and workflows.
+The source modules and helpers include creation-time authentication selection, ordinary
+same-mode updates, API managed identity, safe user-secret persistence, and database-user
+provisioning. Product-specific localhost ports are supplied explicitly by the installer.
+Standalone deployments create their hosting dependencies; shared deployments reference an
+already provisioned management stack. These dependencies are not created by the installer itself.
+
 Digital-product examples create an Entra-only SQL server, an administrator **group in the workload tenant**, and an API user-assigned managed identity. They do not create that group or change External ID sign-in registrations. Replace the example GUID placeholders before deployment; placeholders are only for offline compilation.
 
 | Variable | Used by | Parameter |
