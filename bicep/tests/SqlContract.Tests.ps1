@@ -47,6 +47,17 @@ Describe 'Digital product SQL Bicep contract' {
         $template.parameters.PSObject.Properties.Name | Should -Not -Contain 'adminPassword'
     }
 
+    It 'reconciles the Entra administrator only for existing workload-owned servers' {
+        $text = az bicep build --stdout --file "$bicep\modules\sql-sqlserver.bicep"
+        $LASTEXITCODE | Should -Be 0
+        $template = $text -join "`n" | ConvertFrom-Json
+        $administrator = $template.resources.sqlServerEntraAdministrator
+        $administrator.type | Should -Be 'Microsoft.Sql/servers/administrators'
+        $administrator.condition | Should -Be "[and(not(parameters('createServer')), equals(parameters('authentication'), 'EntraOnly'))]"
+        $administrator.properties.sid | Should -Be "[parameters('entraAdministrator').objectId]"
+        (Get-Content "$bicep\modules\sqldb-workloaddatabase.bicep" -Raw) | Should -Match "module serverModule 'sql-sqlserver\.bicep' = if \(!existing\)"
+    }
+
     It 'emits the same non-secret deployment output keys in both network compositions' {
         foreach ($file in @('workload-digitalproduct.bicep', 'workload-digitalproduct-zerotrust.bicep')) {
             $text = az bicep build --stdout --file "$bicep\templates\$file" 2>&1

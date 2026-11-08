@@ -11,7 +11,7 @@ param location string
 @description('Resource tags for owned resources.')
 param tags object = {}
 
-@description('Create the owned server. Set false for ordinary updates; authentication settings are then left unchanged.')
+@description('Create the owned server. Set false for existing servers; authentication mode stays unchanged and the Entra administrator group is reconciled.')
 param createServer bool = true
 
 @secure()

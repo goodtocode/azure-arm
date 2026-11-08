@@ -21,7 +21,7 @@ param entraAdministrator {
 @allowed(['EntraOnly', 'SqlAuth'])
 param authentication string = 'EntraOnly'
 
-@description('Create a server with authentication settings. Set false for ordinary updates to an existing server.')
+@description('Create a server with authentication settings. Set false for existing servers; Entra administrator group is reconciled without changing authentication mode.')
 param createServer bool = true
 
 @description('SQL administrator login. Required when creating a SqlAuth server; immutable afterward.')
@@ -66,6 +66,17 @@ resource sqlServer 'Microsoft.Sql/servers@2023-08-01-preview' = {
       azureADOnlyAuthentication: true
     }
   })
+}
+
+resource sqlServerEntraAdministrator 'Microsoft.Sql/servers/administrators@2023-08-01-preview' = if (!createServer && authentication == 'EntraOnly') {
+  parent: sqlServer
+  name: 'ActiveDirectory'
+  properties: {
+    administratorType: 'ActiveDirectory'
+    login: entraAdministrator!.login
+    sid: entraAdministrator!.objectId
+    tenantId: entraAdministrator!.tenantId
+  }
 }
 
 resource sqlServerFirewall 'Microsoft.Sql/servers/firewallRules@2023-08-01-preview' = if (allowAzureServices) {
