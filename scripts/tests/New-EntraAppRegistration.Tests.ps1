@@ -8,6 +8,39 @@ BeforeAll {
     foreach ($a in $assignments) { Invoke-Expression $a.Extent.Text }
     $functions = $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -in $wanted }, $false)
     foreach ($f in $functions) { Invoke-Expression $f.Extent.Text }
+
+    $script:identifierUriAssignment = $ast.Find({ param($node) $node -is [System.Management.Automation.Language.AssignmentStatementAst] -and $node.Left.Extent.Text -eq '$identifierUri' }, $false).Extent.Text
+    $script:claimDefaults = @($ast.FindAll({
+        param($node)
+        $node -is [System.Management.Automation.Language.IfStatementAst] -and
+            ($node.Extent.Text.StartsWith("if (-not `$PSBoundParameters.ContainsKey('IdTokenClaims'))") -or
+             $node.Extent.Text.StartsWith("if (-not `$PSBoundParameters.ContainsKey('AccessTokenClaims'))"))
+    }, $false))
+    function Get-ClaimDefaultCounts {
+        param([string]$Type, [string[]]$IdTokenClaims, [string[]]$AccessTokenClaims)
+        Set-StrictMode -Version Latest
+        foreach ($statement in $script:claimDefaults) { Invoke-Expression $statement.Extent.Text }
+        return @($IdTokenClaims.Count, $AccessTokenClaims.Count)
+    }
+}
+
+Describe 'registration defaults under strict mode' {
+    It 'handles an empty identifier URI list' {
+        Set-StrictMode -Version Latest
+        $app = [pscustomobject]@{ IdentifierUris = @() }
+        Invoke-Expression $script:identifierUriAssignment
+        $identifierUri | Should -BeNullOrEmpty
+    }
+    It 'preserves claim arrays for <type>' -TestCases @(
+        @{ type = 'Api'; idCount = 0; accessCount = 4 }
+        @{ type = 'Web'; idCount = 7; accessCount = 0 }
+        @{ type = 'E2E'; idCount = 0; accessCount = 0 }
+    ) {
+        param($type, $idCount, $accessCount)
+        $counts = Get-ClaimDefaultCounts -Type $type
+        $counts[0] | Should -Be $idCount
+        $counts[1] | Should -Be $accessCount
+    }
 }
 
 Describe 'Get-MergedOptionalClaims' {
