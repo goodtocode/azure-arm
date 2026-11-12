@@ -46,6 +46,20 @@ param api apiConfig?
 @description('SQL Server and Database. Omit to skip.')
 param sql sqlConfig?
 
+@description('Create an owned SQL server. Set false on subsequent deployments to preserve its creation-time authentication.')
+param sqlCreateServer bool = true
+
+@secure()
+@description('Password required only when creating a SqlAuth server. Supply through an approved secret store.')
+param sqlAdministratorPassword string = ''
+
+@description('SQL administrator login override for SqlAuth creation. The pipeline supplies SQL_ADMIN_USER.')
+param sqlAdministratorLogin string = ''
+
+@description('Optional owned-server authentication choice supplied by setup. Existing servers retain their declared authentication.')
+@allowed(['', 'EntraOnly', 'SqlAuth'])
+param sqlAuthentication string = ''
+
 @description('Function App and its storage account. Omit to skip.')
 param func funcConfig?
 
@@ -112,6 +126,15 @@ var imagePullEnabled = vnet.?imagePullEnabled ?? false
 var contentShareEnabled = vnet.?contentShareEnabled ?? false
 var backupRestoreEnabled = vnet.?backupRestoreEnabled ?? false
 
+module apiIdentity '../modules/id-userassignedidentity.bicep' = if (api.?userAssignedIdentityName != null) {
+  name: 'digitalproduct-api-identity'
+  params: {
+    name: api!.userAssignedIdentityName!
+    location: location
+    tags: tags
+  }
+}
+
 module apiModule '../modules/api-appservice.bicep' = if (hasApi) {
   name: 'digitalproduct-api'
   params: {
@@ -122,6 +145,7 @@ module apiModule '../modules/api-appservice.bicep' = if (hasApi) {
     appiKey: appiKey
     appiConnection: appiConnection
     planId: planId
+    userAssignedIdentityId: api.?userAssignedIdentityName != null ? apiIdentity!.outputs.id : ''
     subnetId: subnetId
     vnetRouteAllEnabled: routeAllEnabled
     vnetImagePullEnabled: imagePullEnabled
@@ -148,16 +172,18 @@ module webModule '../modules/web-appservice.bicep' = if (hasWeb) {
   }
 }
 
-module sqlModule '../modules/sql-sqlserverdatabase.bicep' = if (hasSql) {
+module sqlModule '../modules/sqldb-workloaddatabase.bicep' = if (hasSql) {
   name: 'digitalproduct-sql'
   params: {
-    name: sql!.serverName
     location: location
     tags: tags
-    adminLogin: sql!.adminLogin
-    adminPassword: sql!.adminPassword
-    sqldbName: sql!.databaseName
-    sku: sql.?databaseSku ?? 'Basic'
+    sql: sql!
+    createServer: sqlCreateServer
+    sqlAdministratorPassword: sqlAdministratorPassword
+    sqlAdministratorLogin: sqlAdministratorLogin
+    sqlAuthentication: sqlAuthentication
+    publicNetworkAccess: sql.?publicNetworkAccess ?? 'Enabled'
+    allowAzureServices: sql.?allowAzureServices ?? true
   }
 }
 
@@ -207,4 +233,40 @@ output webResourceId string = hasWeb ? webModule!.outputs.id : ''
 output apiResourceId string = hasApi ? apiModule!.outputs.id : ''
 
 @description('SQL Server resource ID, empty when not deployed.')
-output sqlResourceId string = hasSql ? sqlModule!.outputs.id : ''
+output sqlResourceId string = hasSql ? sqlModule!.outputs.serverResourceId : ''
+
+@description('SQL server host for deployment-time bootstrap and migrations.')
+output sqlServerHost string = hasSql ? sqlModule!.outputs.serverFullyQualifiedDomainName : ''
+
+@description('SQL database name for deployment-time bootstrap and migrations.')
+output sqlDatabaseName string = hasSql ? sqlModule!.outputs.databaseName : ''
+
+@description('SQL database resource ID.')
+output sqlDatabaseResourceId string = hasSql ? sqlModule!.outputs.databaseResourceId : ''
+
+@description('SQL server ownership/authentication choice. Empty if no SQL component is deployed.')
+output sqlServerKind string = hasSql ? sqlModule!.outputs.serverKind : ''
+
+@description('API managed identity object ID for Azure RBAC, not the service-principal SQL SID.')
+output apiPrincipalId string = !hasApi ? '' : api.?userAssignedIdentityName != null ? apiIdentity!.outputs.principalId : apiModule!.outputs.principalId
+
+@description('API user-assigned identity client ID for SQL SID and explicit SqlClient identity selection. Empty for system-assigned identity.')
+output apiManagedIdentityClientId string = api.?userAssignedIdentityName != null ? apiIdentity!.outputs.clientId : ''
+
+@description('Web system-assigned identity object ID. Does not replace user sign-in credentials.')
+output webPrincipalId string = hasWeb ? webModule!.outputs.principalId : ''
+
+@description('API app name for artifact deployment.')
+output apiAppName string = hasApi ? api!.name : ''
+
+@description('Web app name for artifact deployment.')
+output webAppName string = hasWeb ? web!.name : ''
+
+@description('Actual API HTTPS endpoint, empty when not deployed.')
+output apiEndpoint string = hasApi ? 'https://${apiModule!.outputs.defaultHostName}' : ''
+
+@description('Actual web HTTPS endpoint, empty when not deployed.')
+output webEndpoint string = hasWeb ? 'https://${webModule!.outputs.defaultHostName}' : ''
+
+@description('Application Insights resource ID, independent of workload naming conventions.')
+output applicationInsightsResourceId string = isStandalone ? appiModule!.outputs.id : appiShared!.id

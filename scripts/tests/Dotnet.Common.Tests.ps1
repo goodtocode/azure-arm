@@ -47,13 +47,10 @@ Describe 'user-secrets helpers' -Skip:(-not $script:HasDotnet) {
         $result = @(Set-DotnetUserSecrets -ProjectPath (Join-Path $script:Root 'missing') -Secrets @{ 'A:B' = '1' } 3>$null 6>$null)[-1]
         $result | Should -BeFalse
     }
-    It 'prints secret values once when they cannot be stored' {
-        $captured = Save-DotnetUserSecrets -ProjectPath (Join-Path $script:Root 'missing') -Secrets @{ 'My:ClientSecret' = 'abc' } -Label 'T' 6>&1 3>&1
-        ($captured | Out-String) | Should -Match 'My:ClientSecret = abc'
-        @($captured)[-1] | Should -BeFalse
+    It 'fails without printing secret values when storage is unavailable' {
+        { Save-DotnetUserSecrets -ProjectPath (Join-Path $script:Root 'missing') -Secrets @{ 'My:ClientSecret' = 'synthetic-example' } -Label 'T' 6>$null 3>$null } | Should -Throw '*Values are not printed*'
     }
     It 'does not print values that are not secrets' {
-        $captured = Save-DotnetUserSecrets -ProjectPath (Join-Path $script:Root 'missing') -Secrets @{ 'My:ClientId' = 'abc' } -Label 'T' 6>&1 3>&1
-        ($captured | Out-String) | Should -Not -Match 'My:ClientId = abc'
+        { Save-DotnetUserSecrets -ProjectPath (Join-Path $script:Root 'missing') -Secrets @{ 'My:ClientId' = 'abc' } -Label 'T' 6>$null 3>$null } | Should -Throw '*Values are not printed*'
     }
 }

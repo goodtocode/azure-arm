@@ -31,7 +31,7 @@ if (-not (Test-Path $Target)) { throw "Target folder not found: $Target" }
 $target = (Resolve-Path $Target).Path
 if ($target -eq $source) { throw "Target and source are the same folder." }
 
-$folders = @('entra', 'dotnet', 'lib', 'tests')
+$folders = @('entra', 'dotnet', 'sql', 'lib', 'tests')
 $rootFiles = @('New-EntraDotnetSolution.ps1')
 $platformFiles = @('lib\Platform.Common.ps1', 'tests\Platform.Common.Tests.ps1')
 if ($IncludeHubAndSpoke) { $folders += 'hub-and-spoke' }

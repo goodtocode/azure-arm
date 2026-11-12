@@ -94,10 +94,10 @@ if (-not $PSBoundParameters.ContainsKey('ApplicationRoles')) {
     $ApplicationRoles = if ($Type -eq 'Api') { @('Asset.Automation') } else { @() }
 }
 if (-not $PSBoundParameters.ContainsKey('IdTokenClaims')) {
-    $IdTokenClaims = if ($Type -eq 'Web') { @('email', 'family_name', 'given_name', 'preferred_username', 'upn', 'ctry', 'ipaddr') } else { @() }
+    $IdTokenClaims = @(if ($Type -eq 'Web') { @('email', 'family_name', 'given_name', 'preferred_username', 'upn', 'ctry', 'ipaddr') })
 }
 if (-not $PSBoundParameters.ContainsKey('AccessTokenClaims')) {
-    $AccessTokenClaims = if ($Type -eq 'Api') { @('email', 'family_name', 'given_name', 'upn') } else { @() }
+    $AccessTokenClaims = @(if ($Type -eq 'Api') { @('email', 'family_name', 'given_name', 'upn') })
 }
 
 if ($Type -eq 'E2E' -and [string]::IsNullOrWhiteSpace($ApiAppId)) {
@@ -269,7 +269,7 @@ else {
     Write-Host "Already exists: $($app.AppId)."
 }
 
-$identifierUri = @($app.IdentifierUris)[0]
+$identifierUri = $app.IdentifierUris | Select-Object -First 1
 $sp = $null
 
 if (-not $SecretOnly) {

@@ -32,7 +32,7 @@ Every workload is deployed in one of four modes. The mode decides where shared r
 | 3 | `network` | Same as `shared` | Same as `shared`, plus an existing VNet subnet | Regional VNet integration, storage limited to the subnet | `workload-<archetype>` |
 | 4 | `zerotrust` | Same as `network`, plus a private endpoint per app, SQL server and storage sub-resource | Same as `network`, plus a private endpoint subnet and Private DNS zones | Private endpoints, public access disabled, all outbound traffic through the VNet | `workload-<archetype>-zerotrust` |
 
-Modes 1 to 3 share one template because they differ only in where the plan and App Insights come from and whether a subnet is supplied. Mode 4 needs private endpoints, DNS, and public access switched off on every resource, so it gets its own template instead of adding conditions to the others. Both templates import the same component types from `bicep/types/digitalproduct-types.bicep`, so a product moves from mode 3 to mode 4 by changing the variables file, not the component settings. Mode 4 does not yet cover Application Insights over Private Link, Entra-only SQL authentication, or inbound routing through Front Door or Application Gateway, and it must be deployed from a runner inside the VNet.
+Modes 1 to 3 share one template because they differ only in where the plan and App Insights come from and whether a subnet is supplied. Mode 4 needs private endpoints, DNS, and public access switched off on every resource, so it gets its own template instead of adding conditions to the others. Both templates import the same component types from `bicep/types/digitalproduct-types.bicep`, so a product moves from mode 3 to mode 4 by changing the variables file, not the component settings. Mode 4 does not yet cover Application Insights over Private Link or inbound routing through Front Door or Application Gateway, and it must be deployed from a runner inside the VNet. SQL ownership/authentication is independent of these modes: standalone hosting can create its product database on an existing server.
 
 The platform side supports modes 2 to 4 by providing the spoke management RG, the spoke network RG, and the shared AI RG. Mode 2 does not need a hub or VNet, only the spoke management resources.
 
@@ -166,12 +166,18 @@ param hosting = {
   appiName: 'mgmt-dev-wus2-001-appi'
   planName: 'mgmt-dev-wus2-F1-001-asp'
 }
-param api = { name: 'PRODUCT-dev-wus2-001-api' }
+param api = { name: 'PRODUCT-dev-wus2-001-api', userAssignedIdentityName: 'PRODUCT-dev-wus2-001-api-id' }
 param sql = {
   serverName: 'PRODUCT-dev-wus2-001-sql'
   databaseName: 'PRODUCT-dev-wus2-001-sqldb'
-  adminLogin: readEnvironmentVariable('SQL_ADMIN_USER', 'LocalAdmin')
-  adminPassword: readEnvironmentVariable('SQL_ADMIN_PASSWORD')
+  server: {
+    kind: 'EntraOnly'
+    administrator: {
+      login: 'SQL Administrators'
+      objectId: readEnvironmentVariable('SQL_ENTRA_ADMIN_GROUP_OBJECT_ID')
+      tenantId: readEnvironmentVariable('AZURE_TENANT_ID')
+    }
+  }
 }
 ```
 
@@ -359,39 +365,92 @@ az deployment group create \
 	--parameters <parameters-file>
 ```
 
-### 3. Supply Secrets and Per-Run Overrides
+### 3. Supply Identity Configuration and Per-Run Overrides
 
-Never store passwords in a variables file. The workload variables files read secrets from environment variables at build time, with the placeholder `PASS_FROM_CLI_PARAMETERS` as the fallback so the file still compiles:
+The edge template defaults to Standard Front Door with custom-rule WAF and a configurable
+300 requests/client-IP/minute rate limit. Managed threat/bot rule sets are Premium-only.
+Empty `origins` skips new profile/WAF creation, avoiding the fixed profile base fee; it never
+deletes an existing profile. Standard is approximately USD 35/month and Premium USD 330/month
+before request/transfer and any separate WAF charges. An existing Premium profile cannot be
+downgraded in place. Keep edge disabled until it has a real ingress purpose, and restrict origins
+to the selected Front Door profile before treating WAF as a protection boundary. Retain app auth/TLS.
+
+For the automated consumer setup, copy the complete `bicep/modules`, `bicep/types`,
+`bicep/templates`, and selected `bicep/variables` folders into `.azure/`, and `scripts/`
+into `.azure/scripts/`. The companion `github-actions` repository supplies the root
+`Initialize-Installation.ps1`, `.github/scripts/setup`, CD helpers, and workflows.
+The source modules and helpers include creation-time authentication selection, ordinary
+same-mode updates, API managed identity, safe user-secret persistence, and database-user
+provisioning. Product-specific localhost ports are supplied explicitly by the installer.
+Standalone deployments create their hosting dependencies; shared deployments reference an
+already provisioned management stack. These dependencies are not created by the installer itself.
+
+Digital-product examples create an Entra-only SQL server, an administrator **group in the workload tenant**, and an API user-assigned managed identity. They do not create that group or change External ID sign-in registrations. Replace the example GUID placeholders before deployment; placeholders are only for offline compilation.
 
 | Variable | Used by | Parameter |
 | --- | --- | --- |
-| `SQL_ADMIN_USER` | `workload-digitalproduct-*` | `sql.adminLogin` (optional, falls back to `LocalAdmin`) |
-| `SQL_ADMIN_PASSWORD` | `workload-digitalproduct-*` | `sql.adminPassword` |
+| `SQL_ENTRA_ADMIN_GROUP_OBJECT_ID` | Entra-only digital-product examples | `sql.server.administrator.objectId` (existing group object ID) |
+| `AZURE_TENANT_ID` | Entra-only digital-product examples | `sql.server.administrator.tenantId` (workload tenant, not necessarily External ID tenant) |
 | `VM_ADMIN_PASSWORD` | `workload-usermachines-*` | `adminPassword` |
 
-Set the variable for the session, then deploy as usual. Do not echo it, and do not commit it.
+Set the non-secret administrator IDs for the session, then deploy. Use a named deployment so app CD can read its output contract.
 
 ```powershell
-# PowerShell: prompt for the secret so it never appears in history or files
-$env:SQL_ADMIN_PASSWORD = Read-Host -Prompt 'SQL admin password' -MaskInput
+$env:SQL_ENTRA_ADMIN_GROUP_OBJECT_ID = '<workload-sql-admin-group-object-id>'
+$env:AZURE_TENANT_ID = '<workload-tenant-id>'
 
 az deployment group create `
+    --name workload-digitalproduct `
 	--resource-group <your-resource-group> `
 	--template-file bicep/templates/workload-digitalproduct.bicep `
 	--parameters bicep/variables/workload-digitalproduct-shared-dev.bicepparam
 ```
 
-```sh
-# bash: read without echo
-read -rsp 'SQL admin password: ' SQL_ADMIN_PASSWORD; export SQL_ADMIN_PASSWORD
+`sql.server.kind` is a discriminated choice:
 
-az deployment group create \
-	--resource-group <your-resource-group> \
-	--template-file bicep/templates/workload-digitalproduct.bicep \
-	--parameters bicep/variables/workload-digitalproduct-shared-dev.bicepparam
+- `EntraOnly`: create a server using `administrator: { login, objectId, tenantId }`, without a SQL administrator password.
+- `SqlAuth`: create a server using `administratorLogin`; supply the top-level secure `sqlAdministratorPassword` separately. Never put passwords inside `sql` or deployment outputs.
+- `Existing`: reference `resourceGroupName`, optional `subscriptionId`, and optional `authentication` (`EntraOnly` by default or `SqlAuth`), creating only the product database there. Its region comes from the existing server. The owner must authorize database provisioning and access; the workload never changes server settings. Adopting an existing product database requires an explicit review.
+
+`api.userAssignedIdentityName` is optional. Omit it to retain the existing system-assigned identity; set it to create a dedicated workload-owned UAMI with a stable client ID. No identity is shared between products by default. `apiPrincipalId` is for Azure RBAC; `apiManagedIdentityClientId` is for SqlClient identity selection and service-principal SQL SID, and is empty for system-assigned identity.
+
+Resource deployment does **not** authorize the identities in SQL. After infrastructure creation, run the following as an already authorized SQL Entra administrator/bootstrap principal (Azure CLI login and SqlServer PowerShell module 22+ required):
+
+```powershell
+.\scripts\sql\Set-AzureSqlManagedIdentityUsers.ps1 `
+    -ServerHost '<sqlServerHost output>' -DatabaseName '<sqlDatabaseName output>' `
+    -RuntimeName '<apiAppName output>' -RuntimeClientId '<apiManagedIdentityClientId output>' `
+    -MigrationName 'product-migrations' -MigrationClientId '<github-oidc-app-client-id>'
 ```
 
-In CI, map the variables from the pipeline secret store (for example `SQL_ADMIN_USER: ${{ secrets.SQL_ADMIN_USER }}` and `SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}` in GitHub Actions). The login must match the one the app pipelines use to connect, so set both. Prefer a Key Vault-backed secret where the pipeline supports it.
+The bootstrap uses explicit client IDs for service-principal SIDs (`TYPE = E`), avoiding Graph display-name resolution. User/group object IDs are different identifiers. Runtime receives database DML roles; migration receives DML plus `db_ddladmin`, never `db_owner`. Existing name/SID conflicts or elevated runtime grants fail explicitly. Product-specific migrations needing additional permissions require a reviewed grant by the administrator, not runtime elevation.
+
+The output contract includes app names, Application Insights resource ID, SQL host/database/resource ID/kind, and identity IDs. App deployment reads these outputs instead of guessing resource names. Runtime SqlClient uses `Authentication=Active Directory Managed Identity` with the UAMI client ID as `User Id`; migration uses its existing Azure CLI/OIDC identity.
+
+LocalDB/SQL Server Windows authentication and local clone/debug scripts are unchanged. A laptop does not require an Azure managed identity, and this resource/bootstrap slice does not remove AI keys or web confidential-client secrets.
+
+Owned SQL servers select authentication at creation. Changing authentication or the immutable SQL
+administrator login requires operator-managed replacement; pipelines never convert or delete servers.
+For ordinary redeployments, pass `sqlCreateServer=false`: creation-only administrator and authentication
+properties are omitted while tags, public network access, firewall IP ranges and databases remain managed.
+The module-level equivalent is `createServer=false`. Manual deployments must select this explicitly;
+the GitHub Actions helper selects it through read-only lookups and rejects mismatched authentication.
+New servers default to `sqlCreateServer=true`. Repeated same-mode deployments must preserve data.
+
+For `SqlAuth`, configure `SQL_ADMIN_USER`, `SQL_ADMIN_PASSWORD`, `SQL_MIGRATION_USER`, and
+`SQL_MIGRATION_PASSWORD` environment secrets before deployment. The workflows pass the administrator
+username/password to creation and automatically provision contained users after IaC and before migrations.
+The administrator is used only for provisioning; migrations use the separate migration credential.
+Runtime credentials are generated and retained in the API App Service connection string, not additional
+GitHub secrets. The helper never changes server authentication or removes existing data.
+Entra-only examples and managed-identity bootstrap remain the default.
+
+The deployment owner chooses an existing administrator group in the workload tenant.
+Censic may select its internal operations group; customer installations select a customer-owned
+group, never an embedded publisher group. This contract requires an administrator group;
+no-human-access installation is not implemented. Routine debugging should use separately
+granted least-privilege database users/groups. The administrator retains broad data access,
+independent of application tenant/owner authorization. Publisher support access is not automatic.
 
 To override a top-level parameter for one run, add inline `name=value` pairs after the `.bicepparam` file. Inline values win over the file, and the file must be a `.bicepparam` (do not mix it with a JSON parameters file). This needs a recent Azure CLI and Bicep CLI.
 
