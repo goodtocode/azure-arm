@@ -202,6 +202,11 @@ PowerShell scripts under `scripts/` automate the work around the templates. The 
 | `scripts/lib/` | Helpers the scripts above dot-source (`Entra.Common.ps1`, `Dotnet.Common.ps1`, `Platform.Common.ps1`). |
 | `scripts/tests/` | Pester tests for the helper functions and script conventions. Run `Invoke-Pester ./scripts/tests` (Pester 5 or later). |
 
+`New-EntraDotnetSolution.ps1` accepts optional `-E2EAdditionalApiRoles` with `-IncludeE2E`.
+It adds enabled, application-only roles to the API and grants them to the existing E2E
+identity alongside `Asset.Automation`, preserving unrelated permissions and existing registrations.
+No additional roles are requested by default.
+
 ---
 
 ## Key Features

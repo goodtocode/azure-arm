@@ -49,6 +49,9 @@ param(
     [string]$E2EAppRegistrationName = "",
     [string]$E2EProjectPath         = "",
 
+    # Additional application roles for the existing E2E/automation identity.
+    [string[]]$E2EAdditionalApiRoles = @(),
+
     [string]$ApiProjectPath         = "",
 
     # Secrets are gated to prevent credential sprawl
@@ -68,6 +71,12 @@ $ErrorActionPreference = 'Stop'
 if ($IncludeE2E -and [string]::IsNullOrWhiteSpace($E2EAppRegistrationName)) {
     Write-Error "FATAL: -IncludeE2E requires -E2EAppRegistrationName."
     exit 1
+}
+if ($E2EAdditionalApiRoles.Count -gt 0 -and -not $IncludeE2E) {
+    throw "Additional automation API roles require -IncludeE2E."
+}
+if (@($E2EAdditionalApiRoles | Where-Object { [string]::IsNullOrWhiteSpace($_) }).Count -gt 0) {
+    throw "Additional automation API roles must not be empty."
 }
 
 # ── .NET SDK (needed for user-secrets); modules are handled by the registration script ─
@@ -100,11 +109,16 @@ Write-Host ""
 Write-Host "──────────────────────────────────────────────────"
 Write-Host " Step 1: API App Registration (resource server)"
 Write-Host "──────────────────────────────────────────────────"
-$api = Invoke-Registration -Label 'API' -Arguments @{
+$apiArgs = @{
     Type                = 'Api'
     TenantId            = $TenantId
     AppRegistrationName = $ApiAppRegistrationName
 }
+if ($E2EAdditionalApiRoles.Count -gt 0) {
+    $apiArgs.ApplicationRoles = @(@('Asset.Automation') + $E2EAdditionalApiRoles | Select-Object -Unique)
+    $apiArgs.StrictApplicationRoles = $E2EAdditionalApiRoles
+}
+$api = Invoke-Registration -Label 'API' -Arguments $apiArgs
 Save-DotnetUserSecrets -Label 'API' -ProjectPath $ApiProjectPath -ShowSecrets:$ShowSecrets -Secrets @{
     "EntraExternalId:Instance"          = $EntraInstanceUrl
     "EntraExternalId:TenantId"          = $TenantId
@@ -163,6 +177,7 @@ if ($IncludeE2E) {
         TenantId            = $TenantId
         AppRegistrationName = $E2EAppRegistrationName
         ApiAppId            = $api.AppId
+        ApiRole             = @(@('Asset.Automation') + $E2EAdditionalApiRoles | Select-Object -Unique)
         ProjectName         = (Get-DotnetProjectName $E2EProjectPath)
         SkipPrerequisites   = $true
     }

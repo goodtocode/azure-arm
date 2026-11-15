@@ -9,11 +9,11 @@ Existing values are overwritten with the latest ones.
 
 .EXAMPLE
 # Publish the Web project's user-secrets (single line, safe to paste):
-pwsh -File ./dotnet/Sync-DotnetUserSecretKeyVault.ps1 -Direction ToKeyVault -TenantId "<tenant-id>" -SubscriptionId "<subscription-id>" -KeyVaultName "my-kv" -ProductName "compass" -ProjectName "Web" -ProjectPath "./src/Presentation.Web"
+pwsh -File ./dotnet/Sync-DotnetUserSecretKeyVault.ps1 -Direction ToKeyVault -TenantId "<tenant-id>" -SubscriptionId "<subscription-id>" -KeyVaultName "my-kv" -ProductName "example" -ProjectName "Web" -ProjectPath "./src/Presentation.Web"
 
 .EXAMPLE
 # Restore them on a new machine (single line, safe to paste):
-pwsh -File ./dotnet/Sync-DotnetUserSecretKeyVault.ps1 -Direction FromKeyVault -TenantId "<tenant-id>" -SubscriptionId "<subscription-id>" -KeyVaultName "my-kv" -ProductName "compass" -ProjectName "Web" -ProjectPath "./src/Presentation.Web"
+pwsh -File ./dotnet/Sync-DotnetUserSecretKeyVault.ps1 -Direction FromKeyVault -TenantId "<tenant-id>" -SubscriptionId "<subscription-id>" -KeyVaultName "my-kv" -ProductName "example" -ProjectName "Web" -ProjectPath "./src/Presentation.Web"
 
 .NOTES
 - Requires the .NET SDK and the Az.Accounts and Az.KeyVault modules.
