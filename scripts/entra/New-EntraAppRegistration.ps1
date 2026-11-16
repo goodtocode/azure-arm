@@ -51,12 +51,13 @@ param(
     # Web and E2E: the API registration they call. Required for E2E, optional for Web.
     [string]$ApiAppId,
     [string[]]$ApiScopes = @('access_as_user', 'assets.read', 'assets.edit', 'assets.delete'),
-    [string]$ApiRole = 'Asset.Automation',
+    [string[]]$ApiRole = @('Asset.Automation'),
 
     # Api: what the resource server exposes.
     [string[]]$Scopes = @('access_as_user', 'assets.read', 'assets.edit', 'assets.delete'),
     [string[]]$UserRoles,
     [string[]]$ApplicationRoles,
+    [string[]]$StrictApplicationRoles = @(),
     [ValidateSet(1, 2)][int]$AccessTokenVersion = 2,
 
     # Web: sign-in configuration.
@@ -102,6 +103,9 @@ if (-not $PSBoundParameters.ContainsKey('AccessTokenClaims')) {
 
 if ($Type -eq 'E2E' -and [string]::IsNullOrWhiteSpace($ApiAppId)) {
     throw "-ApiAppId is required for -Type E2E."
+}
+if ($Type -eq 'E2E' -and (@($ApiRole).Count -eq 0 -or @($ApiRole | Where-Object { [string]::IsNullOrWhiteSpace($_) }).Count -gt 0)) {
+    throw "At least one nonempty API application role is required for -Type E2E."
 }
 if ($Type -eq 'Api' -and $SecretOnly) {
     throw "A resource server does not need a client secret; -SecretOnly is not valid for -Type Api."
@@ -196,6 +200,17 @@ function New-RoleSpec([string]$Value, [string]$MemberType) {
     return @{ Id = [guid]::NewGuid(); Value = $Value; DisplayName = $t[0]; Description = $t[1]; IsEnabled = $true; AllowedMemberTypes = @($MemberType) }
 }
 
+function Assert-StrictApplicationRoles([object[]]$ExistingRoles, [string[]]$RequiredRoles, [string[]]$UserRoleValues) {
+    foreach ($strictRole in $RequiredRoles) {
+        $matchingRoles = @($ExistingRoles | Where-Object { $_.Value -eq $strictRole })
+        if ($strictRole -in $UserRoleValues -or ($matchingRoles | Where-Object {
+            -not $_.IsEnabled -or @($_.AllowedMemberTypes).Count -ne 1 -or 'Application' -notin $_.AllowedMemberTypes
+        })) {
+            throw "Role '$strictRole' must be enabled and restricted to application members. Correct the existing role before continuing."
+        }
+    }
+}
+
 function ConvertTo-ClaimSpec($c) {
     $spec = @{ name = $c.Name }
     if ($c.Source) { $spec.source = $c.Source }
@@ -242,6 +257,24 @@ function Get-MergedResourceAccess($app, [string]$ResourceAppId, [object[]]$Wante
     }
     if (-not $changed) { return $null }
     return @($byResource.Keys | ForEach-Object { @{ ResourceAppId = $_; ResourceAccess = @($byResource[$_]) } })
+}
+
+function Get-ApiApplicationRoles($api, [string[]]$RoleNames, [string]$ResourceAppId) {
+    foreach ($name in ($RoleNames | Select-Object -Unique)) {
+        $role = $api.AppRoles | Where-Object {
+            $_.Value -eq $name -and $_.IsEnabled -and $_.AllowedMemberTypes -contains 'Application'
+        } | Select-Object -First 1
+        if (-not $role) { throw "Enabled application role '$name' not found on API '$ResourceAppId'." }
+        $role
+    }
+}
+
+function Get-MissingApiRoleAssignments([object[]]$Roles, [object[]]$Assignments, $ResourceId) {
+    foreach ($role in $Roles) {
+        if (-not ($Assignments | Where-Object { $_.AppRoleId -eq $role.Id -and $_.ResourceId -eq $ResourceId })) {
+            $role
+        }
+    }
 }
 
 # ── Resolve the API this registration depends on ──────────────────────────────
@@ -298,6 +331,7 @@ if (-not $SecretOnly) {
 
     if ($Type -in 'Api', 'Web') {
         $existingRoles = @(@($app.AppRoles) | Where-Object { $_ } | ForEach-Object { ConvertTo-RoleSpec $_ })
+        Assert-StrictApplicationRoles $existingRoles $StrictApplicationRoles $UserRoles
         $existingRoleValues = @($existingRoles | ForEach-Object { $_.Value })
         $newRoles = @()
         $newRoles += @($UserRoles | Where-Object { $_ -and $_ -notin $existingRoleValues } | ForEach-Object { New-RoleSpec $_ 'User' })
@@ -347,9 +381,9 @@ if (-not $SecretOnly) {
     }
 
     if ($Type -eq 'E2E') {
-        $role = $apiReg.AppRoles | Where-Object { $_.Value -eq $ApiRole -and $_.AllowedMemberTypes -contains 'Application' } | Select-Object -First 1
-        if (-not $role) { throw "Application role '$ApiRole' not found on API '$ApiAppId'. Create the API with -ApplicationRoles '$ApiRole' first." }
-        $merged = Get-MergedResourceAccess $app $ApiAppId @(@{ Id = $role.Id; Type = 'Role' })
+        $roles = @(Get-ApiApplicationRoles $apiReg $ApiRole $ApiAppId)
+        $wantedRoles = @($roles | ForEach-Object { @{ Id = $_.Id; Type = 'Role' } })
+        $merged = Get-MergedResourceAccess $app $ApiAppId $wantedRoles
         if ($merged) { Update-MgApplication -ApplicationId $app.Id -RequiredResourceAccess $merged; $app = Wait-ForApplication $app.Id }
     }
 
@@ -367,10 +401,9 @@ if (-not $SecretOnly) {
 
     if ($Type -eq 'E2E') {
         $apiSp = Get-OrNew-ServicePrincipal $ApiAppId
-        $assigned = Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $sp.Id -ErrorAction SilentlyContinue |
-            Where-Object { $_.AppRoleId -eq $role.Id -and $_.ResourceId -eq $apiSp.Id }
-        if (-not $assigned) {
-            Write-Host "Granting '$ApiRole' to the E2E service principal..."
+        $assigned = @(Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $sp.Id -All -ErrorAction Stop)
+        foreach ($role in @(Get-MissingApiRoleAssignments $roles $assigned $apiSp.Id)) {
+            Write-Host "Granting '$($role.Value)' to the automation service principal..."
             New-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $sp.Id -PrincipalId $sp.Id -ResourceId $apiSp.Id -AppRoleId $role.Id | Out-Null
         }
     }
